@@ -69,3 +69,17 @@ document.addEventListener("DOMContentLoaded", () => {
     form.reset();
   });
 });
+
+// BACK-TO-TOP VISIBILITY
+document.addEventListener("DOMContentLoaded", () => {
+  const backToTop = document.querySelector(".back-to-top");
+  if (!backToTop) return;
+
+  const toggleVisibility = () => {
+    if (window.scrollY > 200) backToTop.classList.add("is-visible");
+    else backToTop.classList.remove("is-visible");
+  };
+
+  toggleVisibility();
+  window.addEventListener("scroll", toggleVisibility, { passive: true });
+});

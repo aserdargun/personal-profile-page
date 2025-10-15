@@ -196,6 +196,10 @@ header { background: linear-gradient(180deg, var(--surface) 0%, transparent 100%
   box-shadow: 0 6px 20px rgba(2, 6, 23, .15);
   border-color: var(--primary);
 }
+.back-to-top:hover,
+.back-to-top:focus-visible {
+  transform: translateX(-50%);
+}
 
 /* ===== About ===== */
 .about { display: grid; gap: 1.25rem; }
@@ -249,6 +253,15 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
   left: 50%;
   transform: translateX(-50%);
   z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 /* ===== Reduced motion ===== */
