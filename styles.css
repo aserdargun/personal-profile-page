@@ -246,13 +246,9 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
 .back-to-top {
   position: fixed;
   bottom: clamp(1.25rem, 4vw, 2.5rem);
-  right: clamp(1rem, 4vw, 2.5rem);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 90;
-}
-@media (max-width: 640px) {
-  .back-to-top {
-    right: 1rem;
-  }
 }
 
 /* ===== Reduced motion ===== */
