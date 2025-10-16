@@ -51,28 +51,6 @@ document.documentElement.classList.add("has-js");
   });
 })();
 
-// CONTACT FORM (progressive enhancement, accessible status)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("contact-form");
-  const status = document.getElementById("form-status");
-  if (!form || !status) return;
-
-  form.addEventListener("submit", (e) => {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      form.reportValidity();
-      status.textContent = "Please fill out all required fields.";
-      status.setAttribute("role", "alert");
-      return;
-    }
-    // Simulate success (replace with real submit/XHR if needed)
-    e.preventDefault();
-    status.textContent = "Thanks! Your message has been sent.";
-    status.setAttribute("role", "status");
-    form.reset();
-  });
-});
-
 // BACK-TO-TOP VISIBILITY
 document.addEventListener("DOMContentLoaded", () => {
   const backToTop = document.querySelector(".back-to-top");
