@@ -755,15 +755,25 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
 
 
 @media (max-width: 720px) {
-  .brand-group { flex-wrap: wrap; gap: .75rem; }
-  .brand-links { gap: .25rem; }
+  .nav-inner { padding: .75rem .75rem; align-items: flex-start; }
+  .brand-group { flex-wrap: wrap; gap: .75rem; width: 100%; justify-content: space-between; }
+  .brand { order: 0; }
+  .brand-links { gap: .3rem; flex-wrap: wrap; }
+  .brand-links .icon-btn { width: 32px; height: 32px; }
+  .section { padding-block: clamp(2.4rem, 8vw, 3.4rem); }
+  .hero { padding-block: clamp(1.8rem, 7vw, 2.6rem); }
+  .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .lead { font-size: .98rem; max-width: 60ch; }
+  .stage-grid { gap: 1.2rem; grid-template-columns: minmax(0, 1fr); }
+  .stage-card { padding: 1rem; }
+  .stage-card__icon { inline-size: clamp(40px, 10vw, 46px); block-size: clamp(40px, 10vw, 46px); }
 }
 @media (max-width: 540px) {
-  .brand-group { flex-direction: column; align-items: flex-start; gap: .75rem; }
-}
-@media (max-width: 720px) {
-  .section { padding-block: clamp(2.5rem, 8vw, 3.5rem); }
-  .hero { padding-block: clamp(2rem, 8vw, 3rem); }
+  .brand-group { flex-direction: column; align-items: flex-start; gap: .65rem; }
+  .brand-links { gap: .2rem; }
+  .hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); }
+  .animated-name::before { inset: -35% -15%; }
+  .stage-card__list li { font-size: .95rem; }
 }
 
 @media (max-width: 600px) {
