@@ -125,7 +125,7 @@ header { background: linear-gradient(180deg, var(--surface) 0%, transparent 100%
 .brand { display: inline-flex; align-items: center; gap: .5rem; text-decoration: none; color: inherit; font-weight: 800; letter-spacing: .2px; flex: 1 1 auto; min-width: 0; margin-right: auto; }
 .brand-name { white-space: nowrap; font-size: clamp(1rem, 3.2vw, 1.35rem); }
 
-.brand-links { display: inline-flex; align-items: center; gap: .4rem; padding: 0; margin: 0; list-style: none; flex: 0 0 auto; margin-left: auto; }
+.brand-links { display: inline-flex; align-items: center; gap: .4rem; padding: 0; margin: 0; list-style: none; flex: 0 0 auto; margin-left: auto; flex-shrink: 0; }
 .brand-links .icon-btn { width: 36px; height: 36px; }
 .brand-mark {
   position: relative;
@@ -757,11 +757,12 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
 
 
 @media (max-width: 720px) {
-  .nav-inner { padding: .75rem .75rem; align-items: center; }
-  .brand-group { width: 100%; gap: .6rem; flex-wrap: nowrap; align-items: center; }
-  .brand-name { font-size: clamp(.95rem, 3.4vw, 1.15rem); }
-  .brand-links { gap: .24rem; flex-wrap: nowrap; margin-left: auto; }
-  .brand-links .icon-btn { width: 30px; height: 30px; }
+  .nav-inner { padding: .7rem .7rem; align-items: center; gap: .55rem; }
+  .brand-group { width: 100%; gap: .45rem; flex-wrap: nowrap; align-items: center; }
+  .brand { flex: 0 1 auto; max-width: calc(100% - 120px); }
+  .brand-name { font-size: clamp(.95rem, 3.2vw, 1.15rem); }
+  .brand-links { gap: .22rem; flex-wrap: nowrap; margin-left: auto; }
+  .brand-links .icon-btn { width: 28px; height: 28px; }
   .section { padding-block: clamp(2.4rem, 8vw, 3.4rem); }
   .hero { padding-block: clamp(1.8rem, 7vw, 2.6rem); }
   .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
@@ -771,20 +772,24 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
   .stage-card__icon { inline-size: clamp(40px, 10vw, 46px); block-size: clamp(40px, 10vw, 46px); }
 }
 @media (max-width: 540px) {
-  .brand-group { justify-content: space-between; gap: .45rem; }
-  .brand-links { gap: .18rem; }
+  .brand-group { justify-content: space-between; gap: .35rem; }
+  .brand { max-width: calc(100% - 100px); }
+  .brand-name { font-size: clamp(.9rem, 3.6vw, 1.05rem); }
+  .brand-links { gap: .16rem; }
+  .brand-links .icon-btn { width: 26px; height: 26px; }
   .hero h1 { font-size: clamp(1.5rem, 7vw, 2rem); }
   .animated-name::before { inset: -30% -12%; }
   .stage-card__list li { font-size: .95rem; }
 }
 @media (max-width: 420px) {
-  .nav-inner { gap: .55rem; padding: .6rem .6rem; }
-  .brand-group { gap: .45rem; flex-wrap: nowrap; }
-  .brand-links { gap: .16rem; }
-  .brand-links .icon-btn { width: 26px; height: 26px; }
+  .nav-inner { gap: .45rem; padding: .55rem .55rem; }
+  .brand-group { gap: .3rem; flex-wrap: nowrap; align-items: center; }
+  .brand { max-width: calc(100% - 88px); }
+  .brand-name { font-size: clamp(.82rem, 4.5vw, .98rem); }
+  .brand-links { gap: .12rem; }
+  .brand-links .icon-btn { width: 24px; height: 24px; }
   .container { width: min(100% - 1.25rem, var(--maxw)); }
   .nav-list { width: 100%; gap: .5rem; }
-  .brand-name { font-size: clamp(.9rem, 4vw, 1.05rem); }
   .hero h1 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); line-height: 1.15; }
   .lead { font-size: .95rem; }
   .animated-name { gap: .03em; }
