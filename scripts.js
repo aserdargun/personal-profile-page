@@ -1,3 +1,6 @@
+// Flag JS support for progressive enhancements
+document.documentElement.classList.add("has-js");
+
 // THEME TOGGLE (remembers preference)
 (function () {
   const root = document.documentElement;
@@ -82,4 +85,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   toggleVisibility();
   window.addEventListener("scroll", toggleVisibility, { passive: true });
+});
+
+// MOBILE NAV TOGGLE
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("menu-toggle");
+  const navList = document.getElementById("primary-nav");
+  if (!toggle || !navList) return;
+
+  const closeMenu = () => {
+    navList.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation menu");
+  };
+
+  toggle.addEventListener("click", () => {
+    const isOpen = toggle.getAttribute("aria-expanded") === "true";
+    if (isOpen) {
+      closeMenu();
+    } else {
+      navList.classList.add("is-open");
+      toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", "Close navigation menu");
+    }
+  });
+
+  const handleEscape = (event) => {
+    if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      closeMenu();
+      toggle.focus();
+    }
+  };
+  toggle.addEventListener("keydown", handleEscape);
+  navList.addEventListener("keydown", handleEscape);
+
+  navList.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      if (toggle.getAttribute("aria-expanded") === "true") closeMenu();
+    });
+  });
+
+  if (typeof window.matchMedia === "function") {
+    const mediaQuery = window.matchMedia("(min-width: 721px)");
+    const handleChange = (event) => {
+      if (event.matches) closeMenu();
+    };
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange);
+    } else if (typeof mediaQuery.addListener === "function") {
+      mediaQuery.addListener(handleChange);
+    }
+  }
+
+  closeMenu();
 });
