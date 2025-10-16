@@ -775,6 +775,20 @@ footer { border-top: 1px solid var(--border); background: var(--surface); }
   .animated-name::before { inset: -35% -15%; }
   .stage-card__list li { font-size: .95rem; }
 }
+@media (max-width: 420px) {
+  .nav-inner { gap: .6rem; padding: .65rem .65rem; }
+  .brand-group { gap: .6rem; }
+  .brand-links { gap: .18rem; }
+  .brand-links .icon-btn { width: 28px; height: 28px; }
+  .container { width: min(100% - 1.25rem, var(--maxw)); }
+  .nav-list { width: 100%; gap: .5rem; }
+  .hero h1 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); line-height: 1.15; }
+  .lead { font-size: .95rem; }
+  .stage-card { padding: .9rem; gap: .6rem; }
+  .stage-card__icon { inline-size: clamp(36px, 9vw, 42px); block-size: clamp(36px, 9vw, 42px); }
+  .stage-card__meta { font-size: .75rem; }
+  .stage-card h3 { font-size: clamp(1.05rem, 4.8vw, 1.2rem); }
+}
 
 @media (max-width: 600px) {
   .container { width: min(100% - 1.5rem, var(--maxw)); }
