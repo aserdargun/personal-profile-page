@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Thermal Power Plants Conditions</title>
+  <title>Power Plants Condition Monitoring</title>
   <meta name="description" content="Static dashboard for thermal power plants showing key KPIs with status colors." />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -16,7 +16,7 @@
         <a class="home-link" href="../../../index.html">&larr; Back to Main Portfolio</a>
       </div>
       <p class="eyebrow">Stage 1: Frontend Foundations</p>
-      <h1>Thermal Power Plants Conditions</h1>
+      <h1>Power Plants KPI</h1>
       <p class="lede">
         Quick status view of baseline KPIs for lignite and natural gas thermal units. Traffic light colors reflect
         latest thresholds and trend direction.
@@ -34,7 +34,7 @@
 
         <dl class="kpi-grid">
           <div class="kpi-tile" data-state="good">
-            <dt>Active Power</dt>
+            <dt>Active Power Capacity</dt>
             <dd>
               <span class="kpi-value">
                 450
@@ -50,11 +50,11 @@
           </div>
 
           <div class="kpi-tile" data-state="warning">
-            <dt>Ambient Temperature</dt>
+            <dt>Availability</dt>
             <dd>
               <span class="kpi-value">
                 30
-                <span class="kpi-unit">degC</span>
+                <span class="kpi-unit">C</span>
               </span>
               <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -66,17 +66,17 @@
           </div>
 
           <div class="kpi-tile" data-state="critical">
-            <dt>Vibration Max</dt>
+            <dt>Availability</dt>
             <dd>
               <span class="kpi-value">
-                7.1
-                <span class="kpi-unit">mm/s</span>
+                95
+                <span class="kpi-unit">%</span>
               </span>
-              <span class="kpi-trend kpi-trend--up" aria-label="Up 0.6 mm per s">
+              <span class="kpi-trend kpi-trend--up" aria-label="Up 6 %">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
                   <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
                 </svg>
-                +0.6
+                +1
               </span>
             </dd>
           </div>
@@ -111,9 +111,9 @@
             <dd>
               <span class="kpi-value">
                 20
-                <span class="kpi-unit">degC</span>
+                <span class="kpi-unit">C</span>
               </span>
-              <span class="kpi-trend kpi-trend--down" aria-label="Down 0.8 degC">
+              <span class="kpi-trend kpi-trend--down" aria-label="Down 0.8 C">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
                   <path d="m8 12.8 5.6-5.6-1.1-1.1L8.8 9.8V3.2H7.2v6.6L3.5 6.1l-1.1 1.1z" />
                 </svg>
@@ -123,11 +123,11 @@
           </div>
 
           <div class="kpi-tile" data-state="warning">
-            <dt>Vibration Max</dt>
+            <dt>Availability</dt>
             <dd>
               <span class="kpi-value">
-                4.3
-                <span class="kpi-unit">mm/s</span>
+                50
+                <span class="kpi-unit">%</span>
               </span>
               <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -168,7 +168,7 @@
             <dd>
               <span class="kpi-value">
                 21
-                <span class="kpi-unit">degC</span>
+                <span class="kpi-unit">C</span>
               </span>
               <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -180,13 +180,13 @@
           </div>
 
           <div class="kpi-tile" data-state="critical">
-            <dt>Vibration Max</dt>
+            <dt>Availability</dt>
             <dd>
               <span class="kpi-value">
-                6.5
-                <span class="kpi-unit">mm/s</span>
+                57
+                <span class="kpi-unit">%</span>
               </span>
-              <span class="kpi-trend kpi-trend--up" aria-label="Up 0.9 mm per s">
+              <span class="kpi-trend kpi-trend--up" aria-label="Up 0.9 %">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
                   <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
                 </svg>

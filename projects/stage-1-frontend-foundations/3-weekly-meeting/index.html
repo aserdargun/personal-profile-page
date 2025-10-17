@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weekly Meeting Form | Stage 1 Foundations</title>
+  <meta name="description" content="Accessible weekly meeting form with autosave, export, and import capabilities." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body id="top">
+  <header class="page-header">
+    <div class="container">
+      <div class="header-actions">
+        <a class="home-link" href="../../../index.html">&larr; Back to Main Portfolio</a>
+      </div>
+      <p class="eyebrow">Stage 1: Frontend Foundations</p>
+      <h1>Performance Weekly Sync</h1>
+      <p class="lede">
+        Capture agenda items, live issues, and action assignments for the weekly meeting. Drafts persist locally and
+        can be exported or imported for handoffs.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section aria-label="Weekly meeting form">
+      <form id="meeting-form" novalidate>
+        <fieldset class="field-group">
+          <legend>Meeting Details</legend>
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">Meeting date</span>
+              <input type="date" name="meetingDate" required />
+            </label>
+            <label class="field">
+              <span class="field-label">Facilitator</span>
+              <input type="text" name="facilitator" required placeholder="e.g., Serdar Gundogdu" />
+            </label>
+            <label class="field">
+              <span class="field-label">Location</span>
+              <input type="text" name="location" placeholder="Conference room or Teams link" />
+            </label>
+            <label class="field">
+              <span class="field-label">Attendees</span>
+              <input type="text" name="attendees" placeholder="Comma separated names" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>Agenda</legend>
+          <label class="field">
+            <span class="field-label">Planned topics</span>
+            <textarea name="agenda" rows="6" placeholder="- Review KPIs&#10;- Maintenance plan&#10;- Project updates"
+              required></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>Issues &amp; Risks</legend>
+          <label class="field">
+            <span class="field-label">Current issues</span>
+            <textarea name="issues" rows="6"
+              placeholder="- Turbine vibration trend on Unit 2&#10;- Supplier delays for spare blades"></textarea>
+          </label>
+          <label class="field">
+            <span class="field-label">Mitigation notes</span>
+            <textarea name="mitigations" rows="4"
+              placeholder="Outline proposed solutions, owners, and next checkpoints."></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>Action Items</legend>
+          <label class="field">
+            <span class="field-label">New actions</span>
+            <textarea name="actions" rows="6" placeholder="- [Owner] Task (due date)&#10;- [Owner] Task (due date)"
+              required></textarea>
+          </label>
+          <label class="field checkbox-field">
+            <input type="checkbox" name="sendSummary" />
+            <span>Send summary to all attendees after the meeting</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>Additional Notes</legend>
+          <label class="field">
+            <span class="field-label">Reference links or attachments</span>
+            <textarea name="references" rows="4"
+              placeholder="Paste shared drive links, dashboards, or reference docs."></textarea>
+          </label>
+        </fieldset>
+
+        <div class="actions" role="group" aria-label="Form actions">
+          <button type="submit" class="btn primary">Submit Snapshot</button>
+          <button type="button" id="clear-draft" class="btn ghost">Clear Draft</button>
+          <button type="button" id="export-draft" class="btn ghost">Export JSON</button>
+          <label class="import-btn btn ghost" for="import-file">
+            Import JSON
+            <input type="file" id="import-file" accept="application/json" />
+          </label>
+        </div>
+        <p id="form-status" class="form-status" role="status" aria-live="polite">Draft not saved yet.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-actions">
+      <a class="btn ghost back-to-top" href="#top">Back to top</a>
+    </div>
+  </footer>
+
+  <script src="scripts.js"></script>
+</body>
+
+</html>

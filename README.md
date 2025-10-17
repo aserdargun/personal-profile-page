@@ -13,40 +13,35 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 
 # Stage 1 — Frontend Foundations (Descriptive UI skills)
 
-1) **Plant Glossary & Components (Responsive Cards)**
+1) **Power Plants Asset Glossary (Responsive Cards)**
 - **Goal:** Learn semantic HTML, accessible layout, and mobile-first CSS.
 - **Stack:** HTML, CSS, vanilla JS.
 - **Build:** A glossary with cards for boiler, turbine, condenser, common failures; anchor links & search filter.
 - **Key skills:** Semantics, Grid/Flexbox, A11y basics, query selectors.
 - **Done when:** Keyboard navigable; works well on mobile; search filters cards live.
 
-2) **KPI Tiles (Static Mock Dashboard)**
+2) **Power Plants Condition Monitoring (Static Mock Dashboard)**
 - **Goal:** Practice data-first UI composition and status color rules.
 - **Stack:** HTML, CSS.
 - **Build:** Tiles for Heat Rate, Availability, Vibration Max with thresholds and trend arrows.
 - **Key skills:** CSS variables, prefers-reduced-motion, visual hierarchy.
 - **Done when:** Tiles adapt to light/dark, clear good/warning/critical states.
 
-3) **Weekly Meeting Form (LocalStorage)**
+3) **Performance Weekly Sync (LocalStorage)**
 - **Goal:** Accessible forms + client-side persistence.
 - **Stack:** HTML, CSS, JS.
 - **Build:** Log agenda, issues, actions; autosave drafts to LocalStorage.
 - **Key skills:** Form semantics, validation, persistence.
 - **Done when:** Draft survives refresh; export/import JSON works.
 
-3) **P&ID SVG Viewer**
+---
+
+4) **P&ID SVG Viewer**
 - **Goal:** Master SVG UX (pan/zoom/tooltip).
 - **Stack:** HTML, CSS, JS (SVG).
 - **Build:** Load a static P&ID SVG; zoom/pan; tooltips for pumps/valves/HX.
 - **Key skills:** SVG transforms, focus management, keyboard panning.
 - **Done when:** Mouse + keyboard zoom/pan; components highlight and read labels.
-
-4) **Weekly Meeting Form (LocalStorage)**
-- **Goal:** Accessible forms + client-side persistence.
-- **Stack:** HTML, CSS, JS.
-- **Build:** Log agenda, issues, actions; autosave drafts to LocalStorage.
-- **Key skills:** Form semantics, validation, persistence.
-- **Done when:** Draft survives refresh; export/import JSON works.
 
 5) **Troubleshooting Wizard (Decision Tree)**
 - **Goal:** Progressive disclosure & state handling.
