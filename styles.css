@@ -11,10 +11,11 @@
     --border: #e2e8f0;
     --shadow: 0 1px 2px rgba(2, 6, 23, .06), 0 8px 24px rgba(2, 6, 23, .08);
     --radius: 16px;
-    --maxw: 72rem;
+    --max: 72rem;
     --cert-pill-width: clamp(260px, 44ch, 420px);
     --focus: 2px dashed var(--primary);
     --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --nav-offset: 1rem; /* matches sticky nav height to align section anchors */
     color-scheme: light dark;
     /* respect system by default */
 }
@@ -196,7 +197,7 @@ img {
 }
 
 section {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: var(--nav-offset);
 }
 
 .section-title {
