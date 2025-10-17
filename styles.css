@@ -1029,6 +1029,7 @@ header {
     border-radius: 18px;
     display: grid;
     place-items: center;
+    align-self: start;
     background: linear-gradient(135deg, rgba(37, 99, 235, .25), rgba(14, 165, 233, .2));
     box-shadow: 0 10px 24px rgba(15, 23, 42, .18);
     position: relative;
