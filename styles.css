@@ -80,12 +80,71 @@ body {
 
 a {
     color: var(--primary);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 2px;
+    text-decoration: none;
+    position: relative;
+    transition: color .2s ease;
 }
 
-a:hover {
-    text-decoration-thickness: 3px;
+a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -.25em;
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #38bdf8));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .2s ease, opacity .2s ease;
+    opacity: 0;
+}
+
+a:hover,
+a:focus-visible {
+    color: color-mix(in srgb, var(--primary) 80%, #38bdf8 20%);
+}
+
+a:hover::after,
+a:focus-visible::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+a.btn::after,
+a.icon-btn::after,
+a.brand::after,
+.section-title__link::after,
+.badge::after,
+.nav-list a::after {
+    display: none;
+}
+
+.nav-list a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-list a::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: .2rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .2s ease, opacity .2s ease;
+    opacity: 0;
+}
+
+.nav-list a:hover::before,
+.nav-list a:focus-visible::before,
+.nav-list .active a::before {
+    transform: scaleX(1);
+    opacity: .85;
 }
 
 img {
