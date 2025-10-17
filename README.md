@@ -27,6 +27,13 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** CSS variables, prefers-reduced-motion, visual hierarchy.
 - **Done when:** Tiles adapt to light/dark, clear good/warning/critical states.
 
+3) **Weekly Meeting Form (LocalStorage)**
+- **Goal:** Accessible forms + client-side persistence.
+- **Stack:** HTML, CSS, JS.
+- **Build:** Log agenda, issues, actions; autosave drafts to LocalStorage.
+- **Key skills:** Form semantics, validation, persistence.
+- **Done when:** Draft survives refresh; export/import JSON works.
+
 3) **P&ID SVG Viewer**
 - **Goal:** Master SVG UX (pan/zoom/tooltip).
 - **Stack:** HTML, CSS, JS (SVG).
