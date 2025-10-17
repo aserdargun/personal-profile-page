@@ -5,6 +5,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const cards = Array.from(document.querySelectorAll('.glossary-card'));
   const status = document.querySelector('#search-status');
 
+  const backToTop = document.querySelector('.back-to-top');
+
+  if (backToTop) {
+    const toggleBackToTop = () => {
+      if (window.scrollY > 200) {
+        backToTop.classList.add('is-visible');
+      } else {
+        backToTop.classList.remove('is-visible');
+      }
+    };
+
+    toggleBackToTop();
+    window.addEventListener('scroll', toggleBackToTop, { passive: true });
+  }
+
   if (!searchInput || cards.length === 0 || !status) {
     return;
   }

@@ -154,8 +154,15 @@ a:focus-visible {
   backdrop-filter: blur(10px);
   box-shadow: 0 14px 36px rgba(15, 23, 42, 0.32);
   padding-inline: 1.4rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
 
+.back-to-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .back-to-top:hover,
 .back-to-top:focus-visible {
