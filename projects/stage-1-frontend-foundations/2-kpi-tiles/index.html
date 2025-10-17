@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thermal KPI Tiles</title>
+    <meta
+      name="description"
+      content="Static dashboard for thermal power plants showing key KPIs with status colors."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div class="container">
+        <p class="eyebrow">Stage 1 - KPI Tiles</p>
+        <h1>Thermal Power Portfolio</h1>
+        <p class="lede">
+          Quick status view of baseline KPIs for lignite and natural gas thermal units. Traffic light colors reflect
+          latest thresholds and trend direction.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="plant-grid" aria-label="Thermal plant KPIs">
+        <article class="plant-card">
+          <header class="plant-card__header">
+            <h2>Lignite Thermal Power Plant</h2>
+            <span class="plant-card__badge plant-card__badge--warning">Ramp limited</span>
+          </header>
+
+          <dl class="kpi-grid">
+            <div class="kpi-tile" data-state="good">
+              <dt>Active Power</dt>
+              <dd>
+                <span class="kpi-value">
+                  482
+                  <span class="kpi-unit">MW</span>
+                </span>
+                <span class="kpi-trend kpi-trend--up" aria-label="Up 4 MW">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
+                  </svg>
+                  +4
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="warning">
+              <dt>Ambient Temperature</dt>
+              <dd>
+                <span class="kpi-value">
+                  37.8
+                  <span class="kpi-unit">degC</span>
+                </span>
+                <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M2 9.2h12v-1.6H2z" />
+                  </svg>
+                  0.0
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="critical">
+              <dt>Vibration Max</dt>
+              <dd>
+                <span class="kpi-value">
+                  7.1
+                  <span class="kpi-unit">mm/s</span>
+                </span>
+                <span class="kpi-trend kpi-trend--up" aria-label="Up 0.6 mm per s">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
+                  </svg>
+                  +0.6
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="plant-card">
+          <header class="plant-card__header">
+            <h2>Natural Gas Thermal Power Plant 1</h2>
+            <span class="plant-card__badge plant-card__badge--good">Dispatch ready</span>
+          </header>
+
+          <dl class="kpi-grid">
+            <div class="kpi-tile" data-state="good">
+              <dt>Active Power</dt>
+              <dd>
+                <span class="kpi-value">
+                  612
+                  <span class="kpi-unit">MW</span>
+                </span>
+                <span class="kpi-trend kpi-trend--up" aria-label="Up 8 MW">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
+                  </svg>
+                  +8
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="good">
+              <dt>Ambient Temperature</dt>
+              <dd>
+                <span class="kpi-value">
+                  31.4
+                  <span class="kpi-unit">degC</span>
+                </span>
+                <span class="kpi-trend kpi-trend--down" aria-label="Down 0.8 degC">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="m8 12.8 5.6-5.6-1.1-1.1L8.8 9.8V3.2H7.2v6.6L3.5 6.1l-1.1 1.1z" />
+                  </svg>
+                  -0.8
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="warning">
+              <dt>Vibration Max</dt>
+              <dd>
+                <span class="kpi-value">
+                  4.3
+                  <span class="kpi-unit">mm/s</span>
+                </span>
+                <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M2 9.2h12v-1.6H2z" />
+                  </svg>
+                  0.0
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="plant-card">
+          <header class="plant-card__header">
+            <h2>Natural Gas Thermal Power Plant 2</h2>
+            <span class="plant-card__badge plant-card__badge--critical">Alerted</span>
+          </header>
+
+          <dl class="kpi-grid">
+            <div class="kpi-tile" data-state="warning">
+              <dt>Active Power</dt>
+              <dd>
+                <span class="kpi-value">
+                  405
+                  <span class="kpi-unit">MW</span>
+                </span>
+                <span class="kpi-trend kpi-trend--down" aria-label="Down 12 MW">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="m8 12.8 5.6-5.6-1.1-1.1L8.8 9.8V3.2H7.2v6.6L3.5 6.1l-1.1 1.1z" />
+                  </svg>
+                  -12
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="good">
+              <dt>Ambient Temperature</dt>
+              <dd>
+                <span class="kpi-value">
+                  28.9
+                  <span class="kpi-unit">degC</span>
+                </span>
+                <span class="kpi-trend kpi-trend--steady" aria-label="Holding steady">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M2 9.2h12v-1.6H2z" />
+                  </svg>
+                  0.0
+                </span>
+              </dd>
+            </div>
+
+            <div class="kpi-tile" data-state="critical">
+              <dt>Vibration Max</dt>
+              <dd>
+                <span class="kpi-value">
+                  6.5
+                  <span class="kpi-unit">mm/s</span>
+                </span>
+                <span class="kpi-trend kpi-trend--up" aria-label="Up 0.9 mm per s">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 3.2 2.4 8.8l1.1 1.1L7.2 6.2v6.6h1.6V6.2l3.7 3.7 1.1-1.1z" />
+                  </svg>
+                  +0.9
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

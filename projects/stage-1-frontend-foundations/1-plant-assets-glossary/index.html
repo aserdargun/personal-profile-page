@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plant Asset Glossary | Stage 1 Frontend Foundations</title>
+  <meta name="description"
+    content="Glossary of power plant assets and failure modes with semantic HTML, accessible navigation, and live search." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="scripts.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#glossary">Skip to glossary</a>
+  <header class="page-header">
+    <div class="wrapper">
+      <div class="page-title">
+        <span class="title__icon" aria-hidden="true">
+          <svg viewBox="0 0 72 72" role="presentation">
+            <ellipse cx="36" cy="16" rx="12" ry="4.5" fill="none" stroke="currentColor" stroke-width="3" />
+            <path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+              d="M24 18L18 58h36L48 18" />
+            <circle cx="36" cy="32" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+            <path fill="none" stroke="currentColor" stroke-width="1.6" d="M26 32h20" />
+            <path fill="none" stroke="currentColor" stroke-width="1.6" d="M28 26c3 1.6 13 1.6 16 0" />
+            <path fill="none" stroke="currentColor" stroke-width="1.6" d="M28 38c3-1.6 13-1.6 16 0" />
+            <path fill="none" stroke="currentColor" stroke-width="1.6" d="M36 22c3.4 3.6 3.4 16.8 0 20" />
+            <path fill="none" stroke="currentColor" stroke-width="1.6" d="M36 22c-3.4 3.6-3.4 16.8 0 20" />
+            <path fill="currentColor" d="M20 58h32v4H20z" />
+          </svg>
+        </span>
+        <h1>Power Plants Asset Glossary</h1>
+      </div>
+      <p class="intro">
+        Concise reference information covering thermal, hydro, wind, and solar power plants, as well as common failure
+        signals used by the
+        performance condition monitoring and development team.
+      </p>
+      <form class="search-form" role="search" aria-label="Glossary search">
+        <label class="field-label" for="glossary-search">Search tags or terminology</label>
+        <input id="glossary-search" name="query" class="search-input" type="search"
+          placeholder="e.g., active power, vacuum, vibration" autocomplete="off"
+          aria-describedby="search-hint search-status" />
+        <p id="search-hint" class="field-hint">Results update as you type. Press Escape to clear.</p>
+      </form>
+      <p id="search-status" class="search-status" role="status" aria-live="polite">Showing all glossary cards.</p>
+    </div>
+  </header>
+
+  <main id="glossary" class="wrapper" tabindex="-1">
+    <div class="card-grid" role="list">
+      <article id="thermal" class="glossary-card" role="listitem" data-category="thermal steam fossil">
+        <header class="glossary-card__header">
+          <span class="glossary-card__icon glossary-card__icon--thermal" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <path fill="currentColor"
+                d="M32 6c-5 7.5 3 12 3 18a7 7 0 0 1-14 0c0-5.7 5-9.7 5-14.5C26 5 20 10 18 17c-1.4 4.5-1 16 11 21.5 0 0-5 1.5-8 5.5-3 4-3 9.5-1 13h22c2-3.5 2-9-1-13-3-4-8-5.5-8-5.5 12-5.5 12.4-17 11-21.5C44 14 38 10 38 6Z" />
+            </svg>
+          </span>
+          <div class="glossary-card__heading">
+            <p class="glossary-card__eyebrow">Earth</p>
+            <h2>Thermal Power Plants</h2>
+            <p>
+              Core KPIs for fossil and combined-cycle units, balancing boiler efficiency, turbine load, and condenser
+              limits to deliver dispatchable megawatts.
+            </p>
+          </div>
+        </header>
+        <dl class="term-list"></dl>
+      </article>
+
+      <article id="hydro" class="glossary-card" role="listitem" data-category="hydro penstock">
+        <header class="glossary-card__header">
+          <span class="glossary-card__icon glossary-card__icon--hydro" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <path fill="currentColor"
+                d="M32 6c-9 10-16 18-16 27 0 9 7.2 17 16 17s16-8 16-17c0-9-7-17-16-27Zm0 40c-4.4 0-8-4.3-8-9 0-4.4 2.5-8.1 8-14 5.5 5.9 8 9.6 8 14 0 4.7-3.6 9-8 9Zm-19 6c3 3 7.5 5 13 5s10-2 13-5c3 3 7 5 13 5v-6c-6 0-9-2-12-5-3 3-7 5-14 5s-11-2-14-5c-3 3-6 5-12 5v6c6 0 10-2 13-5Z" />
+            </svg>
+          </span>
+          <div class="glossary-card__heading">
+            <p class="glossary-card__eyebrow">Water</p>
+            <h2>Hydro Power Plants</h2>
+            <p>
+              Monitor water conveyance, wicket gate controls, and generator thermal limits to maximize output while
+              protecting hydraulic assets.
+            </p>
+          </div>
+        </header>
+
+        <dl class="term-list"></dl>
+      </article>
+
+      <article id="wind" class="glossary-card" role="listitem" data-category="wind nacelle">
+        <header class="glossary-card__header">
+          <span class="glossary-card__icon glossary-card__icon--wind" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <path fill="currentColor"
+                d="M32 6a4 4 0 0 0-4 4v16.1l-13-7.5a4 4 0 1 0-4 6.9l13.9 8-13.9 8a4 4 0 1 0 4 6.9l13-7.5V54a4 4 0 0 0 8 0V40.9l13 7.5a4 4 0 0 0 4-6.9l-13.9-8 13.9-8a4 4 0 1 0-4-6.9l-13 7.5V10a4 4 0 0 0-4-4Z" />
+            </svg>
+          </span>
+          <div class="glossary-card__heading">
+            <p class="glossary-card__eyebrow">Air</p>
+            <h2>Wind Power Plants</h2>
+            <p>
+              Key supervisory control and data acquisition (SCADA) channels for utility-scale wind farms spanning wind
+              resource, drivetrain torque, and structural loads.
+            </p>
+          </div>
+        </header>
+
+        <dl class="term-list"></dl>
+      </article>
+
+      <article id="solar" class="glossary-card" role="listitem" data-category="solar pv inverter">
+        <header class="glossary-card__header">
+          <span class="glossary-card__icon glossary-card__icon--solar" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <path fill="currentColor"
+                d="M32 10a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0v-6a3 3 0 0 1 3-3Zm0 32c7.2 0 13-5.8 13-13s-5.8-13-13-13-13 5.8-13 13 5.8 13 13 13Zm0-32-4-8h8l-4 8Zm0 32 4 8h-8l4-8ZM14 29l-8 4v-8l8 4Zm36 0 8 4v-8l-8 4ZM14 35l-8 2 4 7 4-9Zm36 0 8 2-4 7-4-9Zm-33 5h30l5 12H16l1-3h30l-1-3H20l1-3h26l-1-3H17Z" />
+            </svg>
+          </span>
+          <div class="glossary-card__heading">
+            <p class="glossary-card__eyebrow">Fire</p>
+            <h2>Solar Power Plants</h2>
+            <p>
+              Metrics to maintain photovoltaic yield, manage inverter limits, and guard against thermal runaway across
+              utility solar arrays.
+            </p>
+          </div>
+        </header>
+
+        <dl class="term-list"></dl>
+      </article>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="wrapper">
+      <p>
+        Need a deeper dive? See the <a href="../">Stage 1 project list</a> or return to the
+        <a href="../../">Frontend foundations overview</a>.
+      </p>
+    </div>
+  </footer>
+</body>
+
+</html>
