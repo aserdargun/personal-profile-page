@@ -38,17 +38,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** Form semantics, validation, persistence.
 - **Done when:** Draft survives refresh; export/import JSON works.
 
----
-
-4 **P&ID SVG Viewer**
-
-- **Goal:** Master SVG UX (pan/zoom/tooltip).
-- **Stack:** HTML, CSS, JS (SVG).
-- **Build:** Load a static P&ID SVG; zoom/pan; tooltips for pumps/valves/HX.
-- **Key skills:** SVG transforms, focus management, keyboard panning.
-- **Done when:** Mouse + keyboard zoom/pan; components highlight and read labels.
-
-5 **Troubleshooting Wizard (Decision Tree)**
+4 **Troubleshooting Wizard (Decision Tree)**
 
 - **Goal:** Progressive disclosure & state handling.
 - **Stack:** HTML, CSS, JS.
@@ -56,11 +46,19 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** ARIA for wizards, state machine thinking.
 - **Done when:** Back/next works with keyboard; URL hash encodes step.
 
+5 **P&ID SVG Viewer**
+
+- **Goal:** Master SVG UX (pan/zoom/tooltip).
+- **Stack:** HTML, CSS, JS (SVG).
+- **Build:** Load a static P&ID SVG; zoom/pan; tooltips for pumps/valves/HX.
+- **Key skills:** SVG transforms, focus management, keyboard panning.
+- **Done when:** Mouse + keyboard zoom/pan; components highlight and read labels.
+
 ---
 
 ## Stage 2 — Core Backend & Data (Data extraction + CRUD + APIs)
 
-6 **Assets REST API**
+6 **Power Plants Assets REST API**
 
 - **Goal:** Design clean APIs with validation.
 - **Stack:** **FastAPI**, Pydantic, SQLite/Postgres.
@@ -68,15 +66,15 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** Schemas, pagination, filtering, 404/422 contracts.
 - **Done when:** `/assets`, `/workorders` pass schema validation & include tests.
 
-7 **KPI Calculator API**
+7 **Power Plants KPI Calculator API**
 
 - **Goal:** Encapsulate domain formulas.
 - **Stack:** **FastAPI**, Pydantic, pytest.
-- **Build:** Endpoints: `/kpi/heat-rate`, `/kpi/availability` (unit-consistent, validated).
+- **Build:** Endpoints: `/kpi/efficiency`, `/kpi/availability` (unit-consistent, validated).
 - **Key skills:** Dependency injection, caching, unit tests.
 - **Done when:** Deterministic test suite; input/unit validation with clear errors.
 
-8 **Daily Logbook (Flask)**
+8 **Daily Meeting Logbook (Flask)**
 
 - **Goal:** Server-rendered app with auth & uploads.
 - **Stack:** **Flask**, SQLite, Flask-Login, WTForms.
@@ -84,33 +82,25 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** Blueprints, file handling, CSRF, query patterns.
 - **Done when:** Auth works; attachments stored; searchable by tag/date.
 
-9 **Maintenance Calendar (Fullstack)**
-
-- **Goal:** Persist scheduling + partial updates.
-- **Stack:** **Flask** + SQLite + **HTMX/JS**.
-- **Build:** PM tasks on a calendar; drag-to-reschedule with server PATCH.
-- **Key skills:** Data model for PMs, CSRF with async, optimistic UI.
-- **Done when:** Drag-drop updates the DB; conflicts flagged gracefully.
-
 ---
 
 ## Stage 3 — Monitoring & Visualization (Descriptive → Diagnostic)
 
-10 **Condition Monitoring Trends**
+9 **Condition Monitoring Trends**
 -**Goal:** Timeseries UX for plant telemetry.
 -**Stack:** **Dash/Plotly**.
 -**Build:** Multi-series plots (vibration, temp, load) with thresholds and event annotations.
 -**Key skills:** Linked charts, brushing/zooming, caching callbacks.
 -**Done when:** Cross-filter by unit/date; export CSV; annotations toggle.
 
-11 **IoT Ingest Endpoint**
+10 **IoT Ingest Endpoint**
 -**Goal:** Get data in reliably at speed.
 -**Stack:** **FastAPI**, DB bulk writes.
 -**Build:** `POST /telemetry` for batches (timestamp, tag, unit, value); idempotency key.
 -**Key skills:** High-throughput POST, batch inserts, schema validation.
 -**Done when:** Handles duplicates via idempotency; metrics on ingest rate.
 
-12 **Auth & Permissions (RBAC)**
+11 **Auth & Permissions (RBAC)**
 
 - **Goal:** Secure your services.
 - **Stack:** **FastAPI**, JWT (OAuth2 password flow), Passlib.
@@ -122,7 +112,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 
 ## Stage 4 — Realtime & Reliability (Operational awareness)
 
-13 **Real-Time Unit Status**
+12 **Real-Time Unit Status**
 
 - **Goal:** Live updates to the browser.
 - **Stack:** **FastAPI** + **WebSockets/SSE**, JS client.
@@ -130,13 +120,21 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** Realtime messaging, reconnection, backpressure basics.
 - **Done when:** Multiple clients stay in sync; network drops recover cleanly.
 
-14 **Alarm Catalog & Rationalization**
+13 **Alarm Catalog & Rationalization**
 
 - **Goal:** Turn noise into knowledge.
 - **Stack:** **FastAPI**, SQLAlchemy, Alembic.
 - **Build:** CRUD alarms with severity/cause/consequence/mitigation; audit log.
 - **Key skills:** Relational modeling, migrations, optimistic locking.
 - **Done when:** Full edit history; duplicate detection warnings.
+
+14 **Maintenance Calendar (Fullstack)**
+
+- **Goal:** Persist scheduling + partial updates.
+- **Stack:** **Flask** + SQLite + **HTMX/JS**.
+- **Build:** PM tasks on a calendar; drag-to-reschedule with server PATCH.
+- **Key skills:** Data model for PMs, CSRF with async, optimistic UI.
+- **Done when:** Drag-drop updates the DB; conflicts flagged gracefully.
 
 ---
 
