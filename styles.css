@@ -1499,7 +1499,8 @@ footer {
     }
 
     .brand-group {
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 0;
         gap: .45rem;
         flex-wrap: nowrap;
         align-items: center;
@@ -1523,6 +1524,14 @@ footer {
     .brand-links .icon-btn {
         width: 28px;
         height: 28px;
+    }
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        flex: 0 0 auto;
+        margin-left: auto;
     }
 
     .section {
