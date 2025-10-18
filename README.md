@@ -58,7 +58,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 
 ## Stage 2 — Core Backend & Data (Data extraction + CRUD + APIs)
 
-6 **Power Plants Asset REST API**
+6 **Power Plant Assets REST API**
 
 - **Goal:** Design clean APIs with validation.
 - **Stack:** **FastAPI**, Pydantic, SQLite/Postgres.
