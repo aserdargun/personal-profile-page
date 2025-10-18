@@ -38,7 +38,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 - **Key skills:** Form semantics, validation, persistence.
 - **Done when:** Draft survives refresh; export/import JSON works.
 
-4 **Troubleshooting Wizard (Decision Tree)**
+4 **Asset Troubleshooting Wizard (Decision Tree)**
 
 - **Goal:** Progressive disclosure & state handling.
 - **Stack:** HTML, CSS, JS.
@@ -87,6 +87,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 ## Stage 3 — Monitoring & Visualization (Descriptive → Diagnostic)
 
 9 **Condition Monitoring Trends**
+
 -**Goal:** Timeseries UX for plant telemetry.
 -**Stack:** **Dash/Plotly**.
 -**Build:** Multi-series plots (vibration, temp, load) with thresholds and event annotations.
@@ -94,6 +95,7 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 -**Done when:** Cross-filter by unit/date; export CSV; annotations toggle.
 
 10 **IoT Ingest Endpoint**
+
 -**Goal:** Get data in reliably at speed.
 -**Stack:** **FastAPI**, DB bulk writes.
 -**Build:** `POST /telemetry` for batches (timestamp, tag, unit, value); idempotency key.

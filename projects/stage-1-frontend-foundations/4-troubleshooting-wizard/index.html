@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Troubleshooting Wizard | Stage 1 Foundations</title>
+  <meta name="description"
+    content="Accessible troubleshooting wizard that guides operators through diagnosing pump cavitation issues." />
+  <link rel="icon" type="image/png" href="..\..\..\icons\favicon-32.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body id="top">
+  <header class="page-header">
+    <div class="container">
+      <div class="header-actions">
+        <a class="home-link" href="../../../index.html">&larr; Back to Main Portfolio</a>
+      </div>
+      <p class="eyebrow">Stage 1: Frontend Foundations</p>
+      <h1>Asset Troubleshooting Wizard</h1>
+      <p class="lede">
+        Diagnose noisy and underperforming centrifugal pumps with a guided decision tree that captures symptoms,
+        validates suction conditions, and recommends corrective actions.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="wizard-section" aria-labelledby="wizard-section-title">
+      <header class="wizard-section__header">
+        <p class="section-eyebrow">Interactive playbook</p>
+        <h2 id="wizard-section-title" class="section-title">Step-by-step diagnosis</h2>
+        <p class="section-lede">
+          Record what you observe at each stage. Keyboard controls support Space/Enter to select, and the URL hash keeps
+          your current step accessible for deep links or handoffs.
+        </p>
+      </header>
+
+      <div class="wizard-layout" data-wizard>
+        <aside class="wizard-progress" aria-label="Wizard progress">
+          <div class="wizard-progress__header">
+            <h3 class="wizard-progress__title">Wizard Progress</h3>
+            <div class="wizard-progress__bar" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1"
+              aria-label="Current wizard step">
+              <div class="wizard-progress__bar-fill" aria-hidden="true"></div>
+            </div>
+          </div>
+          <ol class="wizard-progress__list">
+            <li class="wizard-progress__item is-active" data-progress-step="0">
+              <span class="wizard-progress__step-index" aria-hidden="true">1</span>
+              <span class="wizard-progress__step-label">Symptom</span>
+            </li>
+            <li class="wizard-progress__item" data-progress-step="1">
+              <span class="wizard-progress__step-index" aria-hidden="true">2</span>
+              <span class="wizard-progress__step-label">Suction</span>
+            </li>
+            <li class="wizard-progress__item" data-progress-step="2">
+              <span class="wizard-progress__step-index" aria-hidden="true">3</span>
+              <span class="wizard-progress__step-label">Fluid</span>
+            </li>
+            <li class="wizard-progress__item" data-progress-step="3">
+              <span class="wizard-progress__step-index" aria-hidden="true">4</span>
+              <span class="wizard-progress__step-label">Plan</span>
+            </li>
+          </ol>
+        </aside>
+
+        <section class="wizard-card" aria-live="off">
+          <div class="wizard__live-region" aria-live="polite" data-live-region></div>
+
+          <article class="wizard-step" data-step="0" id="wizard-step-symptom" role="group"
+            aria-labelledby="wizard-step-symptom-title" aria-describedby="wizard-step-symptom-desc" tabindex="-1">
+            <header class="wizard-step__header">
+              <p class="wizard-step__eyebrow">Step 1 of 4</p>
+              <h3 class="wizard-step__title" id="wizard-step-symptom-title">
+                Pinpoint the primary symptom
+              </h3>
+            </header>
+            <p class="wizard-step__intro" id="wizard-step-symptom-desc">
+              Start by capturing what you are observing. Accurate symptom definition drives the quickest fix.
+            </p>
+            <fieldset class="wizard-form-fieldset">
+              <legend class="wizard-form-legend">
+                What symptom best matches your situation?
+              </legend>
+              <div class="wizard-radio-group" role="radiogroup" aria-label="Primary symptom">
+                <label class="wizard-radio">
+                  <input type="radio" name="symptom" value="noise" />
+                  Intense rattling or gravel noise at the pump inlet.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="symptom" value="low-flow" />
+                  Flow rate suddenly collapsed while the pump keeps spinning.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="symptom" value="vibration" />
+                  Vibration spikes and mechanical movement at the casing.
+                </label>
+              </div>
+              <p class="wizard-error" data-error-for="symptom" hidden>
+                Select the symptom that fits best before moving on.
+              </p>
+            </fieldset>
+            <footer class="wizard-controls">
+              <button type="button" class="wizard-button wizard-button--primary" data-action="next">
+                Next: Check suction
+              </button>
+            </footer>
+          </article>
+
+          <article class="wizard-step" data-step="1" id="wizard-step-suction" role="group"
+            aria-labelledby="wizard-step-suction-title" aria-describedby="wizard-step-suction-desc" hidden tabindex="-1">
+            <header class="wizard-step__header">
+              <p class="wizard-step__eyebrow">Step 2 of 4</p>
+              <h3 class="wizard-step__title" id="wizard-step-suction-title">
+                Review suction-side conditions
+              </h3>
+            </header>
+            <p class="wizard-step__intro" id="wizard-step-suction-desc">
+              Verify that the pump is receiving adequate net positive suction head (NPSH).
+            </p>
+            <fieldset class="wizard-form-fieldset">
+              <legend class="wizard-form-legend">
+                What does the suction gauge report?
+              </legend>
+              <div class="wizard-radio-group" role="radiogroup" aria-label="Suction gauge reading">
+                <label class="wizard-radio">
+                  <input type="radio" name="suction" value="below-limit" />
+                  Gauge is reading far below the recommended NPSH.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="suction" value="unstable" />
+                  Gauge oscillates or drops intermittently.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="suction" value="normal" />
+                  Gauge looks normal or slightly above the limit.
+                </label>
+              </div>
+              <p class="wizard-error" data-error-for="suction" hidden>
+                Choose the suction reading that matches your observation.
+              </p>
+            </fieldset>
+            <footer class="wizard-controls">
+              <button type="button" class="wizard-button" data-action="back">Back</button>
+              <button type="button" class="wizard-button wizard-button--primary" data-action="next">
+                Next: Check fluid quality
+              </button>
+            </footer>
+          </article>
+
+          <article class="wizard-step" data-step="2" id="wizard-step-fluid" role="group"
+            aria-labelledby="wizard-step-fluid-title" aria-describedby="wizard-step-fluid-desc" hidden tabindex="-1">
+            <header class="wizard-step__header">
+              <p class="wizard-step__eyebrow">Step 3 of 4</p>
+              <h3 class="wizard-step__title" id="wizard-step-fluid-title">
+                Inspect process fluid quality
+              </h3>
+            </header>
+            <p class="wizard-step__intro" id="wizard-step-fluid-desc">
+              Debris or entrained gas can mimic cavitation or amplify symptoms.
+            </p>
+            <fieldset class="wizard-form-fieldset">
+              <legend class="wizard-form-legend">
+                What did you find when sampling the fluid?
+              </legend>
+              <div class="wizard-radio-group" role="radiogroup" aria-label="Fluid inspection results">
+                <label class="wizard-radio">
+                  <input type="radio" name="fluid" value="gas" />
+                  Visible bubbles or foaming in the sample.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="fluid" value="debris" />
+                  Suspended solids or metallic fines present.
+                </label>
+                <label class="wizard-radio">
+                  <input type="radio" name="fluid" value="clear" />
+                  Fluid looks clear and free from gas or contaminants.
+                </label>
+              </div>
+              <p class="wizard-error" data-error-for="fluid" hidden>
+                Pick the fluid condition that best fits your findings.
+              </p>
+            </fieldset>
+            <footer class="wizard-controls">
+              <button type="button" class="wizard-button" data-action="back">Back</button>
+              <button type="button" class="wizard-button wizard-button--primary" data-action="next">
+                Review plan
+              </button>
+            </footer>
+          </article>
+
+          <article class="wizard-step" data-step="3" id="wizard-step-plan" role="group"
+            aria-labelledby="wizard-step-plan-title" aria-describedby="wizard-step-plan-desc" hidden tabindex="-1">
+            <header class="wizard-step__header">
+              <p class="wizard-step__eyebrow">Step 4 of 4</p>
+              <h3 class="wizard-step__title" id="wizard-step-plan-title">
+                Recommended action plan
+              </h3>
+            </header>
+            <p class="wizard-step__intro" id="wizard-step-plan-desc">
+              Review corrective actions tailored to the conditions you reported.
+            </p>
+            <section class="wizard-summary" aria-live="polite">
+              <h4 class="wizard-summary__title">Your diagnostics snapshot</h4>
+              <dl class="wizard-summary__list" data-summary>
+                <div class="wizard-summary__item">
+                  <dt>Symptom</dt>
+                  <dd data-summary-field="symptom">-</dd>
+                </div>
+                <div class="wizard-summary__item">
+                  <dt>Suction condition</dt>
+                  <dd data-summary-field="suction">-</dd>
+                </div>
+                <div class="wizard-summary__item">
+                  <dt>Fluid check</dt>
+                  <dd data-summary-field="fluid">-</dd>
+                </div>
+              </dl>
+              <h4 class="wizard-summary__title">Next actions</h4>
+              <ul class="wizard-summary__actions" data-summary-actions>
+                <li>Capture observations on prior steps to view targeted recommendations.</li>
+              </ul>
+            </section>
+            <footer class="wizard-controls">
+              <button type="button" class="wizard-button" data-action="back">Back</button>
+              <button type="button" class="wizard-button wizard-button--ghost" data-action="reset">
+                Start over
+              </button>
+            </footer>
+          </article>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-actions">
+      <a class="btn ghost back-to-top" href="#top">Back to top</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
