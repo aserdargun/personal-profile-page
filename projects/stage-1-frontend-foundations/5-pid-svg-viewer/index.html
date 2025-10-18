@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P&amp;ID SVG Viewer | Stage 1 Foundations</title>
+  <meta name="description"
+    content="Explore a simplified process & instrumentation diagram with keyboard-friendly zoom, pan, and annotated equipment tooltips." />
+  <link rel="icon" type="image/png" href="..\..\..\icons\favicon-32.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body id="top">
+  <header class="page-header">
+    <div class="container">
+      <div class="header-actions">
+        <a class="home-link" href="../../../index.html">&larr; Back to Main Portfolio</a>
+      </div>
+      <p class="eyebrow">Stage 1: Frontend Foundations</p>
+      <h1>P&amp;ID SVG Viewer</h1>
+      <p class="lede">
+        Practice SVG transforms and accessible interaction patterns by exploring a miniature process and instrumentation
+        diagram. Zoom, pan, and highlight equipment to read contextual callouts.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="viewer" aria-labelledby="viewer-title">
+      <header class="viewer__header">
+        <p class="section-eyebrow">Interactive canvas</p>
+        <h2 id="viewer-title" class="section-title">Feedwater preheat loop snapshot</h2>
+        <p class="section-lede">
+          Use the viewer controls or keyboard shortcuts to inspect the diagram. Press <kbd>Tab</kbd> to focus pumps,
+          valves, and heat exchangers; tooltips announce additional detail through an ARIA live region.
+        </p>
+      </header>
+
+      <aside class="viewer__panel" aria-label="Viewer instructions">
+        <div class="panel-card">
+          <h3>Keyboard map</h3>
+          <ul class="hint-list">
+            <li><span class="hint-key">Arrow keys</span> Pan the diagram</li>
+            <li><span class="hint-key">+</span> / <span class="hint-key">-</span> Zoom in or out</li>
+            <li><span class="hint-key">0</span> Reset zoom and center</li>
+            <li><span class="hint-key">Tab</span> Focus equipment hotspots sequentially</li>
+            <li><span class="hint-key">Enter</span> or <span class="hint-key">Space</span> Repeat tooltip announcement</li>
+          </ul>
+        </div>
+        <div class="panel-card">
+          <h3>Viewer controls</h3>
+          <div class="viewer-controls" role="group" aria-label="Zoom and pan controls">
+            <button type="button" class="btn icon" data-action="zoom-in" aria-keyshortcuts="+">Zoom in</button>
+            <button type="button" class="btn icon" data-action="zoom-out" aria-keyshortcuts="-">Zoom out</button>
+            <button type="button" class="btn ghost icon" data-action="reset-view" aria-keyshortcuts="0">Reset</button>
+          </div>
+          <p class="viewer-scale" aria-live="polite">
+            Scale: <span data-scale-display>100%</span>
+          </p>
+        </div>
+      </aside>
+
+      <div class="viewer__stage" data-viewer>
+        <div class="viewer-canvas" data-canvas>
+          <div class="viewer-viewport" data-viewport data-diagram-width="1200" data-diagram-height="600">
+            <svg viewBox="0 0 1200 600" role="img" aria-labelledby="diagram-title diagram-desc">
+              <title id="diagram-title">Simplified feedwater preheat loop P&amp;ID</title>
+              <desc id="diagram-desc">
+                The diagram shows a condensate feed tank feeding a pump, then a control valve, through a heat exchanger
+                and back to the deaerator. Key equipment includes pump P-101, control valve CV-201, and exchanger E-301.
+              </desc>
+
+              <defs>
+                <linearGradient id="pipe-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#9ca3af" />
+                  <stop offset="100%" stop-color="#cbd5f5" />
+                </linearGradient>
+                <pattern id="heat-exchanger" patternUnits="userSpaceOnUse" width="16" height="16">
+                  <rect width="16" height="16" fill="#e0e7ff" />
+                  <path d="M0 0 L16 16 M16 0 L0 16" stroke="#94a3b8" stroke-width="2" opacity="0.5" />
+                </pattern>
+              </defs>
+
+              <rect x="0" y="0" width="1200" height="600" fill="#f8fafc" />
+
+              <g class="pid-grid" aria-hidden="true">
+                <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M0 400 H1200 M0 500 H1200" class="grid-line" />
+                <path d="M200 0 V600 M400 0 V600 M600 0 V600 M800 0 V600 M1000 0 V600" class="grid-line" />
+              </g>
+
+              <g class="pid-piping" aria-hidden="true">
+                <path d="M120 320 H340 L360 300 H520 L540 320 H720 L740 300 H920 L940 320 H1080" />
+                <path d="M540 320 V420 H820 V360" />
+                <path d="M720 320 V220 H880 V260" />
+              </g>
+
+              <g class="pid-labels" aria-hidden="true">
+                <text x="150" y="360">Condensate receiver</text>
+                <text x="950" y="360">Deaerator</text>
+              </g>
+
+              <g data-component role="button" tabindex="0" class="pid-component pump"
+                data-component-label="Feed pump P-101" data-component-detail="Boosts condensate pressure into the preheat loop."
+                aria-describedby="component-instructions">
+                <circle cx="360" cy="300" r="48" class="pump-body" />
+                <path d="M360 252 A48 48 0 0 1 408 300 H360 Z" class="pump-impeller" />
+                <path d="M360 300 L420 300 L408 284" class="pump-arrow" />
+                <text x="360" y="374" class="component-code">P-101</text>
+              </g>
+
+              <g data-component role="button" tabindex="0" class="pid-component valve"
+                data-component-label="Control valve CV-201"
+                data-component-detail="Modulates flow to maintain drum level." aria-describedby="component-instructions">
+                <polygon points="540,320 580,360 500,360" class="valve-body" />
+                <polygon points="540,320 500,280 580,280" class="valve-body" />
+                <rect x="532" y="240" width="16" height="40" class="valve-stem" />
+                <text x="540" y="394" class="component-code">CV-201</text>
+              </g>
+
+              <g data-component role="button" tabindex="0" class="pid-component exchanger"
+                data-component-label="Heat exchanger E-301"
+                data-component-detail="Transfers condensate heat into the makeup water loop."
+                aria-describedby="component-instructions">
+                <rect x="720" y="220" width="180" height="160" rx="18" class="hx-shell" />
+                <rect x="744" y="244" width="132" height="112" class="hx-core" />
+                <path d="M744 268 H876 M744 300 H876 M744 332 H876" class="hx-tube" />
+                <text x="810" y="410" class="component-code">E-301</text>
+              </g>
+
+              <g data-component role="button" tabindex="0" class="pid-component valve recycle"
+                data-component-label="Reclaim valve CV-215"
+                data-component-detail="Bypasses the exchanger to protect against thermal shock."
+                aria-describedby="component-instructions">
+                <polygon points="820,420 860,460 780,460" class="valve-body" />
+                <polygon points="820,420 780,380 860,380" class="valve-body" />
+                <rect x="812" y="460" width="16" height="40" class="valve-stem" />
+                <text x="820" y="512" class="component-code">CV-215</text>
+              </g>
+            </svg>
+          </div>
+          <div class="viewer-tooltip" id="viewer-tooltip" role="tooltip" data-tooltip hidden>
+            <p class="tooltip-title" data-tooltip-label>—</p>
+            <p class="tooltip-body" data-tooltip-detail>—</p>
+          </div>
+          <div class="sr-only" id="component-instructions">
+            Use Enter or Space to repeat the tooltip announcement. Arrow keys pan while a component has focus.
+          </div>
+          <div class="sr-only" aria-live="polite" data-live-region></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-actions">
+      <a class="btn ghost back-to-top" href="#top">Back to top</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

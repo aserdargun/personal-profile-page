@@ -977,6 +977,7 @@ header {
 
 .stage-card__header {
     display: grid;
+    align-self: start;
     grid-template-columns: auto 1fr;
     gap: .65rem;
     align-items: center;
