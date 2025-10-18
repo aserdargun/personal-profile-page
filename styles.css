@@ -391,10 +391,6 @@ header {
     margin-left: 1rem;
 }
 
-.menu-toggle {
-    display: none;
-}
-
 .menu-toggle .icon-close {
     display: none;
 }
@@ -417,10 +413,6 @@ header {
     .nav-controls {
         order: 2;
         margin-left: auto;
-    }
-
-    .menu-toggle {
-        display: inline-flex;
     }
 
     .nav-list {
@@ -464,6 +456,16 @@ header {
     background: var(--bg);
     text-decoration: none;
     transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.menu-toggle {
+    display: none;
+}
+
+@media (max-width: 720px) {
+    .menu-toggle {
+        display: inline-flex;
+    }
 }
 
 @media (hover: hover) {
