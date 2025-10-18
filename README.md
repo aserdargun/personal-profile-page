@@ -88,19 +88,19 @@ Note: Powered by ChatGPT 5 with Extended thinking in Projects feature.
 
 9 **Condition Monitoring Trends**
 
--**Goal:** Timeseries UX for plant telemetry.
--**Stack:** **Dash/Plotly**.
--**Build:** Multi-series plots (vibration, temp, load) with thresholds and event annotations.
--**Key skills:** Linked charts, brushing/zooming, caching callbacks.
--**Done when:** Cross-filter by unit/date; export CSV; annotations toggle.
+- **Goal:** Timeseries UX for plant telemetry.
+- **Stack:** **Dash/Plotly**.
+- **Build:** Multi-series plots (vibration, temp, load) with thresholds and event annotations.
+- **Key skills:** Linked charts, brushing/zooming, caching callbacks.
+- **Done when:** Cross-filter by unit/date; export CSV; annotations toggle.
 
 10 **IoT Ingest Endpoint**
 
--**Goal:** Get data in reliably at speed.
--**Stack:** **FastAPI**, DB bulk writes.
--**Build:** `POST /telemetry` for batches (timestamp, tag, unit, value); idempotency key.
--**Key skills:** High-throughput POST, batch inserts, schema validation.
--**Done when:** Handles duplicates via idempotency; metrics on ingest rate.
+- **Goal:** Get data in reliably at speed.
+- **Stack:** **FastAPI**, DB bulk writes.
+- **Build:** `POST /telemetry` for batches (timestamp, tag, unit, value); idempotency key.
+- **Key skills:** High-throughput POST, batch inserts, schema validation.
+- **Done when:** Handles duplicates via idempotency; metrics on ingest rate.
 
 11 **Auth & Permissions (RBAC)**
 
