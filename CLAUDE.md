@@ -38,11 +38,17 @@ There are no build steps, package managers, or test runners. This is a pure stat
 - Deep learning playground built with PyTorch and Gradio
 - Experimenting with neural networks and deep learning models
 
-**PIPolars** (https://pypi.org/project/pipolars/)
+**PIPolars** (https://pypi.org/project/pipolars/ | https://github.com/aserdargun/pipolars)
 - Python library for extracting OSIsoft PI System data into Polars DataFrames
 - 10-100x performance improvements over pandas
 - Features: bulk tag extraction, lazy evaluation, SQLite/Arrow caching, fluent API
 - Requires Python 3.10+, Windows, PI AF SDK 2.x
+
+**PIWebAPI** (https://www.nuget.org/packages/PIWebAPI | https://github.com/aserdargun/piwebapi)
+- .NET Framework 4.8 REST API for accessing OSIsoft PI System data via the AF SDK
+- Features: PI Points data retrieval, AF hierarchy navigation, StreamSets bulk operations, Event Frames management
+- Health monitoring endpoints for PI Data Archive and AF Server connectivity
+- Windows Integrated Authentication (NTLM/Kerberos)
 
 **DSML101** (https://dsml101.com)
 - Data Science and Machine Learning educational platform and resources
