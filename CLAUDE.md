@@ -30,6 +30,14 @@ There are no build steps, package managers, or test runners. This is a pure stat
 **Scikit-Play** (https://scikit-play.org)
 - Interactive machine learning playground built with Streamlit for experimenting with ML algorithms
 
+**Aeon-Play** (https://aeon-play.org)
+- Time series playground built with Plotly Dash and the Aeon library
+- Experimenting with time series analysis and forecasting
+
+**PyTorch-Play** (https://pytorch-play.org)
+- Deep learning playground built with PyTorch and Gradio
+- Experimenting with neural networks and deep learning models
+
 **PIPolars** (https://pypi.org/project/pipolars/)
 - Python library for extracting OSIsoft PI System data into Polars DataFrames
 - 10-100x performance improvements over pandas
