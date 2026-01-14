@@ -61,6 +61,13 @@ There are no build steps, package managers, or test runners. This is a pure stat
 **SCADA Nerve** (https://scadanerve.com)
 - SCADA and industrial control systems platform for monitoring and automation
 
+**AI Practitioner Dev OS** (https://github.com/aserdargun/ai-practitioner-dev-os | https://github.com/aserdargun/my-ai-practitioner-dev-os)
+- AI-driven, project-based learning operating system for AI practitioners
+- 12-month adaptive curriculum across three tiers (Beginner, Intermediate, Advanced)
+- Claude Code integration with AI agents for planning, building, reviewing, evaluation
+- Features: Command system (/plan-week, /evaluate, /retro), memory tracking, Python evaluation engine
+- Personal fork customized for Advanced tier with NLP pipeline and sequence models specialization
+
 ### Key Patterns
 
 **Theme System:** CSS custom properties (`--bg`, `--text`, `--primary`, etc.) with `data-theme` attribute. Respects `prefers-color-scheme` and persists choice to localStorage.
