@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aserdargun.com/sitemap.xml
