@@ -7,6 +7,7 @@
   --lime: #c8ff36;
   --orange: #ff7043;
   --blue: #6a8dff;
+  --violet: #a78bfa;
   --line-dark: rgba(255, 255, 255, 0.18);
   --line-light: rgba(18, 19, 16, 0.2);
   --content: 1440px;
@@ -470,7 +471,11 @@ ul {
 }
 
 .featured-card:nth-child(3) {
-  grid-column: 4 / span 7;
+  grid-column: span 5;
+}
+
+.featured-card:nth-child(4) {
+  grid-column: span 7;
 }
 
 .featured-card-lime {
@@ -483,6 +488,10 @@ ul {
 
 .featured-card-blue {
   background: var(--blue);
+}
+
+.featured-card-violet {
+  background: var(--violet);
 }
 
 .featured-card::after {
