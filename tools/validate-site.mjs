@@ -4,7 +4,7 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedStageKeys = [
-  "kernel-engineer",
+  "gpu-kernel-engineer",
   "ai-practitioner",
   "full-stack-ai",
   "data-scientist",
@@ -75,8 +75,11 @@ check(JSON.stringify(enExternalLinks) === JSON.stringify(trExternalLinks), "TR/E
 
 check(pages.en.includes("https://aserdargun.com/images/og-ascii.png"), "English Open Graph image is incorrect");
 check(pages.tr.includes("https://aserdargun.com/images/og-ascii-tr.png"), "Turkish Open Graph image is incorrect");
-check(pages.en.includes("Kernel Engineer — studying"), "English kernel learning status is missing");
-check(pages.tr.includes("Kernel Mühendisi — öğrenme aşamasında"), "Turkish kernel learning status is missing");
+check(pages.en.includes("GPU Kernel Engineer — studying"), "English GPU kernel learning status is missing");
+check(pages.tr.includes("GPU Kernel Engineer — öğrenme aşamasında"), "Turkish GPU kernel learning status is missing");
+check(pages.en.includes("Reading direction · 09 → 01"), "English reverse-chronology explanation is missing");
+check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronology explanation is missing");
+check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
