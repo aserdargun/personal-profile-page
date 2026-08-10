@@ -80,6 +80,8 @@ check(pages.tr.includes("GPU Kernel Engineer — öğrenme aşamasında"), "Turk
 check(pages.en.includes("Reading direction · 09 → 01"), "English reverse-chronology explanation is missing");
 check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronology explanation is missing");
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
+check(pages.en.includes("https://unsloth.aserdargun.com/") && pages.tr.includes("https://unsloth.aserdargun.com/"), "Unsloth Studio Learning Atlas link is missing");
+check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Unsloth Studio Atlas&apos;ı keşfet"), "Localized Unsloth Studio Atlas labels are missing");
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
