@@ -106,7 +106,10 @@
         <div class="portrait-sticky">
           <div class="portrait-wrap" data-portrait-effect aria-label="Interactive ASCII-art portrait of Serdar Gündoğdu">
             <div class="portrait-grid" aria-hidden="true"></div>
-            <img class="portrait portrait-ascii" src="/images/serdar-gundogdu-ascii.png" alt="ASCII-art portrait of Serdar Gündoğdu" width="1091" height="1442" fetchpriority="high" draggable="false">
+            <picture>
+              <source type="image/webp" srcset="/images/serdar-gundogdu-ascii-480.webp 480w, /images/serdar-gundogdu-ascii-720.webp 720w" sizes="(max-width: 900px) 225px, (max-width: 1120px) 250px, 290px">
+              <img class="portrait portrait-ascii" src="/images/serdar-gundogdu-ascii.png" alt="ASCII-art portrait of Serdar Gündoğdu" width="720" height="952" fetchpriority="high" draggable="false">
+            </picture>
             <canvas class="portrait-canvas" aria-hidden="true"></canvas>
             <div class="portrait-signal" aria-hidden="true"></div>
             <div class="portrait-stamp" aria-hidden="true"><span>AI</span><small>×</small><span>IND</span></div>
