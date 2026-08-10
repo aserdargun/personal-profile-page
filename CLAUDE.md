@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Personal portfolio website for Serdar Gundogdu - AI Practitioner. The site showcases end-to-end artificial intelligence solutions built using cutting-edge AI coding assistants (Claude Code, ChatGPT Codex, Google Gemini) with VS Code and Antigravity IDE.
 
-**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero external dependencies.
+**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero external dependencies. The public experience is bilingual: `/en/` and `/tr/`, with `/` acting as an accessible language gateway.
 
 ## Development Commands
 
@@ -18,9 +18,11 @@ There are no build steps, package managers, or test runners. This is a pure stat
 ## Architecture
 
 ### Root Level
-- `index.html` - Main portfolio landing page (navigation hub to all sub-projects)
+- `index.html` - Saved/browser-language gateway with no-JavaScript language links
+- `en/index.html`, `tr/index.html` - Complete localized portfolio pages with matching anchors and timeline stage keys
 - `styles.css` - Global design system with CSS custom properties for theming
-- `scripts.js` - Core features: theme toggle, mobile navigation, back-to-top button
+- `scripts.js` - Language preference, active career timeline, and viewport-aware ASCII portrait animation
+- `tools/validate-site.mjs` - Dependency-free parity and metadata validation for both locales
 
 ### Projects
 

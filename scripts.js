@@ -1,126 +1,109 @@
-// Flag JS support for progressive enhancements
 document.documentElement.classList.add("has-js");
 
-// THEME TOGGLE (remembers preference)
-(function () {
-  const root = document.documentElement;
-  const btn = document.getElementById("theme-toggle");
-  const STORAGE_KEY = "theme"; // 'light' | 'dark' | null (system)
+const LANGUAGE_STORAGE_KEY = "portfolio-language";
 
-  function getStoredTheme() {
-    try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
-  }
-  function storeTheme(value) {
-    try {
-      if (value) localStorage.setItem(STORAGE_KEY, value);
-      else localStorage.removeItem(STORAGE_KEY);
-    } catch {}
-  }
-  function applyTheme(theme) {
-    if (theme === "light" || theme === "dark") {
-      root.setAttribute("data-theme", theme);
-      btn?.setAttribute("aria-pressed", String(theme === "dark"));
-      btn?.setAttribute("title", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
-    } else {
-      root.removeAttribute("data-theme"); // follow system
-      // Infer current system to set aria-pressed meaningfully
-      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-      btn?.setAttribute("aria-pressed", String(prefersDark));
-      btn?.setAttribute("title", prefersDark ? "Switch to light mode" : "Switch to dark mode");
-    }
-  }
+function storeLanguage(language) {
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {}
+}
 
-  document.addEventListener("DOMContentLoaded", () => {
-    // Initialize from storage
-    applyTheme(getStoredTheme());
+function initializeLanguageSwitch() {
+  document.querySelectorAll("[data-language-link]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const language = link.getAttribute("data-language-link");
+      if (language !== "tr" && language !== "en") return;
 
-    // React to system changes when following system
-    if (window.matchMedia) {
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-        if (!getStoredTheme()) applyTheme(null);
-      });
-    }
-
-    // Toggle click: cycle between dark and light (explicit)
-    btn?.addEventListener("click", () => {
-      const current = document.documentElement.getAttribute("data-theme");
-      const next = current === "dark" ? "light" : "dark";
-      storeTheme(next);
-      applyTheme(next);
+      event.preventDefault();
+      storeLanguage(language);
+      const destination = new URL(link.href, window.location.origin);
+      destination.hash = window.location.hash;
+      window.location.assign(destination.href);
     });
   });
-})();
+}
 
-// BACK-TO-TOP VISIBILITY
-document.addEventListener("DOMContentLoaded", () => {
-  const backToTop = document.querySelector(".back-to-top");
-  if (!backToTop) return;
+function initializeTimeline() {
+  const timeline = document.querySelector("[data-timeline]");
+  const steps = Array.from(document.querySelectorAll("[data-timeline-step]"));
+  const stageSummary = document.querySelector("[data-stage-summary]");
+  const stageCount = stageSummary?.querySelector("[data-stage-count]");
+  const stageRole = stageSummary?.querySelector("[data-stage-role]");
+  const stageFocus = stageSummary?.querySelector("[data-stage-focus]");
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  const toggleVisibility = () => {
-    if (window.scrollY > 200) backToTop.classList.add("is-visible");
-    else backToTop.classList.remove("is-visible");
-  };
+  if (!timeline || steps.length === 0) return;
 
-  toggleVisibility();
-  window.addEventListener("scroll", toggleVisibility, { passive: true });
-});
+  const setActiveStep = (index) => {
+    const boundedIndex = Math.max(0, Math.min(steps.length - 1, index));
+    const activeStep = steps[boundedIndex];
+    if (activeStep.classList.contains("is-active")) return;
 
-// MOBILE NAV TOGGLE
-document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.getElementById("menu-toggle");
-  const navList = document.getElementById("primary-nav");
-  if (!toggle || !navList) return;
-
-  const closeMenu = () => {
-    navList.classList.remove("is-open");
-    toggle.setAttribute("aria-expanded", "false");
-    toggle.setAttribute("aria-label", "Open navigation menu");
-  };
-
-  toggle.addEventListener("click", () => {
-    const isOpen = toggle.getAttribute("aria-expanded") === "true";
-    if (isOpen) {
-      closeMenu();
-    } else {
-      navList.classList.add("is-open");
-      toggle.setAttribute("aria-expanded", "true");
-      toggle.setAttribute("aria-label", "Close navigation menu");
-    }
-  });
-
-  const handleEscape = (event) => {
-    if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
-      closeMenu();
-      toggle.focus();
-    }
-  };
-  toggle.addEventListener("keydown", handleEscape);
-  navList.addEventListener("keydown", handleEscape);
-
-  navList.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      if (toggle.getAttribute("aria-expanded") === "true") closeMenu();
+    steps.forEach((step, stepIndex) => {
+      step.classList.toggle("is-active", stepIndex === boundedIndex);
     });
+
+    const progress = steps.length > 1 ? boundedIndex / (steps.length - 1) : 1;
+    timeline.style.setProperty("--timeline-progress", String(progress));
+
+    if (stageCount) stageCount.textContent = `${String(boundedIndex + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
+    if (stageRole) stageRole.textContent = activeStep.dataset.stageRole || "";
+    if (stageFocus) stageFocus.textContent = activeStep.dataset.stageFocus || "";
+
+    if (!reduceMotion && typeof stageSummary?.animate === "function") {
+      stageSummary.animate(
+        [
+          { opacity: 0.45, transform: "translateY(8px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        { duration: 260, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      );
+    }
+  };
+
+  steps.forEach((step, index) => {
+    if (index === 0) step.classList.add("is-visible");
   });
 
-  if (typeof window.matchMedia === "function") {
-    const mediaQuery = window.matchMedia("(min-width: 721px)");
-    const handleChange = (event) => {
-      if (event.matches) closeMenu();
-    };
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handleChange);
-    } else if (typeof mediaQuery.addListener === "function") {
-      mediaQuery.addListener(handleChange);
-    }
+  if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -12%", threshold: 0.08 },
+    );
+
+    const activeObserver = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => Math.abs(a.boundingClientRect.top - window.innerHeight * 0.4) - Math.abs(b.boundingClientRect.top - window.innerHeight * 0.4));
+
+        if (visibleEntries.length > 0) {
+          setActiveStep(steps.indexOf(visibleEntries[0].target));
+        }
+      },
+      { rootMargin: "-34% 0px -48%", threshold: 0 },
+    );
+
+    steps.forEach((step) => {
+      revealObserver.observe(step);
+      activeObserver.observe(step);
+    });
+  } else {
+    steps.forEach((step) => step.classList.add("is-visible"));
   }
 
-  closeMenu();
-});
+  steps[0].classList.add("is-active");
+  timeline.style.setProperty("--timeline-progress", "0");
+}
 
-// INTERACTIVE ASCII PORTRAIT
-// A lightweight, image-sliced cloth effect inspired by moving type curtains.
-document.addEventListener("DOMContentLoaded", () => {
+function initializePortrait() {
   const wrap = document.querySelector("[data-portrait-effect]");
   const image = wrap?.querySelector(".portrait-ascii");
   const canvas = wrap?.querySelector(".portrait-canvas");
@@ -151,6 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let sourceWidth = image.naturalWidth;
   let sourceHeight = image.naturalHeight;
   let animationFrame = 0;
+  let animationRunning = false;
+  let portraitVisible = true;
   let dragging = false;
   let dragAnchorX = 0;
   let dragAnchorY = 0;
@@ -225,6 +210,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function draw(time) {
+    if (!portraitVisible || document.hidden) {
+      animationRunning = false;
+      animationFrame = 0;
+      return;
+    }
+
     const stripWidth = width / columns;
     const rowHeight = height / rows;
     const sourceStripWidth = sourceWidth / columns;
@@ -258,8 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
           : 0;
         const dragX = (pointer.x - dragAnchorX) * 0.34 * dragFalloff;
         const dragY = (pointer.y - dragAnchorY) * 0.13 * dragFalloff * pinning;
-        const displacement =
-          ((offsets[column] * (0.28 + pointerFalloff * 0.72) + idle) * pinning) + dragX;
+        const displacement = ((offsets[column] * (0.28 + pointerFalloff * 0.72) + idle) * pinning) + dragX;
         const lift = Math.abs(displacement) * 0.025 * pinning;
 
         ctx.drawImage(
@@ -279,11 +269,22 @@ document.addEventListener("DOMContentLoaded", () => {
     animationFrame = window.requestAnimationFrame(draw);
   }
 
+  function startAnimation() {
+    if (animationRunning || !portraitVisible || document.hidden) return;
+    animationRunning = true;
+    animationFrame = window.requestAnimationFrame(draw);
+  }
+
+  function stopAnimation() {
+    if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+    animationRunning = false;
+  }
+
   function start() {
     resize();
     wrap.classList.add("is-interactive");
-    window.cancelAnimationFrame(animationFrame);
-    animationFrame = window.requestAnimationFrame(draw);
+    startAnimation();
   }
 
   wrap.addEventListener("pointerenter", (event) => {
@@ -321,8 +322,39 @@ document.addEventListener("DOMContentLoaded", () => {
     wrap.classList.remove("is-dragging");
   }, { passive: true });
   image.addEventListener("dragstart", (event) => event.preventDefault());
-  window.addEventListener("resize", resize, { passive: true });
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(resize).observe(wrap);
+  } else {
+    window.addEventListener("resize", resize, { passive: true });
+  }
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(
+      ([entry]) => {
+        portraitVisible = entry.isIntersecting;
+        if (portraitVisible) {
+          resize();
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      { threshold: 0.01 },
+    ).observe(wrap);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopAnimation();
+    else startAnimation();
+  });
 
   if (image.complete && image.naturalWidth) start();
   else image.addEventListener("load", start, { once: true });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initializeLanguageSwitch();
+  initializeTimeline();
+  initializePortrait();
 });

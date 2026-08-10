@@ -1,6 +1,15 @@
 # Personal Profile Page
 
-Personal portfolio website for Serdar Gundogdu - AI Practitioner.
+Bilingual personal portfolio for Serdar Gündoğdu, available at `/en/` and `/tr/`. The root route selects the saved or browser language and retains accessible language links when JavaScript is unavailable.
+
+The opening experience combines an interactive ASCII portrait with a nine-stage career timeline spanning mechanical engineering, manufacturing leadership, data science, full-stack AI, and ongoing GPU kernel engineering study.
+
+## Validation
+
+```bash
+node --check scripts.js
+node tools/validate-site.mjs
+```
 
 ## Projects
 

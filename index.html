@@ -3,54 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#121310">
-  <title>Serdar Gündoğdu — Industrial AI Practitioner</title>
-  <meta name="description" content="Serdar Gündoğdu builds industrial AI platforms, machine learning systems, and open-source tools that turn complex operational data into useful decisions.">
-  <meta name="keywords" content="Serdar Gündoğdu, industrial AI, AI practitioner, machine learning, industrial data, predictive analytics, time series">
-  <meta name="author" content="Serdar Gündoğdu">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://aserdargun.com/">
-  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://aserdargun.com/">
-  <meta property="og:title" content="Serdar Gündoğdu — Industrial AI Practitioner">
-  <meta property="og:description" content="Industrial intelligence, built for the real world.">
-  <meta property="og:image" content="https://aserdargun.com/images/og-ascii.png">
-  <meta property="og:image:width" content="1730">
-  <meta property="og:image:height" content="909">
-  <meta property="og:image:alt" content="ASCII portrait of Serdar Gündoğdu">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Serdar Gündoğdu — Industrial AI Practitioner">
-  <meta name="twitter:description" content="Industrial intelligence, built for the real world.">
-  <meta name="twitter:image" content="https://aserdargun.com/images/og-ascii.png">
-  <link rel="stylesheet" href="styles.css">
-  <script src="scripts.js" defer></script>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Serdar Gündoğdu",
-      "url": "https://aserdargun.com/",
-      "image": "https://aserdargun.com/images/serdar-gundogdu-ascii.png",
-      "jobTitle": "Industrial AI Practitioner",
-      "sameAs": [
-        "https://github.com/aserdargun",
-        "https://www.linkedin.com/in/serdargundogdu/",
-        "https://medium.com/@aserdargun"
-      ],
-      "knowsAbout": [
-        "Industrial artificial intelligence",
-        "Machine learning",
-        "Time series analysis",
-        "Predictive analytics",
-        "Industrial data platforms"
-      ]
-    }
+  <title>Serdar Gündoğdu — Choose language</title>
+  <link rel="alternate" hreflang="en" href="https://aserdargun.com/en/">
+  <link rel="alternate" hreflang="tr" href="https://aserdargun.com/tr/">
+  <link rel="alternate" hreflang="x-default" href="https://aserdargun.com/">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <style>
+    :root { color-scheme: dark; font-family: Inter, "Helvetica Neue", Arial, sans-serif; }
+    * { box-sizing: border-box; }
+    body { display: grid; min-height: 100vh; margin: 0; place-items: center; background: #121310; color: #fffdf7; }
+    main { width: min(680px, calc(100% - 40px)); border: 1px solid rgba(255,255,255,.18); padding: clamp(32px, 7vw, 72px); }
+    .mark { display: grid; width: 48px; height: 48px; place-items: center; margin-bottom: 52px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; color: #c8ff36; font: 700 .72rem "SFMono-Regular", Consolas, monospace; }
+    p { margin: 0 0 14px; color: rgba(255,253,247,.68); line-height: 1.6; }
+    h1 { max-width: 540px; margin: 0 0 36px; font-size: clamp(2.7rem, 8vw, 5rem); font-weight: 520; letter-spacing: -.06em; line-height: .95; }
+    nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    a { border: 1px solid rgba(255,255,255,.2); padding: 18px 20px; color: inherit; text-decoration: none; font-weight: 700; }
+    a:first-child { background: #c8ff36; color: #121310; }
+    a:focus-visible { outline: 3px solid #ff7043; outline-offset: 3px; }
+    @media (max-width: 520px) { nav { grid-template-columns: 1fr; } }
+  </style>
+  <script>
+    (() => {
+      const storageKey = "portfolio-language";
+      let storedLanguage = null;
+      try { storedLanguage = localStorage.getItem(storageKey); } catch {}
+      const language = storedLanguage === "tr" || storedLanguage === "en"
+        ? storedLanguage
+        : (navigator.language || "en").toLowerCase().startsWith("tr") ? "tr" : "en";
+      window.location.replace(`/${language}/${window.location.hash || ""}`);
+    })();
   </script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="#top" aria-label="Serdar Gündoğdu, home"><span class="wordmark-mark">SG</span><span>Serdar Gündoğdu</span></a><nav class="nav-links" aria-label="Primary navigation"><a href="#work">Work</a><a href="#approach">Approach</a><a href="#about">About</a></nav><a class="nav-cta" href="mailto:aserdargun@gmail.com">Let&#x27;s talk <span aria-hidden="true">↗</span></a></header><main id="main"><section class="hero" id="top"><div class="hero-copy"><p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>AI practitioner · Industrial systems</p><h1>Industrial intelligence,<br/><em>built for the real world.</em></h1><p class="hero-intro">I&#x27;m Serdar Gündoğdu—an engineer and AI practitioner who turns complex industrial data into usable products, dependable machine learning systems, and faster decisions.</p><div class="hero-actions"><a class="button button-primary" href="#work">Explore selected work <span aria-hidden="true">↓</span></a><a class="text-link" href="https://github.com/aserdargun" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a><a class="text-link" href="https://www.linkedin.com/in/serdargundogdu/" target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a></div></div><div class="portrait-wrap" data-portrait-effect aria-label="Interactive ASCII-art portrait of Serdar Gündoğdu"><div class="portrait-grid" aria-hidden="true"></div><img class="portrait portrait-ascii" src="images/serdar-gundogdu-ascii.png" alt="ASCII-art portrait of Serdar Gündoğdu" width="1091" height="1442" fetchPriority="high" draggable="false"/><canvas class="portrait-canvas" aria-hidden="true"></canvas><div class="portrait-signal" aria-hidden="true"></div><div class="portrait-caption"><span>Based in Türkiye</span><span>Working globally</span></div><div class="portrait-stamp" aria-hidden="true"><span>AI</span><small>×</small><span>IND</span></div></div></section><section class="signal-strip" aria-label="Core expertise"><p>From raw plant data</p><span aria-hidden="true">→</span><p>to governed intelligence</p><span aria-hidden="true">→</span><p>to decisions people can trust</p></section><section class="section section-light" id="work"><div class="section-heading"><p class="section-kicker">Selected work</p><h2>Products, systems, and tools that move beyond the demo.</h2><p>A selection of industrial platforms and open-source tools shaped around real workflows—not isolated models.</p></div><div class="featured-grid"><article class="featured-card featured-card-lime"><div class="project-topline"><span>01</span><span>Industrial AI platform</span></div><div class="project-body"><h3>SWAPP</h3><p>An AI-first industrial data workbench that brings signal exploration, trends, statistics, PPM views, governed APIs, and natural-language workflows into one product.</p></div><ul class="tag-list" aria-label="SWAPP technologies"><li>Industrial data</li><li>AI workflows</li><li>Edge to cloud</li></ul><div class="project-links"><a href="https://swapp.org.tr" target="_blank" rel="noreferrer">Visit SWAPP <span aria-hidden="true">↗</span></a></div></article><article class="featured-card featured-card-orange"><div class="project-topline"><span>02</span><span>Open-source Python package</span></div><div class="project-body"><h3>PIPolars</h3><p>A high-throughput bridge from the PI System to Polars DataFrames—designed for bulk extraction, lazy evaluation, and practical caching in industrial analytics workflows.</p></div><ul class="tag-list" aria-label="PIPolars technologies"><li>Python</li><li>Polars</li><li>PI System</li></ul><div class="project-links"><a href="https://github.com/aserdargun/pipolars" target="_blank" rel="noreferrer">View on GitHub <span aria-hidden="true">↗</span></a><a href="https://pypi.org/project/pipolars/" target="_blank" rel="noreferrer">PyPI <span aria-hidden="true">↗</span></a></div></article><article class="featured-card featured-card-blue"><div class="project-topline"><span>03</span><span>Adaptive learning system</span></div><div class="project-body"><h3>AI Practitioner Dev OS</h3><p>A project-based operating system for becoming a stronger AI practitioner, with a 12-month adaptive curriculum and agents for planning, building, reviewing, and evaluation.</p></div><ul class="tag-list" aria-label="AI Practitioner Dev OS technologies"><li>AI agents</li><li>Learning design</li><li>Open source</li></ul><div class="project-links"><a href="https://github.com/aserdargun/ai-practitioner-dev-os" target="_blank" rel="noreferrer">Explore the template <span aria-hidden="true">↗</span></a></div></article><article class="featured-card featured-card-violet"><div class="project-topline"><span>04</span><span>Sovereign AI R&amp;D initiative</span></div><div class="project-body"><h3>Project PULSAR</h3><p>An independent R&amp;D initiative for running strong open-weight language models securely and sustainably inside organizational trust boundaries.</p></div><ul class="tag-list" aria-label="Project PULSAR technologies"><li>Open-weight models</li><li>Local control</li><li>Trusted AI</li></ul><div class="project-links"><a href="https://projectpulsar.org/" target="_blank" rel="noreferrer">Explore PULSAR <span aria-hidden="true">↗</span></a></div></article></div></section><section class="section section-dark" id="approach"><div class="section-heading section-heading-dark"><p class="section-kicker">How I work</p><h2>Engineering discipline. AI-native pace.</h2><p>I combine industrial context, statistical thinking, and modern AI development workflows to close the gap between an idea and a system people can actually use.</p></div><div class="approach-grid"><article><span class="approach-number">01</span><h3>Frame the decision</h3><p>Start with the operator, engineer, or business decision—not the model. Define the signal, constraint, and useful action.</p></article><article><span class="approach-number">02</span><h3>Build the full loop</h3><p>Connect data, analysis, APIs, interface, and feedback so the intelligence survives outside a notebook.</p></article><article><span class="approach-number">03</span><h3>Make it operable</h3><p>Design for traceability, human review, deployment constraints, and the realities of industrial environments.</p></article></div><div class="capability-row" aria-label="Capabilities"><span>Predictive analytics</span><span>Time series</span><span>Industrial data platforms</span><span>Applied machine learning</span><span>AI-assisted software delivery</span></div></section><section class="section section-sand" id="lab"><div class="section-heading section-heading-compact"><p class="section-kicker">Open lab</p><h2>Tools for learning by doing.</h2><p>Packages, platforms, and interactive experiments that make difficult concepts easier to explore.</p></div><div class="lab-grid"><a class="lab-card" href="https://github.com/aserdargun/piwebapi" target="_blank" rel="noreferrer"><span class="lab-index">01</span><p class="lab-type">.NET package</p><h3>PIWebAPI</h3><p>A REST layer for PI Points, AF hierarchies, StreamSets, and Event Frames.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://scadanerve.com" target="_blank" rel="noreferrer"><span class="lab-index">02</span><p class="lab-type">Industrial platform</p><h3>SCADA Nerve</h3><p>A focused platform for SCADA monitoring, automation, and operational visibility.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://industry-learn.com" target="_blank" rel="noreferrer"><span class="lab-index">03</span><p class="lab-type">Learning platform</p><h3>Industry-Learn</h3><p>Applied machine-learning patterns and workflows grounded in industrial problems.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://scikit-play.org" target="_blank" rel="noreferrer"><span class="lab-index">04</span><p class="lab-type">Interactive lab</p><h3>Scikit-Play</h3><p>A hands-on playground for understanding and comparing classical ML algorithms.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://aeon-play.org" target="_blank" rel="noreferrer"><span class="lab-index">05</span><p class="lab-type">Time-series lab</p><h3>Aeon-Play</h3><p>Interactive experiments for time-series analysis and forecasting with Aeon.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://pytorch-play.org" target="_blank" rel="noreferrer"><span class="lab-index">06</span><p class="lab-type">Deep-learning lab</p><h3>PyTorch-Play</h3><p>A visual environment for experimenting with neural networks and model behavior.</p><span class="lab-arrow" aria-hidden="true">↗</span></a><a class="lab-card" href="https://dsml101.com" target="_blank" rel="noreferrer"><span class="lab-index">07</span><p class="lab-type">Learning platform</p><h3>DSML101</h3><p>Clear, practical resources for building a foundation in data science and ML.</p><span class="lab-arrow" aria-hidden="true">↗</span></a></div></section><section class="section section-about" id="about"><div class="about-main"><p class="section-kicker">About</p><h2>I sit at the intersection of engineering, data, and product delivery.</h2><div class="about-copy"><p>My background spans statistics, mathematics, mechanical and industrial engineering. That mix helps me see AI as a complete operating system: the data foundation, the model, the interface, the deployment path, and the people making the final decision.</p><p>I use AI coding partners such as Codex, Claude Code, and Gemini as part of a disciplined development workflow—accelerating research and implementation while keeping architecture, validation, and accountability human-led.</p></div><div class="about-links"><a href="https://medium.com/@aserdargun" target="_blank" rel="noreferrer">Read my writing <span aria-hidden="true">↗</span></a><a href="mailto:aserdargun@gmail.com">Start a conversation <span aria-hidden="true">↗</span></a></div></div><aside class="credentials" aria-labelledby="credentials-title"><div class="credentials-heading"><p id="credentials-title">Selected credentials</p><span>Verified links</span></div><ul><li><a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/c00f6af8a83c4fd48d7783c47038655c" target="_blank" rel="noreferrer"><span><strong>AWS Certified AI Practitioner</strong><small>AWS</small></span><span aria-hidden="true">↗</span></a></li><li><a href="https://learn.microsoft.com/en-us/users/serdargundogdu/credentials/c3bd4c75e9e1fbb3" target="_blank" rel="noreferrer"><span><strong>Azure AI Fundamentals</strong><small>Microsoft</small></span><span aria-hidden="true">↗</span></a></li><li><a href="https://learn.microsoft.com/api/credentials/share/en-us/serdargundogdu/5FD8EE37241A70F2" target="_blank" rel="noreferrer"><span><strong>Azure Data Fundamentals</strong><small>Microsoft</small></span><span aria-hidden="true">↗</span></a></li><li><a href="https://www.credly.com/badges/f64dc0f7-49e6-48db-ab75-864180352c30/public_url" target="_blank" rel="noreferrer"><span><strong>Google Cloud Digital Leader</strong><small>Google Cloud</small></span><span aria-hidden="true">↗</span></a></li><li><a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a4502f1e68434db9bafe594a00b8f2ef" target="_blank" rel="noreferrer"><span><strong>AWS Certified Cloud Practitioner</strong><small>AWS</small></span><span aria-hidden="true">↗</span></a></li><li><a href="https://courses.edx.org/certificates/d40606be6f9a444ea60af6c1e9cadb38" target="_blank" rel="noreferrer"><span><strong>CS50: Introduction to Computer Science</strong><small>HarvardX</small></span><span aria-hidden="true">↗</span></a></li></ul></aside></section><section class="contact"><p>Have an industrial AI problem worth solving?</p><a href="mailto:aserdargun@gmail.com">Let&#x27;s build something useful. <span aria-hidden="true">↗</span></a></section></main><footer><p>© 2026 Serdar Gündoğdu</p><p>AI practitioner · Industrial intelligence</p><a href="#top">Back to top ↑</a></footer>
+  <main>
+    <span class="mark" aria-hidden="true">SG</span>
+    <p>Choose your language · Dilinizi seçin</p>
+    <h1>Industrial intelligence, built for the real world.</h1>
+    <nav aria-label="Language selection · Dil seçimi">
+      <a href="/tr/" lang="tr">Türkçe</a>
+      <a href="/en/" lang="en">English</a>
+    </nav>
+  </main>
 </body>
 </html>
