@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">Stackfolio</title>
+  <desc id="description">Three connected portfolio layers forming a personal project stack.</desc>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#121310" stroke="#c8ff36" stroke-width="2"/>
+  <path d="M13 16.5 20 11h31l-7 11H13Z" fill="#c8ff36"/>
+  <path d="M13 26.5h31L51 32H20Z" fill="#ff7043"/>
+  <path d="M20 36h31L44 47H13Z" fill="#6a8dff"/>
+  <path d="M27 19.5h10.5M33 29.25h7.5M24 42.5h13.5" fill="none" stroke="#121310" stroke-linecap="round" stroke-width="2.5"/>
+  <circle cx="48.5" cy="49.5" r="7.5" fill="#fffdf7" stroke="#121310" stroke-width="2"/>
+  <path d="m46 49.5 2 2 4-4.5" fill="none" stroke="#121310" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+</svg>
