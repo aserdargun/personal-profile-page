@@ -82,6 +82,8 @@ check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronolog
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
 check(pages.en.includes("https://unsloth.aserdargun.com/") && pages.tr.includes("https://unsloth.aserdargun.com/"), "Unsloth Studio Learning Atlas link is missing");
 check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Unsloth Studio Atlas&apos;ı keşfet"), "Localized Unsloth Studio Atlas labels are missing");
+check(pages.en.includes("https://stackfolio.aserdargun.com/") && pages.tr.includes("https://stackfolio.aserdargun.com/"), "Stackfolio entry link is missing");
+check(pages.en.includes("Owner workspace · Live") && pages.tr.includes("Kişisel çalışma alanım · Canlı"), "Localized Stackfolio entry labels are missing");
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
@@ -92,7 +94,7 @@ const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
 check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
 check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
 
-for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "styles.css", "scripts.js"]) {
+for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "icons/stackfolio.svg", "styles.css", "scripts.js"]) {
   try {
     await stat(path.join(root, asset));
   } catch {
