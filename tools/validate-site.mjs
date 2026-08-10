@@ -4,15 +4,15 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedStageKeys = [
-  "mechanical-engineering",
-  "industrial-engineering",
-  "materials-manufacturing",
-  "production-engineer",
-  "production-manager",
-  "data-scientist",
-  "full-stack-ai",
-  "ai-practitioner",
   "kernel-engineer",
+  "ai-practitioner",
+  "full-stack-ai",
+  "data-scientist",
+  "production-manager",
+  "production-engineer",
+  "materials-manufacturing",
+  "industrial-engineering",
+  "mechanical-engineering",
 ];
 const expectedAnchors = ["top", "journey", "work", "approach", "about"];
 const failures = [];
@@ -48,6 +48,8 @@ for (const [locale, html] of Object.entries(pages)) {
 
   const stageKeys = matches(html, /data-stage-key="([^"]+)"/g);
   check(JSON.stringify(stageKeys) === JSON.stringify(expectedStageKeys), `${locale}: timeline stage keys or order differ`);
+  const stageNumbers = matches(html, /data-stage-number="([^"]+)"/g);
+  check(JSON.stringify(stageNumbers) === JSON.stringify(["09", "08", "07", "06", "05", "04", "03", "02", "01"]), `${locale}: timeline stage numbers must descend from 09 to 01`);
 
   for (const anchor of expectedAnchors) {
     check(new RegExp(`id="${anchor}"`).test(html), `${locale}: #${anchor} anchor is missing`);

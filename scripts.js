@@ -46,7 +46,8 @@ function initializeTimeline() {
     const progress = steps.length > 1 ? boundedIndex / (steps.length - 1) : 1;
     timeline.style.setProperty("--timeline-progress", String(progress));
 
-    if (stageCount) stageCount.textContent = `${String(boundedIndex + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
+    const stageNumber = activeStep.dataset.stageNumber || String(boundedIndex + 1).padStart(2, "0");
+    if (stageCount) stageCount.textContent = `${stageNumber} / ${String(steps.length).padStart(2, "0")}`;
     if (stageRole) stageRole.textContent = activeStep.dataset.stageRole || "";
     if (stageFocus) stageFocus.textContent = activeStep.dataset.stageFocus || "";
 
