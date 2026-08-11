@@ -436,6 +436,7 @@ ul {
 .portrait-wrap {
   --portrait-x: 50%;
   --portrait-y: 46%;
+  --portrait-media-scale: 0.9;
   position: relative;
   min-height: 100%;
   overflow: hidden;
@@ -483,7 +484,8 @@ ul {
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: none;
+  transform: scale(var(--portrait-media-scale));
+  transform-origin: center;
   object-fit: cover;
   object-position: center top;
   filter: contrast(1.34) brightness(0.86) saturate(0.82);
@@ -503,6 +505,8 @@ ul {
   width: 100%;
   height: 100%;
   opacity: 0;
+  transform: scale(var(--portrait-media-scale));
+  transform-origin: center;
   transition: opacity 180ms ease;
 }
 
