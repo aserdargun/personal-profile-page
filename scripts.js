@@ -115,6 +115,10 @@ function initializePortrait() {
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) return;
 
+  const sourceCanvas = document.createElement("canvas");
+  const sourceCtx = sourceCanvas.getContext("2d", { alpha: true });
+  if (!sourceCtx) return;
+
   const columns = 30;
   const rows = 28;
   const offsets = new Float32Array(columns);
@@ -132,8 +136,12 @@ function initializePortrait() {
   let dpr = 1;
   let sourceX = 0;
   let sourceY = 0;
-  let sourceWidth = image.naturalWidth;
-  let sourceHeight = image.naturalHeight;
+  let sourceWidth = 0;
+  let sourceHeight = 0;
+  let mediaX = 0;
+  let mediaY = 0;
+  let mediaWidth = 0;
+  let mediaHeight = 0;
   let animationFrame = 0;
   let animationRunning = false;
   let portraitVisible = true;
@@ -141,36 +149,60 @@ function initializePortrait() {
   let dragAnchorX = 0;
   let dragAnchorY = 0;
 
+  function rasterizeSource() {
+    const declaredWidth = Number.parseInt(image.getAttribute("width"), 10);
+    const declaredHeight = Number.parseInt(image.getAttribute("height"), 10);
+
+    sourceCanvas.width = Number.isFinite(declaredWidth) && declaredWidth > 0
+      ? declaredWidth
+      : image.naturalWidth;
+    sourceCanvas.height = Number.isFinite(declaredHeight) && declaredHeight > 0
+      ? declaredHeight
+      : image.naturalHeight;
+    sourceCtx.drawImage(image, 0, 0, sourceCanvas.width, sourceCanvas.height);
+  }
+
   function resize() {
     const rect = wrap.getBoundingClientRect();
     width = Math.max(1, rect.width);
     height = Math.max(1, rect.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const mediaScale = Number.parseFloat(
+      getComputedStyle(wrap).getPropertyValue("--portrait-media-scale"),
+    );
+    const fittedScale = Number.isFinite(mediaScale)
+      ? Math.max(0.01, Math.min(1, mediaScale))
+      : 1;
+
+    mediaWidth = width * fittedScale;
+    mediaHeight = height * fittedScale;
+    mediaX = (width - mediaWidth) / 2;
+    mediaY = (height - mediaHeight) / 2;
 
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
 
-    const imageRatio = image.naturalWidth / image.naturalHeight;
-    const frameRatio = width / height;
+    const imageRatio = sourceCanvas.width / sourceCanvas.height;
+    const frameRatio = mediaWidth / mediaHeight;
 
     if (imageRatio > frameRatio) {
-      sourceHeight = image.naturalHeight;
+      sourceHeight = sourceCanvas.height;
       sourceWidth = sourceHeight * frameRatio;
-      sourceX = (image.naturalWidth - sourceWidth) / 2;
+      sourceX = (sourceCanvas.width - sourceWidth) / 2;
       sourceY = 0;
     } else {
-      sourceWidth = image.naturalWidth;
+      sourceWidth = sourceCanvas.width;
       sourceHeight = sourceWidth / frameRatio;
       sourceX = 0;
       sourceY = 0;
     }
 
-    if (sourceHeight > image.naturalHeight) {
-      sourceHeight = image.naturalHeight;
+    if (sourceHeight > sourceCanvas.height) {
+      sourceHeight = sourceCanvas.height;
       sourceWidth = sourceHeight * frameRatio;
-      sourceX = (image.naturalWidth - sourceWidth) / 2;
+      sourceX = (sourceCanvas.width - sourceWidth) / 2;
     }
 
     pointer.x = width / 2;
@@ -217,8 +249,8 @@ function initializePortrait() {
       return;
     }
 
-    const stripWidth = width / columns;
-    const rowHeight = height / rows;
+    const stripWidth = mediaWidth / columns;
+    const rowHeight = mediaHeight / rows;
     const sourceStripWidth = sourceWidth / columns;
     const sourceRowHeight = sourceHeight / rows;
 
@@ -234,11 +266,11 @@ function initializePortrait() {
       offsets[column] += velocities[column];
 
       const idle = Math.sin(time * 0.00072 + column * 0.46) * 0.75;
-      const columnCenter = (column + 0.5) * stripWidth;
+      const columnCenter = mediaX + (column + 0.5) * stripWidth;
 
       for (let row = 0; row < rows; row += 1) {
         const rowProgress = row / Math.max(1, rows - 1);
-        const rowCenter = (row + 0.5) * rowHeight;
+        const rowCenter = mediaY + (row + 0.5) * rowHeight;
         const pointerFalloff = pointer.inside
           ? Math.max(0, 1 - Math.abs(rowCenter - pointer.y) / Math.max(170, height * 0.28))
           : 0.28;
@@ -254,13 +286,13 @@ function initializePortrait() {
         const lift = Math.abs(displacement) * 0.025 * pinning;
 
         ctx.drawImage(
-          image,
+          sourceCanvas,
           sourceX + column * sourceStripWidth,
           sourceY + row * sourceRowHeight,
           sourceStripWidth + 1,
           sourceRowHeight + 1,
-          column * stripWidth + displacement,
-          row * rowHeight - lift + dragY,
+          mediaX + column * stripWidth + displacement,
+          mediaY + row * rowHeight - lift + dragY,
           stripWidth + 1.3,
           rowHeight + 1.3,
         );
@@ -283,6 +315,7 @@ function initializePortrait() {
   }
 
   function start() {
+    rasterizeSource();
     resize();
     wrap.classList.add("is-interactive");
     startAnimation();
