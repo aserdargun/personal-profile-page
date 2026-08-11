@@ -35,6 +35,7 @@ const pages = {
   en: await readFile(path.join(root, "en/index.html"), "utf8"),
   tr: await readFile(path.join(root, "tr/index.html"), "utf8"),
 };
+const styles = await readFile(path.join(root, "styles.css"), "utf8");
 
 for (const [locale, html] of Object.entries(pages)) {
   check(html.includes(`<html lang="${locale}" data-locale="${locale}">`), `${locale}: html language marker is missing`);
@@ -86,6 +87,8 @@ check(pages.en.includes("https://unsloth.aserdargun.com/") && pages.tr.includes(
 check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Unsloth Studio Atlas&apos;ı keşfet"), "Localized Unsloth Studio Atlas labels are missing");
 check(pages.en.includes("https://stackfolio.aserdargun.com/") && pages.tr.includes("https://stackfolio.aserdargun.com/"), "Stackfolio entry link is missing");
 check(pages.en.includes("Owner workspace · Live") && pages.tr.includes("Kişisel çalışma alanım · Canlı"), "Localized Stackfolio entry labels are missing");
+check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
+check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 2, "Portrait image and canvas must share the same fitted scale");
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
