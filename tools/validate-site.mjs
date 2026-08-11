@@ -88,7 +88,7 @@ check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Un
 check(pages.en.includes("https://stackfolio.aserdargun.com/") && pages.tr.includes("https://stackfolio.aserdargun.com/"), "Stackfolio entry link is missing");
 check(pages.en.includes("Owner workspace · Live") && pages.tr.includes("Kişisel çalışma alanım · Canlı"), "Localized Stackfolio entry labels are missing");
 check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
-check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 2, "Portrait image and canvas must share the same fitted scale");
+check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 1, "Only the static portrait image should rely on CSS scaling");
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");

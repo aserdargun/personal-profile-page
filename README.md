@@ -8,6 +8,7 @@ The opening experience combines an interactive ASCII portrait with a nine-stage 
 
 ```bash
 node --check scripts.js
+node --test tools/validate-portrait-canvas.mjs
 node tools/validate-site.mjs
 ```
 
