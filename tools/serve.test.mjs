@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
+import { mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { createServer as createProbeServer } from "node:net";
 import { request as httpRequest } from "node:http";
+import os from "node:os";
 import path from "node:path";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -133,6 +135,25 @@ test("rejects an encoded traversal outside the repository root", async () => {
 
   assert.equal(response.statusCode, 403);
   assert.equal(response.body, "Forbidden\n");
+});
+
+test("rejects a symbolic link that resolves outside the repository root", async () => {
+  const outsideDirectory = await mkdtemp(path.join(os.tmpdir(), "profile-preview-outside-"));
+  const linkDirectory = await mkdtemp(path.join(root, ".profile-preview-link-"));
+  const outsideFile = path.join(outsideDirectory, "private.txt");
+  const linkPath = path.join(linkDirectory, "outside.txt");
+
+  try {
+    await writeFile(outsideFile, "outside repository\n", "utf8");
+    await symlink(outsideFile, linkPath);
+
+    const response = await request(`/${path.basename(linkDirectory)}/outside.txt`);
+    assert.equal(response.statusCode, 403);
+    assert.equal(response.body, "Forbidden\n");
+  } finally {
+    await rm(linkDirectory, { force: true, recursive: true });
+    await rm(outsideDirectory, { force: true, recursive: true });
+  }
 });
 
 test("rejects malformed URL encoding", async () => {

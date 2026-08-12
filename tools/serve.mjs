@@ -1,10 +1,11 @@
 import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
+import { realpath, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const canonicalRoot = await realpath(root);
 const host = process.env.HOST || "127.0.0.1";
 const rawPort = process.env.PORT || "4173";
 const port = Number(rawPort);
@@ -32,6 +33,20 @@ function sendText(response, statusCode, message, extraHeaders = {}) {
   response.end(`${message}\n`);
 }
 
+function isWithin(basePath, candidatePath) {
+  return candidatePath === basePath || candidatePath.startsWith(`${basePath}${path.sep}`);
+}
+
+async function resolveExistingPath(filePath) {
+  const canonicalPath = await realpath(filePath);
+  if (!isWithin(canonicalRoot, canonicalPath)) {
+    throw Object.assign(new Error("Request path escapes the project root"), {
+      statusCode: 403,
+    });
+  }
+  return canonicalPath;
+}
+
 function resolveRequestPath(requestUrl) {
   const rawPath = (requestUrl || "/").split("?", 1)[0].split("#", 1)[0];
   const decodedPath = decodeURIComponent(rawPath).replaceAll("\\", "/");
@@ -42,9 +57,8 @@ function resolveRequestPath(requestUrl) {
 
   const relativePath = decodedPath.replace(/^\/+/, "");
   const resolvedPath = path.resolve(root, relativePath);
-  const rootPrefix = `${root}${path.sep}`;
 
-  if (resolvedPath !== root && !resolvedPath.startsWith(rootPrefix)) {
+  if (!isWithin(root, resolvedPath)) {
     throw Object.assign(new Error("Request path escapes the project root"), {
       statusCode: 403,
     });
@@ -69,9 +83,10 @@ const server = createServer(async (request, response) => {
   }
 
   try {
+    filePath = await resolveExistingPath(filePath);
     let fileStats = await stat(filePath);
     if (fileStats.isDirectory()) {
-      filePath = path.join(filePath, "index.html");
+      filePath = await resolveExistingPath(path.join(filePath, "index.html"));
       fileStats = await stat(filePath);
     }
 
@@ -98,6 +113,11 @@ const server = createServer(async (request, response) => {
     });
     stream.pipe(response);
   } catch (error) {
+    if (error.statusCode === 403) {
+      sendText(response, 403, "Forbidden");
+      return;
+    }
+
     if (error.code === "ENOENT" || error.code === "ENOTDIR") {
       sendText(response, 404, "Not Found");
       return;
