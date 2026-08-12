@@ -4,12 +4,34 @@ Bilingual personal portfolio for Serdar Gündoğdu, available at `/en/` and `/tr
 
 The opening experience combines an interactive ASCII portrait with a nine-stage career timeline spanning mechanical engineering, manufacturing leadership, data science, full-stack AI, and ongoing GPU kernel engineering study.
 
-## Validation
+## Development
+
+Install the project metadata from the lockfile, then start the dependency-free
+local preview server:
 
 ```bash
-node --check scripts.js
-node --test tools/validate-portrait-canvas.mjs
-node tools/validate-site.mjs
+npm ci
+npm run dev
+```
+
+Open http://127.0.0.1:4173. The host and port can be overridden with `HOST` and
+`PORT` environment variables.
+
+## Validation
+
+Run the complete validation gate:
+
+```bash
+npm test
+```
+
+For focused troubleshooting, run an individual check:
+
+```bash
+npm run check:js
+npm run test:portrait
+npm run test:server
+npm run validate:site
 ```
 
 ## Projects
