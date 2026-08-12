@@ -1,0 +1,15 @@
+{
+  "name": "aserdargun.com",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "check:js": "node --check scripts.js",
+    "test:portrait": "node --test tools/validate-portrait-canvas.mjs",
+    "validate:site": "node tools/validate-site.mjs",
+    "test": "npm run check:js && npm run test:portrait && npm run validate:site"
+  }
+}
