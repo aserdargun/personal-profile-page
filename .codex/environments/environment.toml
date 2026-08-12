@@ -3,18 +3,14 @@ version = 1
 name = "aserdargun.com"
 
 [setup]
-script = """
-set -eu
-node --version
-python3 --version
-"""
+script = "npm ci"
 
 [[actions]]
-name = "Preview Site"
+name = "Run"
 icon = "run"
-command = "python3 -m http.server 4173 --bind 127.0.0.1"
+command = "npm run dev"
 
 [[actions]]
-name = "Validate Site"
-icon = "test"
-command = "node --check scripts.js && node --test tools/validate-portrait-canvas.mjs && node tools/validate-site.mjs"
+name = "Validate"
+icon = "tool"
+command = "npm test"

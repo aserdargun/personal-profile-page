@@ -6,13 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Personal portfolio website for Serdar Gundogdu - AI Practitioner. The site showcases end-to-end artificial intelligence solutions built using cutting-edge AI coding assistants (Claude Code, ChatGPT Codex, Google Gemini) with VS Code and Antigravity IDE.
 
-**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero external dependencies. The public experience is bilingual: `/en/` and `/tr/`, with `/` acting as an accessible language gateway.
+**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero runtime dependencies. Node.js 20+ and npm provide dependency-free local development and validation commands. The public experience is bilingual: `/en/` and `/tr/`, with `/` acting as an accessible language gateway.
 
 ## Development Commands
 
-There are no build steps, package managers, or test runners. This is a pure static site.
+There is no production build step. npm provides the shared development command surface without installing runtime or development packages.
 
-- **Local development:** Open `index.html` in a browser or use any static file server
+- **Setup:** `npm ci`
+- **Local development:** `npm run dev` (serves `http://127.0.0.1:4173` by default)
+- **Validation:** `npm test`
+- **Static server tests:** `npm run test:server`
 - **Deployment:** Automatic via Azure Static Web Apps on push to `main` branch
 
 ## Architecture
@@ -22,6 +25,9 @@ There are no build steps, package managers, or test runners. This is a pure stat
 - `en/index.html`, `tr/index.html` - Complete localized portfolio pages with matching anchors and timeline stage keys
 - `styles.css` - Global design system with CSS custom properties for theming
 - `scripts.js` - Language preference, active career timeline, and viewport-aware ASCII portrait animation
+- `package.json` - Shared setup, preview, and validation command contract
+- `tools/serve.mjs` - Dependency-free local static preview server
+- `tools/serve.test.mjs` - HTTP behavior and path-confinement regression tests
 - `tools/validate-site.mjs` - Dependency-free parity and metadata validation for both locales
 
 ### Projects
