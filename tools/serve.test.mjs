@@ -104,6 +104,10 @@ test("serves the English homepage at root without client navigation", async () =
   assert.match(response.headers["content-type"], /^text\/html/);
   assert.equal(response.headers["cache-control"], "no-store");
   assert.match(response.body, /<html lang="en" data-locale="en">/);
+  assert.match(
+    response.body,
+    /<link rel="canonical" href="https:\/\/aserdargun\.com\/">/,
+  );
   assert.doesNotMatch(response.body, /window\.location\.replace/);
 });
 

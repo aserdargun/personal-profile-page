@@ -105,11 +105,15 @@ for (const selector of ["lab-index", "lab-type", "credentials-heading", "credent
 }
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
-check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
-check(rootPage.includes("navigator.language"), "Root browser-language fallback is missing");
-check(rootPage.includes("href=\"/tr/\"") && rootPage.includes("href=\"/en/\""), "Root no-JavaScript language links are missing");
+check(rootPage.includes('<html lang="en" data-locale="en">'), "Root English language marker is missing");
+check(rootPage.includes('<link rel="canonical" href="https://aserdargun.com/">'), "Root canonical URL is incorrect");
+check(rootPage.includes('<meta property="og:url" content="https://aserdargun.com/">'), "Root Open Graph URL is incorrect");
+check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL is incorrect");
+check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
+check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
 
 const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
+check(sitemap.includes("<loc>https://aserdargun.com/</loc>"), "Sitemap is missing root URL");
 check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
 check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
 

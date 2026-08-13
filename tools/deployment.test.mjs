@@ -66,11 +66,20 @@ test("Azure bypasses build discovery for the dependency-free static site", () =>
   );
 });
 
-test("Azure serves the English homepage at root without client navigation", () => {
-  assert.deepEqual(
-    staticConfig.routes?.find(({ route }) => route === "/"),
-    { route: "/", rewrite: "/en/index.html" },
+test("Azure serves a self-canonical English homepage directly at root", async () => {
+  const rootHomepage = await readFile(path.join(root, "index.html"), "utf8");
+
+  assert.equal(
+    staticConfig.routes?.some(({ route }) => route === "/"),
+    false,
+    "root must use its own index.html instead of rewriting another canonical URL",
   );
+  assert.match(rootHomepage, /<html lang="en" data-locale="en">/);
+  assert.match(
+    rootHomepage,
+    /<link rel="canonical" href="https:\/\/aserdargun\.com\/">/,
+  );
+  assert.doesNotMatch(rootHomepage, /window\.location\.replace/);
 });
 
 test("Azure caches static assets without long-caching HTML", () => {

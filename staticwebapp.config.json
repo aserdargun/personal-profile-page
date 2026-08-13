@@ -1,10 +1,6 @@
 {
   "routes": [
     {
-      "route": "/",
-      "rewrite": "/en/index.html"
-    },
-    {
       "route": "/styles.css",
       "headers": {
         "Cache-Control": "public, max-age=86400"
