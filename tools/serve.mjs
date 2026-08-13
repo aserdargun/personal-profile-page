@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import { realpath, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,8 +9,12 @@ const canonicalRoot = await realpath(root);
 const host = process.env.HOST || "127.0.0.1";
 const rawPort = process.env.PORT || "4173";
 const port = Number(rawPort);
+const staticConfig = JSON.parse(
+  await readFile(path.join(root, "staticwebapp.config.json"), "utf8"),
+);
 
 const mimeTypes = new Map([
+  [".avif", "image/avif"],
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
   [".ico", "image/x-icon"],
@@ -47,7 +51,7 @@ async function resolveExistingPath(filePath) {
   return canonicalPath;
 }
 
-function resolveRequestPath(requestUrl) {
+function requestPathname(requestUrl) {
   const rawPath = (requestUrl || "/").split("?", 1)[0].split("#", 1)[0];
   const decodedPath = decodeURIComponent(rawPath).replaceAll("\\", "/");
 
@@ -55,7 +59,11 @@ function resolveRequestPath(requestUrl) {
     throw Object.assign(new Error("Invalid request path"), { statusCode: 400 });
   }
 
-  const relativePath = decodedPath.replace(/^\/+/, "");
+  return decodedPath.startsWith("/") ? decodedPath : `/${decodedPath}`;
+}
+
+function resolveRequestPath(pathname) {
+  const relativePath = pathname.replace(/^\/+/, "");
   const resolvedPath = path.resolve(root, relativePath);
 
   if (!isWithin(root, resolvedPath)) {
@@ -67,6 +75,16 @@ function resolveRequestPath(requestUrl) {
   return resolvedPath;
 }
 
+function matchesRoute(route, pathname) {
+  return route.endsWith("*")
+    ? pathname.startsWith(route.slice(0, -1))
+    : pathname === route;
+}
+
+function configuredRoute(pathname) {
+  return staticConfig.routes?.find(({ route }) => matchesRoute(route, pathname));
+}
+
 const server = createServer(async (request, response) => {
   if (request.method !== "GET" && request.method !== "HEAD") {
     sendText(response, 405, "Method Not Allowed", { Allow: "GET, HEAD" });
@@ -74,8 +92,11 @@ const server = createServer(async (request, response) => {
   }
 
   let filePath;
+  let routeRule;
   try {
-    filePath = resolveRequestPath(request.url);
+    const pathname = requestPathname(request.url);
+    routeRule = configuredRoute(pathname);
+    filePath = resolveRequestPath(routeRule?.rewrite ?? pathname);
   } catch (error) {
     const statusCode = error instanceof URIError ? 400 : error.statusCode || 400;
     sendText(response, statusCode, statusCode === 403 ? "Forbidden" : "Bad Request");
@@ -99,6 +120,7 @@ const server = createServer(async (request, response) => {
       "Cache-Control": "no-store",
       "Content-Length": fileStats.size,
       "Content-Type": mimeTypes.get(path.extname(filePath).toLowerCase()) || "application/octet-stream",
+      ...routeRule?.headers,
     });
 
     if (request.method === "HEAD") {

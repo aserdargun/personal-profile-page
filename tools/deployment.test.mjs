@@ -17,6 +17,9 @@ function setting(source, name) {
 }
 
 const targetWorkflow = await readFile(targetWorkflowPath, "utf8");
+const staticConfig = JSON.parse(
+  await readFile(path.join(root, "staticwebapp.config.json"), "utf8"),
+);
 
 test("Azure deployment root contains every public route and shared asset", async () => {
   const appLocation = setting(targetWorkflow, "app_location");
@@ -59,6 +62,37 @@ test("Azure bypasses build discovery for the dependency-free static site", () =>
     "true",
     "Azure must upload the static files without invoking Oryx",
   );
+});
+
+test("Azure serves the English homepage at root without client navigation", () => {
+  assert.deepEqual(
+    staticConfig.routes?.find(({ route }) => route === "/"),
+    { route: "/", rewrite: "/en/index.html" },
+  );
+});
+
+test("Azure caches static assets without long-caching HTML", () => {
+  const routeMap = new Map(
+    (staticConfig.routes ?? []).map((rule) => [rule.route, rule]),
+  );
+
+  assert.equal(
+    routeMap.get("/styles.css")?.headers?.["Cache-Control"],
+    "public, max-age=86400",
+  );
+  assert.equal(
+    routeMap.get("/scripts.js")?.headers?.["Cache-Control"],
+    "public, max-age=86400",
+  );
+  assert.equal(
+    routeMap.get("/images/*")?.headers?.["Cache-Control"],
+    "public, max-age=604800",
+  );
+  assert.equal(
+    routeMap.get("/icons/*")?.headers?.["Cache-Control"],
+    "public, max-age=604800",
+  );
+  assert.equal(routeMap.get("/")?.headers, undefined);
 });
 
 test("main pushes trigger exactly one Azure Static Web Apps deployment", async () => {

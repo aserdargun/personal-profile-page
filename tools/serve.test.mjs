@@ -97,13 +97,14 @@ after(async () => {
   }
 });
 
-test("serves the root index as HTML without caching", async () => {
+test("serves the English homepage at root without client navigation", async () => {
   const response = await request("/");
 
   assert.equal(response.statusCode, 200);
   assert.match(response.headers["content-type"], /^text\/html/);
   assert.equal(response.headers["cache-control"], "no-store");
-  assert.match(response.body, /<!doctype html>/i);
+  assert.match(response.body, /<html lang="en" data-locale="en">/);
+  assert.doesNotMatch(response.body, /window\.location\.replace/);
 });
 
 test("serves both localized directory indexes", async () => {
@@ -121,6 +122,21 @@ test("supports HEAD requests with asset metadata and no body", async () => {
   assert.match(response.headers["content-type"], /^text\/css/);
   assert.ok(Number(response.headers["content-length"]) > 0);
   assert.equal(response.body, "");
+});
+
+test("emulates Azure cache headers for shared assets", async () => {
+  const expectations = new Map([
+    ["/styles.css", "public, max-age=86400"],
+    ["/scripts.js", "public, max-age=86400"],
+    ["/images/serdar-gundogdu-ascii-480.webp", "public, max-age=604800"],
+    ["/icons/stackfolio.svg", "public, max-age=604800"],
+  ]);
+
+  for (const [pathname, cacheControl] of expectations) {
+    const response = await request(pathname, "HEAD");
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.headers["cache-control"], cacheControl);
+  }
 });
 
 test("returns 404 for a missing resource", async () => {
