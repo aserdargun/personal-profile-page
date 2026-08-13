@@ -37,6 +37,8 @@ test("Azure deployment root contains every public route and shared asset", async
     "scripts.js",
     "staticwebapp.config.json",
     "images/serdar-gundogdu-ascii.png",
+    "images/serdar-gundogdu-ascii-480.avif",
+    "images/serdar-gundogdu-ascii-720.avif",
     "icons/stackfolio.svg",
   ];
   const missingPaths = [];

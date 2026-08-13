@@ -46,6 +46,7 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes("data-language-link=\"tr\""), `${locale}: Turkish language link is missing`);
   check(html.includes("data-language-link=\"en\""), `${locale}: English language link is missing`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
+  check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.webp 480w") && html.includes("/images/serdar-gundogdu-ascii-720.webp 720w"), `${locale}: responsive WebP portrait sources are missing`);
   check(html.includes('width="720" height="952" fetchpriority="high"'), `${locale}: portrait dimensions or loading priority are incorrect`);
 
@@ -99,7 +100,7 @@ const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
 check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
 check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
 
-for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "images/serdar-gundogdu-ascii-480.webp", "images/serdar-gundogdu-ascii-720.webp", "icons/stackfolio.svg", "styles.css", "scripts.js"]) {
+for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "images/serdar-gundogdu-ascii-480.avif", "images/serdar-gundogdu-ascii-720.avif", "images/serdar-gundogdu-ascii-480.webp", "images/serdar-gundogdu-ascii-720.webp", "icons/stackfolio.svg", "styles.css", "scripts.js"]) {
   try {
     await stat(path.join(root, asset));
   } catch {
@@ -114,10 +115,16 @@ check(trOgDimensions?.width === 1730 && trOgDimensions?.height === 909, "Turkish
 const portraitBuffer = await readFile(path.join(root, "images/serdar-gundogdu-ascii.png"));
 const portraitDimensions = readPngDimensions(portraitBuffer);
 const portraitPngStats = await stat(path.join(root, "images/serdar-gundogdu-ascii.png"));
+const portrait480AvifStats = await stat(path.join(root, "images/serdar-gundogdu-ascii-480.avif"))
+  .catch(() => ({ size: Number.POSITIVE_INFINITY }));
+const portrait720AvifStats = await stat(path.join(root, "images/serdar-gundogdu-ascii-720.avif"))
+  .catch(() => ({ size: Number.POSITIVE_INFINITY }));
 const portrait480Stats = await stat(path.join(root, "images/serdar-gundogdu-ascii-480.webp"));
 const portrait720Stats = await stat(path.join(root, "images/serdar-gundogdu-ascii-720.webp"));
 check(portraitDimensions?.width === 720 && portraitDimensions?.height === 952, "Fallback portrait must be 720×952 PNG");
 check(portraitPngStats.size <= 550_000, "Fallback portrait exceeds its 550 KB performance budget");
+check(portrait480AvifStats.size < portrait480Stats.size, "480px AVIF portrait must be smaller than WebP");
+check(portrait720AvifStats.size < portrait720Stats.size, "720px AVIF portrait must be smaller than WebP");
 check(portrait480Stats.size <= 150_000, "480px WebP portrait exceeds its 150 KB performance budget");
 check(portrait720Stats.size <= 300_000, "720px WebP portrait exceeds its 300 KB performance budget");
 
