@@ -45,6 +45,12 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes("hreflang=\"x-default\""), `${locale}: x-default hreflang is missing`);
   check(html.includes("data-language-link=\"tr\""), `${locale}: Turkish language link is missing`);
   check(html.includes("data-language-link=\"en\""), `${locale}: English language link is missing`);
+  const trLanguageLink = html.match(/<a[^>]+data-language-link="tr"[^>]*>/)?.[0] ?? "";
+  const enLanguageLink = html.match(/<a[^>]+data-language-link="en"[^>]*>/)?.[0] ?? "";
+  check(trLanguageLink.includes('aria-label="TR —'), `${locale}: Turkish language label must contain visible text TR`);
+  check(enLanguageLink.includes('aria-label="EN —'), `${locale}: English language label must contain visible text EN`);
+  check(!/<a class="wordmark"[^>]+aria-label=/.test(html), `${locale}: wordmark must use its visible content as the accessible name`);
+  check(!/<a class="stackfolio-entry"[^>]+aria-label=/.test(html), `${locale}: Stackfolio must use its visible content as the accessible name`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.webp 480w") && html.includes("/images/serdar-gundogdu-ascii-720.webp 720w"), `${locale}: responsive WebP portrait sources are missing`);
@@ -90,6 +96,12 @@ check(pages.en.includes("https://stackfolio.aserdargun.com/") && pages.tr.includ
 check(pages.en.includes("Owner workspace · Live") && pages.tr.includes("Kişisel çalışma alanım · Canlı"), "Localized Stackfolio entry labels are missing");
 check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
 check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 1, "Only the static portrait image should rely on CSS scaling");
+check(/\.has-js \.timeline-step\s*\{[^}]*opacity:\s*1;/.test(styles), "Inactive timeline steps must not reduce descendant contrast with parent opacity");
+check(/\.section-kicker\s*\{[^}]*color:\s*rgba\(18, 19, 16, 0\.65\);/.test(styles), "Section kicker contrast is below the required token");
+for (const selector of ["lab-index", "lab-type", "credentials-heading", "credentials small"]) {
+  const selectorPattern = selector.replace(" ", "\\s+");
+  check(new RegExp(`\\.${selectorPattern}\\s*\\{[^}]*color:\\s*rgba\\(18, 19, 16, 0\\.7\\);`).test(styles), `${selector} contrast is below the required token`);
+}
 
 const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes("portfolio-language"), "Root language preference lookup is missing");
