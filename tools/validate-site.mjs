@@ -49,7 +49,8 @@ for (const [locale, html] of Object.entries(pages)) {
   const enLanguageLink = html.match(/<a[^>]+data-language-link="en"[^>]*>/)?.[0] ?? "";
   check(trLanguageLink.includes('aria-label="TR —'), `${locale}: Turkish language label must contain visible text TR`);
   check(enLanguageLink.includes('aria-label="EN —'), `${locale}: English language label must contain visible text EN`);
-  check(!/<a class="wordmark"[^>]+aria-label=/.test(html), `${locale}: wordmark must use its visible content as the accessible name`);
+  const wordmarkLink = html.match(/<a class="wordmark"[^>]*>/)?.[0] ?? "";
+  check(wordmarkLink.includes('aria-label="SG — Serdar Gündoğdu'), `${locale}: wordmark accessible name must contain all visible text`);
   check(!/<a class="stackfolio-entry"[^>]+aria-label=/.test(html), `${locale}: Stackfolio must use its visible content as the accessible name`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
