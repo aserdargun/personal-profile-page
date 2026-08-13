@@ -3,8 +3,12 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
-test("responsive portrait draws the complete bitmap into the interactive canvas", async () => {
+async function createFixture({ supportsIdleCallback }) {
   const animationFrames = [];
+  const idleCallbacks = [];
+  const idleTimeouts = [];
+  const timerCallbacks = [];
+  const timerDelays = [];
   const documentListeners = new Map();
   const canvasDraws = [];
   const activeClasses = new Set();
@@ -42,7 +46,7 @@ test("responsive portrait draws the complete bitmap into the interactive canvas"
     naturalWidth: 290,
     naturalHeight: 383.4444,
     complete: true,
-    currentSrc: "https://aserdargun.com/images/serdar-gundogdu-ascii-720.webp",
+    currentSrc: "https://aserdargun.com/images/serdar-gundogdu-ascii-720.avif",
     src: "https://aserdargun.com/images/serdar-gundogdu-ascii.png",
     getAttribute(name) {
       return name === "width" ? "720" : name === "height" ? "952" : null;
@@ -90,8 +94,21 @@ test("responsive portrait draws the complete bitmap into the interactive canvas"
       return animationFrames.length;
     },
     cancelAnimationFrame() {},
+    setTimeout(callback, delay) {
+      timerCallbacks.push(callback);
+      timerDelays.push(delay);
+      return timerCallbacks.length;
+    },
     addEventListener() {},
   };
+
+  if (supportsIdleCallback) {
+    window.requestIdleCallback = (callback, options) => {
+      idleCallbacks.push(callback);
+      idleTimeouts.push(options?.timeout);
+      return idleCallbacks.length;
+    };
+  }
 
   const context = vm.createContext({
     console,
@@ -106,24 +123,84 @@ test("responsive portrait draws the complete bitmap into the interactive canvas"
 
   const scripts = await readFile(new URL("../scripts.js", import.meta.url), "utf8");
   vm.runInContext(scripts, context, { filename: "scripts.js" });
-  documentListeners.get("DOMContentLoaded")();
 
-  assert.equal(activeClasses.has("is-interactive"), true);
-  assert.equal(animationFrames.length, 1);
-  animationFrames.shift()(0);
+  return {
+    activeClasses,
+    animationFrames,
+    canvasDraws,
+    idleTimeouts,
+    sourceCanvas,
+    timerDelays,
+    fireDOMContentLoaded() {
+      documentListeners.get("DOMContentLoaded")();
+    },
+    runAnimationFrame(time = 0) {
+      const callback = animationFrames.shift();
+      assert.ok(callback, "an animation frame must be scheduled");
+      callback(time);
+    },
+    runIdleCallback() {
+      const callback = idleCallbacks.shift();
+      assert.ok(callback, "an idle callback must be scheduled");
+      callback({ didTimeout: false, timeRemaining: () => 50 });
+    },
+    runTimer() {
+      const callback = timerCallbacks.shift();
+      assert.ok(callback, "a fallback timer must be scheduled");
+      callback();
+    },
+    wasSourceRasterized() {
+      return sourceRasterized;
+    },
+  };
+}
 
-  assert.equal(sourceRasterized, true);
-  assert.equal(sourceCanvas.width, 720);
-  assert.equal(sourceCanvas.height, 952);
-  assert.equal(canvasDraws.length, 30 * 28);
+test("portrait initialization waits for browser idle time", async () => {
+  const fixture = await createFixture({ supportsIdleCallback: true });
+
+  fixture.fireDOMContentLoaded();
+
+  assert.equal(fixture.activeClasses.has("is-interactive"), false);
+  assert.deepEqual(fixture.idleTimeouts, [800]);
+  assert.deepEqual(fixture.timerDelays, []);
+
+  fixture.runIdleCallback();
+  assert.equal(fixture.activeClasses.has("is-interactive"), true);
+});
+
+test("portrait initialization uses a bounded timer fallback", async () => {
+  const fixture = await createFixture({ supportsIdleCallback: false });
+
+  fixture.fireDOMContentLoaded();
+
+  assert.equal(fixture.activeClasses.has("is-interactive"), false);
+  assert.deepEqual(fixture.timerDelays, [300]);
+
+  fixture.runTimer();
+  assert.equal(fixture.activeClasses.has("is-interactive"), true);
+});
+
+test("responsive portrait draws the complete bitmap into the interactive canvas", async () => {
+  const fixture = await createFixture({ supportsIdleCallback: true });
+
+  fixture.fireDOMContentLoaded();
+  fixture.runIdleCallback();
+
+  assert.equal(fixture.animationFrames.length, 1);
+  fixture.runAnimationFrame();
+
+  assert.equal(fixture.wasSourceRasterized(), true);
+  assert.equal(fixture.sourceCanvas.width, 720);
+  assert.equal(fixture.sourceCanvas.height, 952);
+  assert.equal(fixture.canvasDraws.length, 30 * 28);
   const leftmostDestinationEdge = Math.min(
-    ...canvasDraws.map(([, , , , , destinationX]) => destinationX),
+    ...fixture.canvasDraws.map(([, , , , , destinationX]) => destinationX),
   );
   const topmostDestinationEdge = Math.min(
-    ...canvasDraws.map(([, , , , , , destinationY]) => destinationY),
+    ...fixture.canvasDraws.map(([, , , , , , destinationY]) => destinationY),
   );
   const rightmostSourceEdge = Math.max(
-    ...canvasDraws.map(([, sourceX, , sourceWidth]) => sourceX + sourceWidth),
+    ...fixture.canvasDraws.map(([, sourceX, , sourceWidth]) => sourceX + sourceWidth),
   );
   assert.ok(leftmostDestinationEdge >= 13.7 && leftmostDestinationEdge <= 14.5);
   assert.ok(Math.abs(topmostDestinationEdge - 19.2) < 0.0001);

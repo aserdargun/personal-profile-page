@@ -387,8 +387,17 @@ function initializePortrait() {
   else image.addEventListener("load", start, { once: true });
 }
 
+function schedulePortraitInitialization() {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(initializePortrait, { timeout: 800 });
+    return;
+  }
+
+  window.setTimeout(initializePortrait, 300);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeLanguageSwitch();
   initializeTimeline();
-  initializePortrait();
+  schedulePortraitInitialization();
 });
