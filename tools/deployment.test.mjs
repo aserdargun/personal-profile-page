@@ -97,6 +97,10 @@ test("Azure caches static assets without long-caching HTML", () => {
   assert.equal(routeMap.get("/")?.headers, undefined);
 });
 
+test("Azure serves AVIF portraits with the browser image MIME type", () => {
+  assert.equal(staticConfig.mimeTypes?.[".avif"], "image/avif");
+});
+
 test("main pushes trigger exactly one Azure Static Web Apps deployment", async () => {
   const workflowFiles = (await readdir(workflowsDirectory))
     .filter((file) => /\.ya?ml$/.test(file))
