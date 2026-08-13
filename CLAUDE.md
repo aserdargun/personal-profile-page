@@ -86,7 +86,7 @@ There is no production build step. npm provides the shared development command s
 
 ## Deployment
 
-Azure Static Web Apps via GitHub Actions (`.github/workflows/azure-static-web-apps-icy-hill-00c42ed1e.yml`):
+Azure Static Web Apps via GitHub Actions (`.github/workflows/azure-static-web-apps-red-tree-06630f303.yml`):
 - Triggers on push to `main` or PR events
 - No build step required - serves static files directly
 - PR branches get automatic staging environments

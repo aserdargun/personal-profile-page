@@ -8,9 +8,10 @@
   "scripts": {
     "dev": "node tools/serve.mjs",
     "check:js": "node --check scripts.js",
+    "test:deployment": "node --test tools/deployment.test.mjs",
     "test:portrait": "node --test tools/validate-portrait-canvas.mjs",
     "test:server": "node --test tools/serve.test.mjs",
     "validate:site": "node tools/validate-site.mjs",
-    "test": "npm run check:js && npm run test:portrait && npm run validate:site"
+    "test": "npm run check:js && npm run test:deployment && npm run test:portrait && npm run validate:site"
   }
 }
