@@ -4,6 +4,18 @@ import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  CONTROL_HEADER,
+  CONTROL_ROUTE,
+  createControlRecord,
+  isLoopbackAddress,
+  isProcessAlive,
+  readControlRecord,
+  removeControlRecord,
+  tokensMatch,
+  writeControlRecord,
+} from "./preview-control.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const canonicalRoot = await realpath(root);
 const host = process.env.HOST || "127.0.0.1";
@@ -12,6 +24,8 @@ const port = Number(rawPort);
 const staticConfig = JSON.parse(
   await readFile(path.join(root, "staticwebapp.config.json"), "utf8"),
 );
+let controlRecord = null;
+let shutdownPromise;
 
 const mimeTypes = new Map([
   [".avif", "image/avif"],
@@ -86,6 +100,44 @@ function configuredRoute(pathname) {
 }
 
 const server = createServer(async (request, response) => {
+  let pathname;
+  try {
+    pathname = requestPathname(request.url);
+  } catch (error) {
+    const statusCode = error instanceof URIError ? 400 : error.statusCode || 400;
+    sendText(response, statusCode, statusCode === 403 ? "Forbidden" : "Bad Request");
+    return;
+  }
+
+  if (request.method === "POST" && pathname === CONTROL_ROUTE) {
+    let currentRecord = null;
+    try {
+      currentRecord = await readControlRecord(canonicalRoot);
+    } catch (error) {
+      console.error("Unable to validate preview control record:", error);
+    }
+
+    const authorized = controlRecord
+      && currentRecord
+      && isLoopbackAddress(request.socket.remoteAddress)
+      && tokensMatch(request.headers[CONTROL_HEADER], controlRecord.token)
+      && currentRecord.pid === controlRecord.pid
+      && tokensMatch(currentRecord.token, controlRecord.token);
+
+    if (!authorized) {
+      sendText(response, 403, "Forbidden");
+      return;
+    }
+
+    response.writeHead(202, {
+      "Cache-Control": "no-store",
+      "Content-Length": "0",
+    });
+    response.once("finish", () => void shutdown());
+    response.end();
+    return;
+  }
+
   if (request.method !== "GET" && request.method !== "HEAD") {
     sendText(response, 405, "Method Not Allowed", { Allow: "GET, HEAD" });
     return;
@@ -94,7 +146,6 @@ const server = createServer(async (request, response) => {
   let filePath;
   let routeRule;
   try {
-    const pathname = requestPathname(request.url);
     routeRule = configuredRoute(pathname);
     filePath = resolveRequestPath(routeRule?.rewrite ?? pathname);
   } catch (error) {
@@ -150,6 +201,29 @@ const server = createServer(async (request, response) => {
   }
 });
 
+function shutdown() {
+  if (shutdownPromise) return shutdownPromise;
+
+  shutdownPromise = new Promise((resolve) => {
+    server.close(async (error) => {
+      try {
+        if (controlRecord) await removeControlRecord(controlRecord);
+      } catch (cleanupError) {
+        console.error("Unable to remove preview control record:", cleanupError);
+        process.exitCode = 1;
+      }
+      if (error) {
+        console.error("Unable to stop preview server cleanly:", error);
+        process.exitCode = 1;
+      }
+      resolve();
+    });
+    server.closeIdleConnections?.();
+  });
+
+  return shutdownPromise;
+}
+
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   console.error(`Invalid PORT value: ${rawPort}`);
   process.exitCode = 1;
@@ -159,18 +233,32 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
     process.exitCode = 1;
   });
 
-  server.listen(port, host, () => {
-    console.log(`Preview server running at http://${host}:${port}`);
+  server.listen(port, host, async () => {
+    try {
+      const existingRecord = await readControlRecord(canonicalRoot);
+      if (existingRecord) {
+        if (isProcessAlive(existingRecord.pid)) {
+          throw new Error(`A managed preview is already running with PID ${existingRecord.pid}`);
+        }
+        await removeControlRecord(existingRecord);
+      }
+
+      controlRecord = createControlRecord({
+        root: canonicalRoot,
+        pid: process.pid,
+        host,
+        port: server.address().port,
+      });
+      await writeControlRecord(controlRecord);
+      console.log(`Preview server running at http://${host}:${controlRecord.port}`);
+    } catch (error) {
+      console.error("Unable to register preview server:", error);
+      process.exitCode = 1;
+      server.close();
+    }
   });
 
   for (const signal of ["SIGINT", "SIGTERM"]) {
-    process.once(signal, () => {
-      server.close((error) => {
-        if (error) {
-          console.error("Unable to stop preview server cleanly:", error);
-          process.exitCode = 1;
-        }
-      });
-    });
+    process.once(signal, () => void shutdown());
   }
 }
