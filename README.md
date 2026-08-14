@@ -17,6 +17,16 @@ npm run dev
 Open http://127.0.0.1:4173. The host and port can be overridden with `HOST` and
 `PORT` environment variables.
 
+Stop the managed preview from another terminal with:
+
+```bash
+npm run stop
+```
+
+The Codex environment exposes matching `Run`, `Stop`, and `Validate` actions.
+`Stop` affects only the preview registered for the current worktree and is a
+successful no-op when no managed preview is running.
+
 ## Validation
 
 Run the complete validation gate:
@@ -29,8 +39,10 @@ For focused troubleshooting, run an individual check:
 
 ```bash
 npm run check:js
+npm run test:environment
 npm run test:portrait
 npm run test:server
+npm run test:stop
 npm run validate:site
 ```
 
