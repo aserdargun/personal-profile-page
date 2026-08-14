@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { createServer as createProbeServer } from "node:net";
 import { request as httpRequest } from "node:http";
 import os from "node:os";
@@ -9,10 +9,13 @@ import path from "node:path";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { CONTROL_HEADER, CONTROL_ROUTE, getControlRecordPath } from "./preview-control.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const host = "127.0.0.1";
 let port;
 let serverProcess;
+let controlDir;
 
 async function reservePort() {
   const probe = createProbeServer();
@@ -57,10 +60,10 @@ function waitForStartup(child) {
   });
 }
 
-function request(pathname, method = "GET") {
+function request(pathname, method = "GET", headers = {}) {
   return new Promise((resolve, reject) => {
     const outgoingRequest = httpRequest(
-      { host, port, path: pathname, method },
+      { host, port, path: pathname, method, headers },
       (response) => {
         const chunks = [];
         response.on("data", (chunk) => chunks.push(chunk));
@@ -79,10 +82,16 @@ function request(pathname, method = "GET") {
 }
 
 before(async () => {
+  controlDir = await mkdtemp(path.join(os.tmpdir(), "profile-preview-control-"));
   port = await reservePort();
   serverProcess = spawn(process.execPath, ["tools/serve.mjs"], {
     cwd: root,
-    env: { ...process.env, HOST: host, PORT: String(port) },
+    env: {
+      ...process.env,
+      HOST: host,
+      PORT: String(port),
+      PREVIEW_CONTROL_DIR: controlDir,
+    },
     stdio: ["ignore", "pipe", "pipe"],
   });
   await waitForStartup(serverProcess);
@@ -95,6 +104,28 @@ after(async () => {
     assert.equal(code, 0);
     assert.equal(signal, null);
   }
+  await rm(controlDir, { force: true, recursive: true });
+});
+
+test("registers the running preview for this worktree", async () => {
+  const record = JSON.parse(
+    await readFile(getControlRecordPath(root, { controlDir }), "utf8"),
+  );
+
+  assert.equal(record.root, root);
+  assert.equal(record.pid, serverProcess.pid);
+  assert.equal(record.host, host);
+  assert.equal(record.port, port);
+  assert.match(record.token, /^[a-f0-9]{64}$/);
+});
+
+test("rejects an invalid stop token and keeps serving", async () => {
+  const stopped = await request(CONTROL_ROUTE, "POST", {
+    [CONTROL_HEADER]: "0".repeat(64),
+  });
+
+  assert.equal(stopped.statusCode, 403);
+  assert.equal((await request("/")).statusCode, 200);
 });
 
 test("serves the English homepage at root without client navigation", async () => {

@@ -11,6 +11,11 @@ icon = "run"
 command = "npm run dev"
 
 [[actions]]
+name = "Stop"
+icon = "tool"
+command = "npm run stop"
+
+[[actions]]
 name = "Validate"
 icon = "tool"
 command = "npm test"

@@ -14,7 +14,26 @@ const expectedStageKeys = [
   "industrial-engineering",
   "mechanical-engineering",
 ];
-const expectedAnchors = ["top", "journey", "work", "approach", "about"];
+const expectedAnchors = ["top", "apps", "journey", "approach", "about"];
+const expectedAppCodes = ["stk", "aia", "llm", "usl", "gpu", "cld"];
+const expectedAppUrls = expectedAppCodes.map((code) => `https://${code}.aserdargun.com/`);
+const expectedAppRepos = expectedAppCodes.map((code) => `${code}-aserdargun-com`);
+const retiredProjectUrls = [
+  "https://stackfolio.aserdargun.com/",
+  "https://unsloth.aserdargun.com/",
+  "https://swapp.org.tr",
+  "https://github.com/aserdargun/pipolars",
+  "https://pypi.org/project/pipolars/",
+  "https://github.com/aserdargun/ai-practitioner-dev-os",
+  "https://projectpulsar.org/",
+  "https://github.com/aserdargun/piwebapi",
+  "https://scadanerve.com",
+  "https://industry-learn.com",
+  "https://scikit-play.org",
+  "https://aeon-play.org",
+  "https://pytorch-play.org",
+  "https://dsml101.com",
+];
 const failures = [];
 
 function check(condition, message) {
@@ -51,7 +70,6 @@ for (const [locale, html] of Object.entries(pages)) {
   check(enLanguageLink.includes('aria-label="EN —'), `${locale}: English language label must contain visible text EN`);
   const wordmarkLink = html.match(/<a class="wordmark"[^>]*>/)?.[0] ?? "";
   check(wordmarkLink.includes('aria-label="SG — Serdar Gündoğdu'), `${locale}: wordmark accessible name must contain all visible text`);
-  check(!/<a class="stackfolio-entry"[^>]+aria-label=/.test(html), `${locale}: Stackfolio must use its visible content as the accessible name`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.webp 480w") && html.includes("/images/serdar-gundogdu-ascii-720.webp 720w"), `${locale}: responsive WebP portrait sources are missing`);
@@ -64,6 +82,21 @@ for (const [locale, html] of Object.entries(pages)) {
 
   for (const anchor of expectedAnchors) {
     check(new RegExp(`id="${anchor}"`).test(html), `${locale}: #${anchor} anchor is missing`);
+  }
+
+  check(html.includes('class="app-map"'), `${locale}: application map is missing`);
+  check(html.includes('aria-labelledby="app-map-title"'), `${locale}: application map heading relationship is missing`);
+  check(html.includes('aria-describedby="app-map-description"'), `${locale}: application map description relationship is missing`);
+  const appCodes = matches(html, /<th scope="row"><code>([^<]+)<\/code><\/th>/g);
+  check(JSON.stringify(appCodes) === JSON.stringify(expectedAppCodes), `${locale}: application codes or order differ`);
+  for (const url of expectedAppUrls) {
+    check(html.includes(`href="${url}"`), `${locale}: application URL is missing: ${url}`);
+  }
+  for (const repository of expectedAppRepos) {
+    check(html.includes(`<code>${repository}</code>`), `${locale}: repository mapping is missing: ${repository}`);
+  }
+  for (const retiredUrl of retiredProjectUrls) {
+    check(!html.includes(`href="${retiredUrl}"`), `${locale}: retired project URL remains: ${retiredUrl}`);
   }
 
   const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
@@ -91,15 +124,17 @@ check(pages.tr.includes("GPU Kernel Engineer — öğrenme aşamasında"), "Turk
 check(pages.en.includes("Reading direction · 09 → 01"), "English reverse-chronology explanation is missing");
 check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronology explanation is missing");
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
-check(pages.en.includes("https://unsloth.aserdargun.com/") && pages.tr.includes("https://unsloth.aserdargun.com/"), "Unsloth Studio Learning Atlas link is missing");
+check(pages.en.includes("https://usl.aserdargun.com/") && pages.tr.includes("https://usl.aserdargun.com/"), "Unsloth Studio Learning link is missing");
 check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Unsloth Studio Atlas&apos;ı keşfet"), "Localized Unsloth Studio Atlas labels are missing");
-check(pages.en.includes("https://stackfolio.aserdargun.com/") && pages.tr.includes("https://stackfolio.aserdargun.com/"), "Stackfolio entry link is missing");
-check(pages.en.includes("Owner workspace · Live") && pages.tr.includes("Kişisel çalışma alanım · Canlı"), "Localized Stackfolio entry labels are missing");
+check(pages.en.includes("One portfolio, six focused applications."), "English application map definition is missing");
+check(pages.tr.includes("Tek portföy, altı odaklı uygulama."), "Turkish application map definition is missing");
 check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
 check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 1, "Only the static portrait image should rely on CSS scaling");
 check(/\.has-js \.timeline-step\s*\{[^}]*opacity:\s*1;/.test(styles), "Inactive timeline steps must not reduce descendant contrast with parent opacity");
 check(/\.section-kicker\s*\{[^}]*color:\s*rgba\(18, 19, 16, 0\.65\);/.test(styles), "Section kicker contrast is below the required token");
-for (const selector of ["lab-index", "lab-type", "credentials-heading", "credentials small"]) {
+check(styles.includes(".app-map tbody tr:first-child"), "Stackfolio-first application map styling is missing");
+check(styles.includes(".app-map tbody td:nth-of-type(1) span"), "Application descriptions are not styled");
+for (const selector of ["credentials-heading", "credentials small"]) {
   const selectorPattern = selector.replace(" ", "\\s+");
   check(new RegExp(`\\.${selectorPattern}\\s*\\{[^}]*color:\\s*rgba\\(18, 19, 16, 0\\.7\\);`).test(styles), `${selector} contrast is below the required token`);
 }
@@ -111,13 +146,16 @@ check(rootPage.includes('<meta property="og:url" content="https://aserdargun.com
 check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL is incorrect");
 check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
 check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
+for (const url of expectedAppUrls) {
+  check(rootPage.includes(`href="${url}"`), `Root application URL is missing: ${url}`);
+}
 
 const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
 check(sitemap.includes("<loc>https://aserdargun.com/</loc>"), "Sitemap is missing root URL");
 check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
 check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
 
-for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "images/serdar-gundogdu-ascii-480.avif", "images/serdar-gundogdu-ascii-720.avif", "images/serdar-gundogdu-ascii-480.webp", "images/serdar-gundogdu-ascii-720.webp", "icons/stackfolio.svg", "styles.css", "scripts.js"]) {
+for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "images/serdar-gundogdu-ascii-480.avif", "images/serdar-gundogdu-ascii-720.avif", "images/serdar-gundogdu-ascii-480.webp", "images/serdar-gundogdu-ascii-720.webp", "styles.css", "scripts.js"]) {
   try {
     await stat(path.join(root, asset));
   } catch {
@@ -150,5 +188,5 @@ if (failures.length > 0) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
-  console.log("Site validation passed: TR/EN routes, timeline parity, metadata, links, and assets are consistent.");
+  console.log("Site validation passed: TR/EN routes, application map, timeline parity, metadata, links, and assets are consistent.");
 }
