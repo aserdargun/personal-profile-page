@@ -1,7 +1,7 @@
 # Codex Preview Stop Action Design
 
 Date: 2026-08-14
-Status: Approved in conversation; pending written-spec review
+Status: Approved
 
 ## Context
 
