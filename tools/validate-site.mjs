@@ -24,10 +24,63 @@ const expectedStageImages = [
   "02-industrial-engineering",
   "01-mechanical-engineering",
 ];
+const expectedPortraitModes = [
+  "ascii-depth",
+  "ascii-depth",
+  "ascii-depth",
+  "pixel-analog",
+  "pixel-analog",
+  "pixel-analog",
+  "pixel-analog",
+  "pixel-analog",
+];
+const expectedPixelSizes = ["4", "6", "8", "11", "14"];
+const expectedPaletteLevels = ["5", "4", "4", "3", "2"];
+const expectedEnglishBridges = [
+  "Turning intelligence into working systems",
+  "From models to products",
+  "From data to models",
+  "From operations to data",
+  "Making production measurable",
+  "From materials to evidence",
+  "Systems and flow",
+  "Matter and mechanics",
+];
+const expectedTurkishBridges = [
+  "Zekâyı çalışan sistemlere dönüştürmek",
+  "Modellerden ürünlere",
+  "Veriden modellere",
+  "Operasyondan veriye",
+  "Üretimi ölçülebilir kılmak",
+  "Malzemeden kanıta",
+  "Sistemler ve akış",
+  "Madde ve mekanik",
+];
 const expectedAnchors = ["top", "apps", "journey", "approach", "about"];
-const expectedAppCodes = ["stk", "aia", "llm", "usl", "gpu", "cld"];
-const expectedAppUrls = expectedAppCodes.map((code) => `https://${code}.aserdargun.com/`);
-const expectedAppRepos = expectedAppCodes.map((code) => `${code}-aserdargun-com`);
+const expectedAssetVersion = "20260815-physical-digital";
+const expectedStylesheetHref = `/styles.css?v=${expectedAssetVersion}`;
+const expectedScriptSrc = `/scripts.js?v=${expectedAssetVersion}`;
+const expectedApplicationRows = [
+  { code: "aia", repository: "aia-aserdargun-com", repositoryUrl: "https://github.com/aserdargun/aia-aserdargun-com", productUrl: "https://aia.aserdargun.com/", productLabel: "aia.aserdargun.com" },
+  { code: "llm", repository: "llm-aserdargun-com", repositoryUrl: "https://github.com/aserdargun/llm-aserdargun-com", productUrl: "https://llm.aserdargun.com/", productLabel: "llm.aserdargun.com" },
+  { code: "usl", repository: "usl-aserdargun-com", repositoryUrl: "https://github.com/aserdargun/usl-aserdargun-com", productUrl: "https://usl.aserdargun.com/", productLabel: "usl.aserdargun.com" },
+  { code: "gpu", repository: "gpu-aserdargun-com", repositoryUrl: "https://github.com/aserdargun/gpu-aserdargun-com", productUrl: "https://gpu.aserdargun.com/", productLabel: "gpu.aserdargun.com" },
+  { code: "cld", repository: "cld-aserdargun-com", repositoryUrl: "https://github.com/aserdargun/cld-aserdargun-com", productUrl: "https://cld.aserdargun.com/", productLabel: "cld.aserdargun.com" },
+].map((row) => ({
+  code: row.code,
+  repository: row.repository,
+  repositoryUrl: row.repositoryUrl,
+  repositoryTarget: "_blank",
+  repositoryRel: "noreferrer",
+  repositoryArrow: "↗",
+  repositoryArrowAriaHidden: "true",
+  productUrl: row.productUrl,
+  productTarget: "_blank",
+  productRel: "noreferrer",
+  productLabel: row.productLabel,
+  productArrow: "↗",
+  productArrowAriaHidden: "true",
+}));
 const retiredProjectUrls = [
   "https://stackfolio.aserdargun.com/",
   "https://unsloth.aserdargun.com/",
@@ -52,6 +105,260 @@ function check(condition, message) {
 
 function matches(source, pattern) {
   return Array.from(source.matchAll(pattern), (match) => match[1]);
+}
+
+function tokenizeAttributes(source) {
+  const attributes = new Map();
+  const pattern = /([^\s"'<>\/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  for (const match of source.matchAll(pattern)) {
+    const name = match[1].toLowerCase();
+    const value = match[2] ?? match[3] ?? match[4] ?? "";
+    const values = attributes.get(name) ?? [];
+    values.push(value);
+    attributes.set(name, values);
+  }
+  return attributes;
+}
+
+function attribute(attributes, name) {
+  const values = attributes.get(name.toLowerCase());
+  return values?.length === 1 ? values[0] : null;
+}
+
+function parseMarkerContent(content) {
+  const match = content.match(/^\s*([\s\S]*?)\s*<span\b([^>]*)>([\s\S]*?)<\/span>\s*$/i);
+  if (!match) return null;
+  const [, label, markerAttributes, marker] = match;
+  return {
+    label: label.trim(),
+    marker: marker.trim(),
+    markerAriaHidden: attribute(tokenizeAttributes(markerAttributes), "aria-hidden"),
+  };
+}
+
+function parseAnchor(anchorHtml) {
+  const match = anchorHtml.match(/^<a\b([^>]*)>([\s\S]*?)<\/a>$/i);
+  if (!match) return null;
+  const [, attributeSource, content] = match;
+  const attributes = tokenizeAttributes(attributeSource);
+  return {
+    href: attribute(attributes, "href"),
+    target: attribute(attributes, "target"),
+    rel: attribute(attributes, "rel"),
+    content,
+  };
+}
+
+function onlyAnchor(cell) {
+  const openingAnchorCount = Array.from(cell.matchAll(/<a\b/gi)).length;
+  const anchors = Array.from(cell.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/gi), (match) => match[0]);
+  return openingAnchorCount === 1 && anchors.length === 1 ? parseAnchor(anchors[0]) : null;
+}
+
+function parseApplicationMapRows(html) {
+  const body = html.match(/<section class="app-map"[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/)?.[1] ?? "";
+  return Array.from(body.matchAll(/<tr>([\s\S]*?)<\/tr>/g), (match) => {
+    const row = match[1];
+    const cells = Array.from(row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi), (cell) => cell[1]);
+    const repositoryAnchor = cells.length === 3 ? onlyAnchor(cells[1]) : null;
+    const productAnchor = cells.length === 3 ? onlyAnchor(cells[2]) : null;
+    const repositoryPresentation = parseMarkerContent(repositoryAnchor?.content ?? "");
+    const repository = repositoryPresentation?.label.match(/^<code>([^<]+)<\/code>$/)?.[1] ?? null;
+    const productPresentation = parseMarkerContent(productAnchor?.content ?? "");
+    const productLabel = productPresentation && !/[<>]/.test(productPresentation.label)
+      ? productPresentation.label
+      : null;
+    return {
+      code: row.match(/<th\s+scope="row">\s*<code>([^<]+)<\/code>\s*<\/th>/)?.[1] ?? null,
+      repository,
+      repositoryUrl: repositoryAnchor?.href ?? null,
+      repositoryTarget: repositoryAnchor?.target ?? null,
+      repositoryRel: repositoryAnchor?.rel ?? null,
+      repositoryArrow: repositoryPresentation?.marker ?? null,
+      repositoryArrowAriaHidden: repositoryPresentation?.markerAriaHidden ?? null,
+      productUrl: productAnchor?.href ?? null,
+      productTarget: productAnchor?.target ?? null,
+      productRel: productAnchor?.rel ?? null,
+      productLabel,
+      productArrow: productPresentation?.marker ?? null,
+      productArrowAriaHidden: productPresentation?.markerAriaHidden ?? null,
+    };
+  });
+}
+
+function validateApplicationMapRows(locale, html) {
+  const rows = parseApplicationMapRows(html);
+  check(rows.length === expectedApplicationRows.length, `${locale}: application map row count differs`);
+  check(
+    JSON.stringify(rows) === JSON.stringify(expectedApplicationRows),
+    `${locale}: application map row tuples or order differ`,
+  );
+}
+
+function stripCssComments(source) {
+  let result = "";
+  let quote = null;
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      result += character;
+      if (character === "\\") {
+        index += 1;
+        result += source[index] ?? "";
+      } else if (character === quote) {
+        quote = null;
+      }
+    } else if (character === '"' || character === "'") {
+      quote = character;
+      result += character;
+    } else if (character === "/" && source[index + 1] === "*") {
+      index += 2;
+      while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) index += 1;
+      index += 1;
+      result += " ";
+    } else {
+      result += character;
+    }
+  }
+  return result;
+}
+
+function findCssDelimiter(source, start) {
+  let quote = null;
+  let parentheses = 0;
+  let brackets = 0;
+  for (let index = start; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      if (character === "\\") index += 1;
+      else if (character === quote) quote = null;
+      continue;
+    }
+    if (character === '"' || character === "'") quote = character;
+    else if (character === "(") parentheses += 1;
+    else if (character === ")") parentheses = Math.max(0, parentheses - 1);
+    else if (character === "[") brackets += 1;
+    else if (character === "]") brackets = Math.max(0, brackets - 1);
+    else if (parentheses === 0 && brackets === 0 && (character === "{" || character === ";")) {
+      return { character, index };
+    }
+  }
+  return null;
+}
+
+function findMatchingCssBrace(source, openIndex) {
+  let depth = 1;
+  let quote = null;
+  for (let index = openIndex + 1; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      if (character === "\\") index += 1;
+      else if (character === quote) quote = null;
+      continue;
+    }
+    if (character === '"' || character === "'") quote = character;
+    else if (character === "{") depth += 1;
+    else if (character === "}" && --depth === 0) return index;
+  }
+  return -1;
+}
+
+function splitCssSelectorList(source) {
+  const selectors = [];
+  let start = 0;
+  let quote = null;
+  let parentheses = 0;
+  let brackets = 0;
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      if (character === "\\") index += 1;
+      else if (character === quote) quote = null;
+    } else if (character === '"' || character === "'") quote = character;
+    else if (character === "(") parentheses += 1;
+    else if (character === ")") parentheses = Math.max(0, parentheses - 1);
+    else if (character === "[") brackets += 1;
+    else if (character === "]") brackets = Math.max(0, brackets - 1);
+    else if (character === "," && parentheses === 0 && brackets === 0) {
+      selectors.push(source.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  selectors.push(source.slice(start).trim());
+  return selectors.filter(Boolean);
+}
+
+function scanCssRules(source) {
+  const rules = [];
+  const groupingAtRules = new Set(["container", "document", "layer", "media", "scope", "starting-style", "supports"]);
+
+  function scanBlock(block) {
+    let cursor = 0;
+    while (cursor < block.length) {
+      while (/\s/.test(block[cursor] ?? "")) cursor += 1;
+      const delimiter = findCssDelimiter(block, cursor);
+      if (!delimiter) break;
+      if (delimiter.character === ";") {
+        cursor = delimiter.index + 1;
+        continue;
+      }
+      const closeIndex = findMatchingCssBrace(block, delimiter.index);
+      if (closeIndex < 0) break;
+      const prelude = block.slice(cursor, delimiter.index).trim();
+      const body = block.slice(delimiter.index + 1, closeIndex);
+      if (prelude.startsWith("@")) {
+        const atRuleName = prelude.match(/^@([\w-]+)/)?.[1].toLowerCase();
+        if (groupingAtRules.has(atRuleName)) scanBlock(body);
+      } else if (prelude) {
+        rules.push({ selectors: splitCssSelectorList(prelude), declarations: body });
+      }
+      cursor = closeIndex + 1;
+    }
+  }
+
+  scanBlock(stripCssComments(source));
+  return rules;
+}
+
+function declarationExists(rule, property, value) {
+  const declarations = rule.split(";");
+  return declarations.some((declaration) => {
+    const colonIndex = declaration.indexOf(":");
+    if (colonIndex < 0) return false;
+    const actualProperty = declaration.slice(0, colonIndex).trim().toLowerCase();
+    const actualValue = declaration.slice(colonIndex + 1).trim().toLowerCase();
+    return actualProperty === property && actualValue === value;
+  });
+}
+
+const canonicalRepositoryCodeSelector = ".app-map tbody td:nth-of-type(2) a code";
+const retiredRowSelectorSuffixes = [
+  ".app-map tbody tr:first-child",
+  ".app-map tbody > tr:first-child",
+  ".app-map > tbody tr:first-child",
+  ".app-map > tbody > tr:first-child",
+  ".app-map tbody tr:nth-child(1)",
+  ".app-map tbody > tr:nth-child(1)",
+  ".app-map > tbody tr:nth-child(1)",
+  ".app-map > tbody > tr:nth-child(1)",
+];
+
+function normalizeCssSelectorComponent(selector) {
+  return selector
+    .trim()
+    .replace(/[ \t\r\n\f]+/g, " ")
+    .replace(/[ \t\r\n\f]*>[ \t\r\n\f]*/g, " > ");
+}
+
+function isCanonicalRepositoryCodeSelector(selector) {
+  return normalizeCssSelectorComponent(selector) === canonicalRepositoryCodeSelector;
+}
+
+function isRetiredRowSelector(selector) {
+  const normalized = normalizeCssSelectorComponent(selector);
+  return retiredRowSelectorSuffixes.some(
+    (suffix) => normalized === suffix || normalized.endsWith(` ${suffix}`),
+  );
 }
 
 function readPngDimensions(buffer) {
@@ -87,6 +394,8 @@ for (const [locale, html] of Object.entries(pages)) {
   const wordmarkLink = html.match(/<a class="wordmark"[^>]*>/)?.[0] ?? "";
   check(wordmarkLink.includes('aria-label="SG — Serdar Gündoğdu'), `${locale}: wordmark accessible name must contain all visible text`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
+  check(html.includes(`<link rel="stylesheet" href="${expectedStylesheetHref}">`), `${locale}: stylesheet cache version is stale`);
+  check(html.includes(`<script src="${expectedScriptSrc}" defer></script>`), `${locale}: script cache version is stale`);
   check(html.includes("data-career-portrait"), `${locale}: career portrait stage is missing`);
   check(html.includes("data-career-transition"), `${locale}: career transition canvas is missing`);
   check(html.includes('width="640" height="800"'), `${locale}: normalized career portrait dimensions are missing`);
@@ -96,6 +405,23 @@ for (const [locale, html] of Object.entries(pages)) {
   check(JSON.stringify(stageKeys) === JSON.stringify(expectedStageKeys), `${locale}: timeline stage keys or order differ`);
   const stageNumbers = matches(html, /data-stage-number="([^"]+)"/g);
   check(JSON.stringify(stageNumbers) === JSON.stringify(expectedStageNumbers), `${locale}: timeline stage numbers must descend from 08 to 01`);
+  const portraitModes = matches(html, /data-stage-portrait-mode="([^"]+)"/g);
+  check(JSON.stringify(portraitModes) === JSON.stringify(expectedPortraitModes), `${locale}: portrait modes or order differ`);
+  const pixelSizes = matches(html, /data-stage-pixel-size="([^"]+)"/g);
+  check(JSON.stringify(pixelSizes) === JSON.stringify(expectedPixelSizes), `${locale}: analog pixel sizes must be 4, 6, 8, 11, 14 in reverse timeline order`);
+  const paletteLevels = matches(html, /data-stage-palette-levels="([^"]+)"/g);
+  check(JSON.stringify(paletteLevels) === JSON.stringify(expectedPaletteLevels), `${locale}: analog palette levels must be 5, 4, 4, 3, 2 in reverse timeline order`);
+  const expectedBridges = locale === "tr" ? expectedTurkishBridges : expectedEnglishBridges;
+  const bridges = matches(html, /data-stage-bridge="([^"]+)"/g);
+  check(JSON.stringify(bridges) === JSON.stringify(expectedBridges), `${locale}: physical-to-digital bridge copy differs`);
+  check((html.match(/class="portrait-story"/g) || []).length === 8, `${locale}: every portrait needs one visible story`);
+  const worldLabels = matches(html, /data-stage-world-label="([^"]+)"/g);
+  const expectedWorldLabels = expectedPortraitModes.map((mode) => (
+    locale === "tr"
+      ? mode === "pixel-analog" ? "FİZİKSEL DÜNYA" : "DİJİTAL DÜNYA"
+      : mode === "pixel-analog" ? "PHYSICAL WORLD" : "DIGITAL WORLD"
+  ));
+  check(JSON.stringify(worldLabels) === JSON.stringify(expectedWorldLabels), `${locale}: physical/digital world labels differ`);
   for (const assetName of expectedStageImages) {
     check(html.includes(`/images/career/${assetName}.webp`), `${locale}: WebP career portrait is missing: ${assetName}`);
     check(html.includes(`/images/career/${assetName}.png`), `${locale}: PNG career portrait is missing: ${assetName}`);
@@ -110,14 +436,24 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes('class="app-map"'), `${locale}: application map is missing`);
   check(html.includes('aria-labelledby="app-map-title"'), `${locale}: application map heading relationship is missing`);
   check(html.includes('aria-describedby="app-map-description"'), `${locale}: application map description relationship is missing`);
-  const appCodes = matches(html, /<th scope="row"><code>([^<]+)<\/code><\/th>/g);
-  check(JSON.stringify(appCodes) === JSON.stringify(expectedAppCodes), `${locale}: application codes or order differ`);
-  for (const url of expectedAppUrls) {
-    check(html.includes(`href="${url}"`), `${locale}: application URL is missing: ${url}`);
-  }
-  for (const repository of expectedAppRepos) {
-    check(html.includes(`<code>${repository}</code>`), `${locale}: repository mapping is missing: ${repository}`);
-  }
+  validateApplicationMapRows(locale, html);
+
+  const appMapIntro = html.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
+  const expectedKicker = locale === "tr"
+    ? "Uygulama haritası · canlı adresler"
+    : "Application map · live destinations";
+  const expectedHeading = locale === "tr"
+    ? "Tek portföy. Odaklı uygulamalar."
+    : "One portfolio. Focused applications.";
+  check(appMapIntro.includes(expectedKicker), `${locale}: number-neutral application map kicker is missing`);
+  check(appMapIntro.includes(expectedHeading), `${locale}: number-neutral application map heading is missing`);
+  check(!/\b(?:06|six|altı)\b/i.test(appMapIntro), `${locale}: numeric application count remains in the map introduction`);
+
+  check(!html.includes('<th scope="row"><code>stk</code></th>'), `${locale}: Stackfolio application code remains`);
+  check(!html.includes("Stackfolio"), `${locale}: Stackfolio product content remains`);
+  check(!html.includes("stk-aserdargun-com"), `${locale}: Stackfolio repository name remains`);
+  check(!html.includes("https://stk.aserdargun.com/"), `${locale}: Stackfolio product URL remains`);
+  check(!html.includes("https://github.com/aserdargun/stk-aserdargun-com"), `${locale}: Stackfolio repository URL remains`);
   for (const retiredUrl of retiredProjectUrls) {
     check(!html.includes(`href="${retiredUrl}"`), `${locale}: retired project URL remains: ${retiredUrl}`);
   }
@@ -148,14 +484,34 @@ check(pages.en.includes("Reading direction · 08 → 01"), "English reverse-chro
 check(pages.tr.includes("Okuma yönü · 08 → 01"), "Turkish reverse-chronology explanation is missing");
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
 check(pages.en.includes("https://usl.aserdargun.com/") && pages.tr.includes("https://usl.aserdargun.com/"), "Unsloth Studio Learning link is missing");
-check(pages.en.includes("One portfolio, six focused applications."), "English application map definition is missing");
-check(pages.tr.includes("Tek portföy, altı odaklı uygulama."), "Turkish application map definition is missing");
+check(pages.en.includes("One portfolio. Focused applications."), "English application map definition is missing");
+check(pages.tr.includes("Tek portföy. Odaklı uygulamalar."), "Turkish application map definition is missing");
 check(!pages.en.includes("<h3>GPU Kernel Engineer") && !pages.tr.includes("<h3>GPU Kernel Engineer"), "Legacy GPU Kernel Engineer career title is still present");
 check(styles.includes(".career-transition"), "Career transition canvas styles are missing");
 check(styles.includes(".career-portrait-fallback"), "Career portrait fallback styles are missing");
 check(/\.has-js \.timeline-step\s*\{[^}]*opacity:\s*1;/.test(styles), "Inactive timeline steps must not reduce descendant contrast with parent opacity");
 check(/\.section-kicker\s*\{[^}]*color:\s*rgba\(18, 19, 16, 0\.65\);/.test(styles), "Section kicker contrast is below the required token");
-check(styles.includes(".app-map tbody tr:first-child"), "Stackfolio-first application map styling is missing");
+const cssRules = scanCssRules(styles);
+check(
+  !cssRules.some((rule) => rule.selectors.some(isRetiredRowSelector)),
+  "Stackfolio-first application map styling remains",
+);
+const requiredRepositoryCodeDeclarations = [
+  ["color", "inherit"],
+  ["font", "inherit"],
+  ["overflow-wrap", "anywhere"],
+  ["white-space", "inherit"],
+];
+const repositoryCodeRules = cssRules.filter(
+  (rule) => rule.selectors.some(isCanonicalRepositoryCodeSelector),
+);
+check(repositoryCodeRules.length > 0, "Repository code labels do not inherit application map link styling");
+check(
+  repositoryCodeRules.some((rule) => requiredRepositoryCodeDeclarations.every(
+    ([property, value]) => declarationExists(rule.declarations, property, value),
+  )),
+  "Repository code labels must declare color: inherit, font: inherit, overflow-wrap: anywhere, and white-space: inherit in the same canonical rule",
+);
 check(styles.includes(".app-map tbody td:nth-of-type(1) span"), "Application descriptions are not styled");
 for (const selector of ["credentials-heading", "credentials small"]) {
   const selectorPattern = selector.replace(" ", "\\s+");
@@ -166,19 +522,34 @@ const rootPage = await readFile(path.join(root, "index.html"), "utf8");
 check(rootPage.includes('<html lang="en" data-locale="en">'), "Root English language marker is missing");
 check(rootPage.includes('<link rel="canonical" href="https://aserdargun.com/">'), "Root canonical URL is incorrect");
 check(rootPage.includes('<meta property="og:url" content="https://aserdargun.com/">'), "Root Open Graph URL is incorrect");
+check(rootPage.includes(`<link rel="stylesheet" href="${expectedStylesheetHref}">`), "Root stylesheet cache version is stale");
+check(rootPage.includes(`<script src="${expectedScriptSrc}" defer></script>`), "Root script cache version is stale");
 check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL is incorrect");
 check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
 check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
 check(JSON.stringify(matches(rootPage, /data-stage-key="([^"]+)"/g)) === JSON.stringify(expectedStageKeys), "Root timeline stage keys or order differ");
 check(JSON.stringify(matches(rootPage, /data-stage-number="([^"]+)"/g)) === JSON.stringify(expectedStageNumbers), "Root timeline stage numbers must descend from 08 to 01");
+check(JSON.stringify(matches(rootPage, /data-stage-portrait-mode="([^"]+)"/g)) === JSON.stringify(expectedPortraitModes), "Root portrait modes or order differ");
+check(JSON.stringify(matches(rootPage, /data-stage-pixel-size="([^"]+)"/g)) === JSON.stringify(expectedPixelSizes), "Root analog pixel sizes must be 4, 6, 8, 11, 14 in reverse timeline order");
+check(JSON.stringify(matches(rootPage, /data-stage-palette-levels="([^"]+)"/g)) === JSON.stringify(expectedPaletteLevels), "Root analog palette levels must be 5, 4, 4, 3, 2 in reverse timeline order");
+check(JSON.stringify(matches(rootPage, /data-stage-bridge="([^"]+)"/g)) === JSON.stringify(expectedEnglishBridges), "Root physical-to-digital bridge copy differs");
+check((rootPage.match(/class="portrait-story"/g) || []).length === 8, "Root every portrait needs one visible story");
+const rootWorldLabels = matches(rootPage, /data-stage-world-label="([^"]+)"/g);
+check(JSON.stringify(rootWorldLabels) === JSON.stringify(expectedPortraitModes.map((mode) => mode === "pixel-analog" ? "PHYSICAL WORLD" : "DIGITAL WORLD")), "Root physical/digital world labels differ");
 for (const assetName of expectedStageImages) {
   check(rootPage.includes(`/images/career/${assetName}.webp`), `Root WebP career portrait is missing: ${assetName}`);
   check(rootPage.includes(`/images/career/${assetName}.png`), `Root PNG career portrait is missing: ${assetName}`);
 }
 check(!/AI Practitioner/i.test(rootPage.replaceAll("AWS Certified AI Practitioner", "")), "Root AI Practitioner personal title remains");
-for (const url of expectedAppUrls) {
-  check(rootPage.includes(`href="${url}"`), `Root application URL is missing: ${url}`);
-}
+validateApplicationMapRows("Root", rootPage);
+const rootAppMapIntro = rootPage.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
+check(rootAppMapIntro.includes("Application map · live destinations"), "Root number-neutral application map kicker is missing");
+check(rootAppMapIntro.includes("One portfolio. Focused applications."), "Root number-neutral application map heading is missing");
+check(!/\b(?:06|six)\b/i.test(rootAppMapIntro), "Root numeric application count remains in the map introduction");
+check(!rootPage.includes('<th scope="row"><code>stk</code></th>'), "Root Stackfolio application code remains");
+check(!rootPage.includes("Stackfolio"), "Root Stackfolio product content remains");
+check(!rootPage.includes("stk-aserdargun-com"), "Root Stackfolio repository name remains");
+check(!rootPage.includes("https://stk.aserdargun.com/"), "Root Stackfolio product URL remains");
 check(rootPage.includes("<h3>AI Engineer</h3>") && !rootPage.includes("<h3>GPU Kernel Engineer"), "Root AI Engineer career content is incorrect");
 check(!rootPage.includes("current-stage-link"), "Root current-stage Explore buttons must be removed");
 

@@ -394,11 +394,6 @@ ul {
   transition: background 160ms ease;
 }
 
-.app-map tbody tr:first-child {
-  background: rgba(200, 255, 54, 0.055);
-  box-shadow: inset 3px 0 var(--lime);
-}
-
 .app-map tbody tr:last-child {
   border-bottom: 0;
 }
@@ -449,6 +444,13 @@ ul {
 
 .app-map td > code {
   white-space: nowrap;
+}
+
+.app-map tbody td:nth-of-type(2) a code {
+  color: inherit;
+  font: inherit;
+  overflow-wrap: anywhere;
+  white-space: inherit;
 }
 
 .app-map a {
@@ -525,8 +527,14 @@ ul {
   object-fit: contain;
   object-position: center;
   filter: saturate(0.94) contrast(1.035);
-  transition: opacity 180ms ease;
+  transition: opacity 180ms ease, transform 180ms ease;
   user-select: none;
+}
+
+.career-portrait-image,
+.timeline-step-portrait img {
+  transform: scale(var(--portrait-source-scale, 1));
+  transform-origin: center;
 }
 
 .ascii-portrait-canvas {
@@ -535,6 +543,7 @@ ul {
   z-index: 2;
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 4px 7px rgba(0, 0, 0, 0.24));
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease;
@@ -548,6 +557,35 @@ ul {
 .career-portrait.is-ascii-rendered .ascii-portrait-source,
 .timeline-step-portrait.is-ascii-rendered .ascii-portrait-source {
   opacity: 0;
+}
+
+[data-portrait-render-mode="pixel-analog"] .ascii-portrait-canvas,
+.timeline-step-portrait[data-portrait-render-mode="pixel-analog"] .ascii-portrait-canvas {
+  filter: drop-shadow(0 0 5px rgba(130, 189, 29, 0.28));
+  image-rendering: pixelated;
+}
+
+[data-portrait-render-mode="pixel-analog"]::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 3px,
+    rgba(5, 7, 4, 0.11) 3px 4px
+  );
+  content: "";
+  pointer-events: none;
+  transition: opacity 100ms ease;
+}
+
+.career-portrait.is-transitioning[data-portrait-render-mode="pixel-analog"]::after {
+  opacity: 0;
+}
+
+[data-portrait-render-mode="pixel-analog"] .career-portrait-image,
+.timeline-step-portrait[data-portrait-render-mode="pixel-analog"] img {
+  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(36deg) brightness(0.78);
 }
 
 .career-portrait::before,
@@ -727,6 +765,30 @@ ul {
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.12em;
+}
+
+.portrait-stage-world,
+.portrait-story-world {
+  color: #82bd1d;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.portrait-stage[data-portrait-world="digital"] .portrait-stage-world,
+.portrait-story[data-portrait-world="digital"] .portrait-story-world {
+  color: #c8ff36;
+}
+
+.portrait-stage-bridge,
+.portrait-story-bridge {
+  color: rgba(255, 253, 247, 0.58);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.68rem;
+  line-height: 1.35;
 }
 
 .portrait-stage strong {
@@ -932,6 +994,14 @@ ul {
   height: 100%;
   object-fit: contain;
   object-position: center;
+}
+
+.portrait-story {
+  display: none;
+  max-width: 650px;
+  gap: 4px;
+  margin: -18px 0 22px;
+  font-family: var(--font-geist-mono), monospace;
 }
 
 .has-js .timeline-step-portrait {
@@ -1534,6 +1604,10 @@ footer a {
     display: block;
   }
 
+  .portrait-story {
+    display: grid;
+  }
+
   .portrait-sticky {
     position: static;
     min-height: auto;
@@ -1559,6 +1633,12 @@ footer a {
 
   .has-js .story-content {
     grid-row: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .portrait-story-bridge {
+    overflow-wrap: anywhere;
   }
 }
 

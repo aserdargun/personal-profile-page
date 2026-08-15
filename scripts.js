@@ -28,7 +28,9 @@ function initializeTimeline() {
   const steps = Array.from(document.querySelectorAll("[data-timeline-step]"));
   const stageSummary = document.querySelector("[data-stage-summary]");
   const stageCount = stageSummary?.querySelector("[data-stage-count]");
+  const stageWorldLabel = stageSummary?.querySelector("[data-stage-world-label]");
   const stageRole = stageSummary?.querySelector("[data-stage-role]");
+  const stageBridge = stageSummary?.querySelector("[data-stage-bridge]");
   const stageFocus = stageSummary?.querySelector("[data-stage-focus]");
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
@@ -50,7 +52,15 @@ function initializeTimeline() {
 
     const stageNumber = activeStep.dataset.stageNumber || String(boundedIndex + 1).padStart(2, "0");
     if (stageCount) stageCount.textContent = `${stageNumber} / ${String(steps.length).padStart(2, "0")}`;
+    const worldLabel = activeStep.dataset.stageWorldLabel || "";
+    const portraitWorld = activeStep.dataset.stagePortraitMode === "pixel-analog" ? "physical" : "digital";
+    if (stageSummary) stageSummary.dataset.portraitWorld = portraitWorld;
+    if (stageWorldLabel) {
+      const marker = portraitWorld === "physical" ? "■" : ">_";
+      stageWorldLabel.textContent = `${marker} ${worldLabel}`;
+    }
     if (stageRole) stageRole.textContent = activeStep.dataset.stageRole || "";
+    if (stageBridge) stageBridge.textContent = activeStep.dataset.stageBridge || "";
     if (stageFocus) stageFocus.textContent = activeStep.dataset.stageFocus || "";
     portraitTransition?.setStage(boundedIndex);
 
@@ -107,8 +117,66 @@ function initializeTimeline() {
   timeline.style.setProperty("--timeline-progress", "0");
 }
 
-function createAsciiPortraitRenderer({ wrap, image }) {
+function readPortraitScale(element, attribute = "data-portrait-scale") {
+  const parsed = Number.parseFloat(element?.getAttribute?.(attribute) || "1");
+  return Number.isFinite(parsed) && parsed > 0 && parsed <= 1 ? parsed : 1;
+}
+
+function readPortraitPresentation(element, attributes = {}) {
+  const modeAttribute = attributes.mode || "data-portrait-mode";
+  const cellAttribute = attributes.cellSize || "data-portrait-pixel-size";
+  const paletteAttribute = attributes.paletteLevels || "data-portrait-palette-levels";
+  const scaleAttribute = attributes.scale || "data-portrait-scale";
+  const mode = element?.getAttribute?.(modeAttribute) === "pixel-analog"
+    ? "pixel-analog"
+    : "ascii-depth";
+  const parsedCellSize = Number.parseFloat(element?.getAttribute?.(cellAttribute) || "4");
+  const parsedPaletteLevels = Number.parseInt(element?.getAttribute?.(paletteAttribute) || "5", 10);
+  return {
+    mode,
+    nominalCellSize: Number.isFinite(parsedCellSize)
+      ? Math.max(3, Math.min(14, parsedCellSize))
+      : 4,
+    paletteLevels: Number.isFinite(parsedPaletteLevels)
+      ? Math.max(2, Math.min(5, parsedPaletteLevels))
+      : 5,
+    scale: readPortraitScale(element, scaleAttribute),
+  };
+}
+
+const STAGE_PRESENTATION_ATTRIBUTES = {
+  mode: "data-stage-portrait-mode",
+  cellSize: "data-stage-pixel-size",
+  paletteLevels: "data-stage-palette-levels",
+  scale: "data-stage-portrait-scale",
+};
+
+function createCareerPortraitRenderer({ wrap, image, presentation }) {
   if (!wrap || !image) return null;
+  let currentPresentation = {
+    mode: "ascii-depth",
+    nominalCellSize: 4,
+    paletteLevels: 5,
+    scale: 1,
+    ...presentation,
+  };
+
+  function applyPresentation(nextPresentation = {}) {
+    currentPresentation = {
+      mode: nextPresentation.mode === "pixel-analog" ? "pixel-analog" : "ascii-depth",
+      nominalCellSize: Math.max(3, Math.min(14, Number(nextPresentation.nominalCellSize) || 4)),
+      paletteLevels: Math.max(2, Math.min(5, Number(nextPresentation.paletteLevels) || 5)),
+      scale: Number.isFinite(nextPresentation.scale) && nextPresentation.scale > 0 && nextPresentation.scale <= 1
+        ? nextPresentation.scale
+        : 1,
+    };
+    wrap.setAttribute("data-portrait-render-mode", currentPresentation.mode);
+    wrap.style.setProperty("--portrait-source-scale", String(currentPresentation.scale));
+    wrap.style.setProperty("--portrait-pixel-size", String(currentPresentation.nominalCellSize));
+    wrap.style.setProperty("--portrait-palette-levels", String(currentPresentation.paletteLevels));
+  }
+
+  applyPresentation(currentPresentation);
 
   const canvas = document.createElement("canvas");
   canvas.className = "ascii-portrait-canvas";
@@ -122,7 +190,15 @@ function createAsciiPortraitRenderer({ wrap, image }) {
   wrap.append(canvas);
 
   const glyphs = "@%#*+=-:.";
+  const phosphorPalette = ["#24420f", "#4f7618", "#82bd1d", "#c8ff36", "#efffb8"];
   const pointer = { x: 0, y: 0, previousX: 0, previousY: 0, inside: false };
+  const defaultLight = { x: 0.72, y: 0.64 };
+  const light = {
+    x: defaultLight.x,
+    y: defaultLight.y,
+    targetX: defaultLight.x,
+    targetY: defaultLight.y,
+  };
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   let cells = [];
   let offsets = new Float32Array(0);
@@ -132,6 +208,7 @@ function createAsciiPortraitRenderer({ wrap, image }) {
   let width = 0;
   let height = 0;
   let dpr = 1;
+  let effectiveCellSize = 2.75;
   let currentMedia = image;
   let animationFrame = 0;
   let visible = true;
@@ -158,6 +235,13 @@ function createAsciiPortraitRenderer({ wrap, image }) {
       drawX = (columns - drawWidth) / 2;
     }
 
+    const centerX = drawX + drawWidth / 2;
+    const centerY = drawY + drawHeight / 2;
+    drawWidth *= currentPresentation.scale;
+    drawHeight *= currentPresentation.scale;
+    drawX = centerX - drawWidth / 2;
+    drawY = centerY - drawHeight / 2;
+
     sourceCtx.clearRect(0, 0, columns, rows);
     sourceCtx.drawImage(media, 0, 0, mediaWidth, mediaHeight, drawX, drawY, drawWidth, drawHeight);
   }
@@ -167,8 +251,22 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     width = Math.max(1, bounds.width);
     height = Math.max(1, bounds.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    columns = Math.max(78, Math.min(112, Math.round(width / 2.75)));
-    rows = Math.max(28, Math.round(columns * (height / width) * 0.55));
+    if (currentPresentation.mode === "pixel-analog") {
+      effectiveCellSize = Math.max(
+        3,
+        Math.min(
+          currentPresentation.nominalCellSize,
+          currentPresentation.nominalCellSize * (width / 290),
+        ),
+      );
+      columns = Math.max(1, Math.ceil(width / effectiveCellSize));
+      rows = Math.max(1, Math.ceil(height / effectiveCellSize));
+    } else {
+      effectiveCellSize = 2.75;
+      columns = Math.max(78, Math.min(112, Math.round(width / effectiveCellSize)));
+      rows = Math.max(28, Math.round(columns * (height / width) * 0.55));
+    }
+    wrap.style.setProperty("--portrait-effective-cell-size", String(effectiveCellSize));
 
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -179,23 +277,57 @@ function createAsciiPortraitRenderer({ wrap, image }) {
 
     fitSource(media);
     const pixels = sourceCtx.getImageData(0, 0, columns, rows).data;
+    const sampleCount = columns * rows;
+    const alphas = new Float32Array(sampleCount);
+    const luminances = new Float32Array(sampleCount);
     const nextCells = [];
+
+    for (let index = 0; index < sampleCount; index += 1) {
+      const offset = index * 4;
+      alphas[index] = pixels[offset + 3] / 255;
+      luminances[index] = (
+        pixels[offset] * 0.2126
+        + pixels[offset + 1] * 0.7152
+        + pixels[offset + 2] * 0.0722
+      ) / 255;
+    }
+
+    function sampleAt(values, row, column) {
+      const boundedRow = Math.max(0, Math.min(rows - 1, row));
+      const boundedColumn = Math.max(0, Math.min(columns - 1, column));
+      return values[boundedRow * columns + boundedColumn];
+    }
 
     for (let row = 0; row < rows; row += 1) {
       for (let column = 0; column < columns; column += 1) {
-        const offset = (row * columns + column) * 4;
-        const alpha = pixels[offset + 3] / 255;
+        const index = row * columns + column;
+        const alpha = alphas[index];
         if (alpha < 0.08) continue;
 
-        const luminance = (
-          pixels[offset] * 0.2126
-          + pixels[offset + 1] * 0.7152
-          + pixels[offset + 2] * 0.0722
-        ) / 255;
+        const luminance = luminances[index];
+        if (currentPresentation.mode === "pixel-analog") {
+          const paletteLevels = currentPresentation.paletteLevels;
+          const paletteIndex = Math.min(
+            paletteLevels - 1,
+            Math.floor(luminance * paletteLevels),
+          );
+          nextCells.push({ alpha, column, luminance, paletteIndex, row });
+          continue;
+        }
+        const horizontalEdge = Math.abs(
+          sampleAt(luminances, row, column + 1) - sampleAt(luminances, row, column - 1),
+        );
+        const verticalEdge = Math.abs(
+          sampleAt(luminances, row + 1, column) - sampleAt(luminances, row - 1, column),
+        );
+        const edge = Math.min(1, (horizontalEdge + verticalEdge) * 1.8);
+        const depth = Math.min(1, (1 - luminance) * 0.42 + edge * 0.9);
         const glyphIndex = Math.min(glyphs.length - 1, Math.floor(luminance * glyphs.length));
         nextCells.push({
           alpha,
           column,
+          depth,
+          edge,
           glyph: glyphs[glyphIndex],
           luminance,
           row,
@@ -220,22 +352,98 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     const fontSize = cellHeight * 0.92;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
+    if (currentPresentation.mode === "pixel-analog") {
+      const palette = currentPresentation.paletteLevels === 2
+        ? ["#4f7618", "#c8ff36"]
+        : currentPresentation.paletteLevels === 3
+          ? ["#4f7618", "#82bd1d", "#c8ff36"]
+          : currentPresentation.paletteLevels === 4
+            ? phosphorPalette.slice(0, 4)
+            : phosphorPalette;
+      ctx.imageSmoothingEnabled = false;
+      for (const cell of cells) {
+        const centerX = (cell.column + 0.5) * effectiveCellSize;
+        const centerY = (cell.row + 0.5) * effectiveCellSize;
+        const pointerRadius = Math.max(36, effectiveCellSize * 5);
+        const distance = Math.hypot(centerX - pointer.x, centerY - pointer.y);
+        const glow = pointer.inside ? Math.max(0, 1 - distance / pointerRadius) : 0;
+        const displacementX = Math.max(-0.6, Math.min(0.6, light.x * 0.5 * glow));
+        const displacementY = Math.max(-0.6, Math.min(0.6, light.y * 0.5 * glow));
+        const snap = (value) => Math.round(value * dpr) / dpr;
+        const paletteIndex = Math.min(
+          palette.length - 1,
+          cell.paletteIndex + (glow >= 0.35 ? 1 : 0),
+        );
+        ctx.fillStyle = palette[paletteIndex];
+        ctx.globalAlpha = Math.min(1, cell.alpha * (0.72 + (1 - cell.luminance) * 0.28 + glow * 0.2));
+        ctx.fillRect(
+          snap(cell.column * effectiveCellSize + displacementX),
+          snap(cell.row * effectiveCellSize + displacementY),
+          effectiveCellSize,
+          effectiveCellSize,
+        );
+      }
+      ctx.globalAlpha = 1;
+      wrap.classList.add("is-ascii-rendered");
+      image.classList.add("ascii-portrait-source");
+      return;
+    }
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `700 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
 
-    for (const cell of cells) {
+    function getCellPosition(cell) {
       const columnX = (cell.column + 0.5) * cellWidth;
       const rowY = (cell.row + 0.5) * cellHeight;
       const verticalFalloff = pointer.inside
         ? Math.max(0, 1 - Math.abs(rowY - pointer.y) / Math.max(100, height * 0.34))
         : 0.22;
       const displacement = offsets[cell.column] * (0.24 + verticalFalloff * 0.76);
-      const brightness = 0.46 + (1 - cell.luminance) * 0.34;
-      ctx.globalAlpha = Math.min(1, cell.alpha * (brightness + 0.2));
-      ctx.fillStyle = cell.luminance > 0.72 ? "#efffb8" : cell.luminance > 0.42 ? "#c8ff36" : "#82bd1d";
-      ctx.fillText(cell.glyph, columnX + displacement, rowY - Math.abs(displacement) * 0.025);
+      return {
+        x: columnX + displacement,
+        y: rowY - Math.abs(displacement) * 0.025,
+      };
     }
+
+    function drawGlyphLayer(kind, lightX, lightY) {
+      for (const cell of cells) {
+        const position = getCellPosition(cell);
+
+        if (kind === "extrusion") {
+          const distance = 0.45 + cell.depth * 1.55;
+          ctx.fillStyle = "#24420f";
+          ctx.globalAlpha = Math.min(0.72, cell.alpha * (0.28 + cell.depth * 0.42));
+          ctx.fillText(
+            cell.glyph,
+            position.x + lightX * distance,
+            position.y + lightY * distance,
+          );
+          continue;
+        }
+
+        if (kind === "front") {
+          const brightness = 0.46 + (1 - cell.luminance) * 0.34;
+          ctx.globalAlpha = Math.min(1, cell.alpha * (brightness + 0.2));
+          ctx.fillStyle = cell.luminance > 0.72 ? "#efffb8" : cell.luminance > 0.42 ? "#c8ff36" : "#82bd1d";
+          ctx.fillText(cell.glyph, position.x, position.y);
+          continue;
+        }
+
+        if (kind === "highlight" && cell.edge >= 0.12) {
+          ctx.fillStyle = "#efffb8";
+          ctx.globalAlpha = Math.min(0.68, cell.alpha * cell.edge * 0.82);
+          ctx.fillText(
+            cell.glyph,
+            position.x - lightX * 0.38,
+            position.y - lightY * 0.38,
+          );
+        }
+      }
+    }
+
+    drawGlyphLayer("extrusion", light.x, light.y);
+    drawGlyphLayer("front", light.x, light.y);
+    drawGlyphLayer("highlight", light.x, light.y);
 
     ctx.globalAlpha = 1;
     wrap.classList.add("is-ascii-rendered");
@@ -247,11 +455,16 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     if (destroyed || !visible || document.hidden || reduceMotion) return;
 
     let energy = 0;
-    for (let column = 0; column < columns; column += 1) {
-      velocities[column] += -offsets[column] * 0.055;
-      velocities[column] *= 0.89;
-      offsets[column] += velocities[column];
-      energy += Math.abs(offsets[column]) + Math.abs(velocities[column]);
+    light.x += (light.targetX - light.x) * 0.16;
+    light.y += (light.targetY - light.y) * 0.16;
+    energy += Math.abs(light.targetX - light.x) + Math.abs(light.targetY - light.y);
+    if (currentPresentation.mode === "ascii-depth") {
+      for (let column = 0; column < columns; column += 1) {
+        velocities[column] += -offsets[column] * 0.055;
+        velocities[column] *= 0.89;
+        offsets[column] += velocities[column];
+        energy += Math.abs(offsets[column]) + Math.abs(velocities[column]);
+      }
     }
     draw();
 
@@ -270,6 +483,8 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     const bounds = wrap.getBoundingClientRect();
     const x = Math.max(0, Math.min(width, event.clientX - bounds.left));
     const y = Math.max(0, Math.min(height, event.clientY - bounds.top));
+    light.targetX = Math.max(-1.2, Math.min(1.2, ((x / width) - 0.5) * 2.4));
+    light.targetY = Math.max(-1.2, Math.min(1.2, ((y / height) - 0.5) * 2.4));
     const deltaX = x - pointer.previousX;
     const deltaY = y - pointer.previousY;
     const rawSpeed = deltaX * 0.82 + deltaY * 0.18;
@@ -285,16 +500,20 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     wrap.style.setProperty("--portrait-y", `${y}px`);
     wrap.classList.add("is-pointer-active");
 
-    for (let column = 0; column < columns; column += 1) {
-      const centerX = (column + 0.5) / columns * width;
-      const falloff = Math.max(0, 1 - Math.abs(centerX - x) / radius);
-      velocities[column] += speed * falloff * falloff;
+    if (currentPresentation.mode === "ascii-depth") {
+      for (let column = 0; column < columns; column += 1) {
+        const centerX = (column + 0.5) / columns * width;
+        const falloff = Math.max(0, 1 - Math.abs(centerX - x) / radius);
+        velocities[column] += speed * falloff * falloff;
+      }
     }
     scheduleMotion();
   }
 
   function handlePointerLeave() {
     pointer.inside = false;
+    light.targetX = defaultLight.x;
+    light.targetY = defaultLight.y;
     wrap.classList.remove("is-pointer-active");
     scheduleMotion();
   }
@@ -320,7 +539,8 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     }
   }
 
-  function setImage(media) {
+  function setImage(media, options = {}) {
+    if (options.presentation) applyPresentation(options.presentation);
     currentMedia = media;
     if (media.complete && media.naturalWidth) {
       renderMedia(media);
@@ -394,7 +614,16 @@ function initializeAsciiPortraits() {
   const mobile = window.matchMedia?.("(max-width: 900px)").matches;
   if (mobile) {
     const renderers = Array.from(document.querySelectorAll(".timeline-step-portrait"))
-      .map((wrap) => createAsciiPortraitRenderer({ wrap, image: wrap.querySelector("img") }))
+      .map((wrap) => {
+        const step = wrap.closest("[data-timeline-step]");
+        return createCareerPortraitRenderer({
+          wrap,
+          image: wrap.querySelector("img"),
+          presentation: step
+            ? readPortraitPresentation(step, STAGE_PRESENTATION_ATTRIBUTES)
+            : readPortraitPresentation(wrap),
+        });
+      })
       .filter(Boolean);
     return {
       destroy() {
@@ -418,11 +647,15 @@ function initializeCareerPortraitTransition() {
 
   if (!stage || !image) return null;
 
-  const asciiRenderer = createAsciiPortraitRenderer({ wrap: stage, image });
+  const portraitRenderer = createCareerPortraitRenderer({
+    wrap: stage,
+    image,
+    presentation: readPortraitPresentation(steps[0], STAGE_PRESENTATION_ATTRIBUTES),
+  });
   if (!source || !canvas || steps.length === 0) {
     return {
       destroy() {
-        asciiRenderer?.destroy();
+        portraitRenderer?.destroy();
       },
       setStage() {},
     };
@@ -432,7 +665,7 @@ function initializeCareerPortraitTransition() {
   if (!ctx) {
     return {
       destroy() {
-        asciiRenderer?.destroy();
+        portraitRenderer?.destroy();
       },
       setStage() {},
     };
@@ -489,8 +722,8 @@ function initializeCareerPortraitTransition() {
   }
 
   function captureCurrentPortrait() {
-    const asciiSnapshot = asciiRenderer?.snapshot();
-    if (asciiSnapshot) return asciiSnapshot;
+    const portraitSnapshot = portraitRenderer?.snapshot();
+    if (portraitSnapshot) return portraitSnapshot;
     if (!image.complete || !image.naturalWidth || !image.naturalHeight) return null;
 
     const snapshot = document.createElement("canvas");
@@ -623,6 +856,7 @@ function initializeCareerPortraitTransition() {
     const webpPath = nextStep.getAttribute("data-stage-image-webp");
     const pngPath = nextStep.getAttribute("data-stage-image-png");
     const alt = nextStep.getAttribute("data-stage-image-alt") || "";
+    const presentation = readPortraitPresentation(nextStep, STAGE_PRESENTATION_ATTRIBUTES);
     if (!webpPath || !pngPath) return;
 
     const snapshot = captureCurrentPortrait();
@@ -639,7 +873,7 @@ function initializeCareerPortraitTransition() {
         else source.removeAttribute("srcset");
         image.setAttribute("src", pngPath);
         image.setAttribute("alt", alt);
-        asciiRenderer?.setImage(portrait);
+        portraitRenderer?.setImage(portrait, { presentation });
         currentIndex = boundedIndex;
 
         if (!reduceMotion && !options.immediate && snapshot) {
@@ -656,7 +890,9 @@ function initializeCareerPortraitTransition() {
   image.addEventListener("load", () => {
     stage.classList.remove("has-image-error");
     fallback?.setAttribute("aria-hidden", "true");
-    asciiRenderer?.setImage(image);
+    portraitRenderer?.setImage(image, {
+      presentation: readPortraitPresentation(steps[currentIndex], STAGE_PRESENTATION_ATTRIBUTES),
+    });
   });
   image.addEventListener("error", () => {
     stage.classList.add("has-image-error");
@@ -679,7 +915,7 @@ function initializeCareerPortraitTransition() {
   return {
     destroy() {
       clearTransition();
-      asciiRenderer?.destroy();
+      portraitRenderer?.destroy();
     },
     setStage,
   };
