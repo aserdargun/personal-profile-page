@@ -1,12 +1,12 @@
 # Career Photo Timeline Design
 
 **Date:** 2026-08-15
-**Status:** Approved and implemented
+**Status:** Implemented; settled portrait rendering is superseded by `2026-08-15-career-ascii-portraits-design.md`
 **Scope:** Root English, `/en/`, and `/tr/` career journey surfaces
 
 ## Outcome
 
-Replace the current nine-stage career timeline and single ASCII portrait with an eight-stage, reverse-chronological career journey. The experience starts at the current role, AI Engineer, and moves backward to Mechanical Engineering. Every stage uses the matching user-supplied photograph, while Matrix-inspired ASCII characters appear only during transitions between otherwise normal photographs.
+Replace the current nine-stage career timeline and single ASCII portrait with an eight-stage, reverse-chronological career journey. The experience starts at the current role, AI Engineer, and moves backward to Mechanical Engineering. Every stage uses the matching user-supplied photograph. The original implementation limited Matrix-inspired ASCII characters to transitions; the superseding ASCII-portrait specification changes the settled rendering without changing the stage or asset mapping.
 
 ## Career Data and Display Order
 

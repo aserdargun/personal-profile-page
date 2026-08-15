@@ -529,6 +529,49 @@ ul {
   user-select: none;
 }
 
+.ascii-portrait-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.career-portrait.is-ascii-rendered .ascii-portrait-canvas,
+.timeline-step-portrait.is-ascii-rendered .ascii-portrait-canvas {
+  opacity: 1;
+}
+
+.career-portrait.is-ascii-rendered .ascii-portrait-source,
+.timeline-step-portrait.is-ascii-rendered .ascii-portrait-source {
+  opacity: 0;
+}
+
+.career-portrait::before,
+.timeline-step-portrait::before {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: radial-gradient(
+    circle 105px at var(--portrait-x, 50%) var(--portrait-y, 46%),
+    rgba(200, 255, 54, 0.18),
+    rgba(200, 255, 54, 0.045) 42%,
+    transparent 72%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.career-portrait.is-pointer-active::before,
+.timeline-step-portrait.is-pointer-active::before {
+  opacity: 1;
+}
+
 .career-transition {
   position: absolute;
   inset: 0;
@@ -558,7 +601,8 @@ ul {
 }
 
 .career-portrait.has-image-error picture,
-.career-portrait.has-image-error .career-transition {
+.career-portrait.has-image-error .career-transition,
+.career-portrait.has-image-error .ascii-portrait-canvas {
   opacity: 0;
 }
 
@@ -866,6 +910,7 @@ ul {
 }
 
 .timeline-step-portrait {
+  position: relative;
   display: block;
   width: min(260px, 100%);
   aspect-ratio: 4 / 5;
@@ -878,6 +923,7 @@ ul {
     radial-gradient(circle at 50% 34%, rgba(200, 255, 54, 0.15), transparent 42%),
     #0a0d08;
   background-size: 28px 28px, 28px 28px, auto, auto;
+  touch-action: pan-y;
 }
 
 .timeline-step-portrait img {
@@ -1321,6 +1367,10 @@ footer a {
     padding: 82px 20px;
   }
 
+  .section-about {
+    padding-bottom: 0;
+  }
+
   .section-heading {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -1397,6 +1447,11 @@ footer a {
   }
 
   .career-transition {
+    display: none;
+  }
+
+  .career-portrait::before,
+  .timeline-step-portrait::before {
     display: none;
   }
 

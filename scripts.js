@@ -34,7 +34,7 @@ function initializeTimeline() {
 
   if (!timeline || steps.length === 0) return;
 
-  const portraitTransition = initializeCareerPortraitTransition();
+  const portraitTransition = initializeAsciiPortraits();
 
   const setActiveStep = (index) => {
     const boundedIndex = Math.max(0, Math.min(steps.length - 1, index));
@@ -107,6 +107,306 @@ function initializeTimeline() {
   timeline.style.setProperty("--timeline-progress", "0");
 }
 
+function createAsciiPortraitRenderer({ wrap, image }) {
+  if (!wrap || !image) return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.className = "ascii-portrait-canvas";
+  canvas.setAttribute("aria-hidden", "true");
+
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const sourceCanvas = document.createElement("canvas");
+  const sourceCtx = sourceCanvas.getContext("2d", { alpha: true, willReadFrequently: true });
+  if (!ctx || !sourceCtx) return null;
+
+  wrap.append(canvas);
+
+  const glyphs = "@%#*+=-:.";
+  const pointer = { x: 0, y: 0, previousX: 0, previousY: 0, inside: false };
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  let cells = [];
+  let offsets = new Float32Array(0);
+  let velocities = new Float32Array(0);
+  let columns = 0;
+  let rows = 0;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let currentMedia = image;
+  let animationFrame = 0;
+  let visible = true;
+  let destroyed = false;
+  let resizeObserver = null;
+  let visibilityObserver = null;
+  let usesWindowResize = false;
+
+  function fitSource(media) {
+    const mediaWidth = media.naturalWidth || Number.parseInt(media.getAttribute?.("width"), 10) || 640;
+    const mediaHeight = media.naturalHeight || Number.parseInt(media.getAttribute?.("height"), 10) || 800;
+    const sourceRatio = mediaWidth / mediaHeight;
+    const frameRatio = columns / rows;
+    let drawWidth = columns;
+    let drawHeight = rows;
+    let drawX = 0;
+    let drawY = 0;
+
+    if (sourceRatio > frameRatio) {
+      drawHeight = columns / sourceRatio;
+      drawY = (rows - drawHeight) / 2;
+    } else {
+      drawWidth = rows * sourceRatio;
+      drawX = (columns - drawWidth) / 2;
+    }
+
+    sourceCtx.clearRect(0, 0, columns, rows);
+    sourceCtx.drawImage(media, 0, 0, mediaWidth, mediaHeight, drawX, drawY, drawWidth, drawHeight);
+  }
+
+  function sampleMedia(media) {
+    const bounds = wrap.getBoundingClientRect();
+    width = Math.max(1, bounds.width);
+    height = Math.max(1, bounds.height);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    columns = Math.max(38, Math.min(58, Math.round(width / 5.5)));
+    rows = Math.max(28, Math.round(columns * (height / width) * 0.55));
+
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    sourceCanvas.width = columns;
+    sourceCanvas.height = rows;
+
+    fitSource(media);
+    const pixels = sourceCtx.getImageData(0, 0, columns, rows).data;
+    const nextCells = [];
+
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        const offset = (row * columns + column) * 4;
+        const alpha = pixels[offset + 3] / 255;
+        if (alpha < 0.08) continue;
+
+        const luminance = (
+          pixels[offset] * 0.2126
+          + pixels[offset + 1] * 0.7152
+          + pixels[offset + 2] * 0.0722
+        ) / 255;
+        const glyphIndex = Math.min(glyphs.length - 1, Math.floor(luminance * glyphs.length));
+        nextCells.push({
+          alpha,
+          column,
+          glyph: glyphs[glyphIndex],
+          luminance,
+          row,
+        });
+      }
+    }
+
+    cells = nextCells;
+    offsets = new Float32Array(columns);
+    velocities = new Float32Array(columns);
+    pointer.x = width / 2;
+    pointer.y = height * 0.46;
+    pointer.previousX = pointer.x;
+    pointer.previousY = pointer.y;
+  }
+
+  function draw() {
+    if (destroyed || cells.length === 0) return;
+
+    const cellWidth = width / columns;
+    const cellHeight = height / rows;
+    const fontSize = cellHeight * 0.92;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `700 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+
+    for (const cell of cells) {
+      const columnX = (cell.column + 0.5) * cellWidth;
+      const rowY = (cell.row + 0.5) * cellHeight;
+      const verticalFalloff = pointer.inside
+        ? Math.max(0, 1 - Math.abs(rowY - pointer.y) / Math.max(100, height * 0.34))
+        : 0.22;
+      const displacement = offsets[cell.column] * (0.24 + verticalFalloff * 0.76);
+      const brightness = 0.46 + (1 - cell.luminance) * 0.34;
+      ctx.globalAlpha = Math.min(1, cell.alpha * (brightness + 0.2));
+      ctx.fillStyle = cell.luminance > 0.72 ? "#efffb8" : cell.luminance > 0.42 ? "#c8ff36" : "#82bd1d";
+      ctx.fillText(cell.glyph, columnX + displacement, rowY - Math.abs(displacement) * 0.025);
+    }
+
+    ctx.globalAlpha = 1;
+    wrap.classList.add("is-ascii-rendered");
+    image.classList.add("ascii-portrait-source");
+  }
+
+  function animateMotion() {
+    animationFrame = 0;
+    if (destroyed || !visible || document.hidden || reduceMotion) return;
+
+    let energy = 0;
+    for (let column = 0; column < columns; column += 1) {
+      velocities[column] += -offsets[column] * 0.055;
+      velocities[column] *= 0.89;
+      offsets[column] += velocities[column];
+      energy += Math.abs(offsets[column]) + Math.abs(velocities[column]);
+    }
+    draw();
+
+    if (energy > 0.12) {
+      animationFrame = window.requestAnimationFrame(animateMotion);
+    }
+  }
+
+  function scheduleMotion() {
+    if (animationFrame || reduceMotion || !visible || destroyed) return;
+    animationFrame = window.requestAnimationFrame(animateMotion);
+  }
+
+  function updatePointer(event) {
+    if (reduceMotion) return;
+    const bounds = wrap.getBoundingClientRect();
+    const x = Math.max(0, Math.min(width, event.clientX - bounds.left));
+    const y = Math.max(0, Math.min(height, event.clientY - bounds.top));
+    const deltaX = x - pointer.previousX;
+    const deltaY = y - pointer.previousY;
+    const rawSpeed = deltaX * 0.82 + deltaY * 0.18;
+    const speed = Math.max(-24, Math.min(24, Math.abs(rawSpeed) < 0.5 ? 1.2 : rawSpeed));
+    const radius = Math.max(78, width * 0.3);
+
+    pointer.x = x;
+    pointer.y = y;
+    pointer.inside = true;
+    pointer.previousX = x;
+    pointer.previousY = y;
+    wrap.style.setProperty("--portrait-x", `${x}px`);
+    wrap.style.setProperty("--portrait-y", `${y}px`);
+    wrap.classList.add("is-pointer-active");
+
+    for (let column = 0; column < columns; column += 1) {
+      const centerX = (column + 0.5) / columns * width;
+      const falloff = Math.max(0, 1 - Math.abs(centerX - x) / radius);
+      velocities[column] += speed * falloff * falloff;
+    }
+    scheduleMotion();
+  }
+
+  function handlePointerLeave() {
+    pointer.inside = false;
+    wrap.classList.remove("is-pointer-active");
+    scheduleMotion();
+  }
+
+  function handleVisibilityChange() {
+    if (document.hidden && animationFrame) {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    } else if (!document.hidden) {
+      draw();
+    }
+  }
+
+  function renderMedia(media) {
+    if (destroyed || !media || !media.naturalWidth || !media.naturalHeight) return;
+    currentMedia = media;
+    try {
+      sampleMedia(media);
+      draw();
+    } catch {
+      wrap.classList.remove("is-ascii-rendered");
+      image.classList.remove("ascii-portrait-source");
+    }
+  }
+
+  function setImage(media) {
+    currentMedia = media;
+    if (media.complete && media.naturalWidth) {
+      renderMedia(media);
+      return;
+    }
+    media.addEventListener("load", () => renderMedia(media), { once: true });
+  }
+
+  function resize() {
+    if (currentMedia?.naturalWidth) renderMedia(currentMedia);
+  }
+
+  function snapshot() {
+    if (!wrap.classList.contains("is-ascii-rendered")) return null;
+    const copy = document.createElement("canvas");
+    copy.width = canvas.width;
+    copy.height = canvas.height;
+    copy.getContext("2d", { alpha: true })?.drawImage(canvas, 0, 0);
+    return copy;
+  }
+
+  function destroy() {
+    destroyed = true;
+    if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+    resizeObserver?.disconnect();
+    visibilityObserver?.disconnect();
+    wrap.removeEventListener("pointerenter", updatePointer);
+    wrap.removeEventListener("pointermove", updatePointer);
+    wrap.removeEventListener("pointerleave", handlePointerLeave);
+    wrap.removeEventListener("pointerdown", updatePointer);
+    window.removeEventListener("pointerup", scheduleMotion);
+    if (usesWindowResize) window.removeEventListener("resize", resize);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }
+
+  wrap.addEventListener("pointerenter", updatePointer, { passive: true });
+  wrap.addEventListener("pointermove", updatePointer, { passive: true });
+  wrap.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+  wrap.addEventListener("pointerdown", updatePointer, { passive: true });
+  window.addEventListener("pointerup", scheduleMotion, { passive: true });
+
+  if (typeof ResizeObserver === "function") {
+    resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(wrap);
+  } else {
+    usesWindowResize = true;
+    window.addEventListener("resize", resize, { passive: true });
+  }
+
+  if ("IntersectionObserver" in window) {
+    visibilityObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible && animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      } else if (visible) {
+        resize();
+      }
+    }, { threshold: 0.01 });
+    visibilityObserver.observe(wrap);
+  }
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  setImage(image);
+  return { canvas, destroy, drawStatic: draw, setImage, snapshot };
+}
+
+function initializeAsciiPortraits() {
+  const mobile = window.matchMedia?.("(max-width: 900px)").matches;
+  if (mobile) {
+    const renderers = Array.from(document.querySelectorAll(".timeline-step-portrait"))
+      .map((wrap) => createAsciiPortraitRenderer({ wrap, image: wrap.querySelector("img") }))
+      .filter(Boolean);
+    return {
+      destroy() {
+        renderers.forEach((renderer) => renderer.destroy());
+      },
+      setStage() {},
+    };
+  }
+
+  return initializeCareerPortraitTransition();
+}
+
 function initializeCareerPortraitTransition() {
   const stage = document.querySelector("[data-career-portrait]");
   const source = stage?.querySelector("[data-career-source]");
@@ -116,10 +416,27 @@ function initializeCareerPortraitTransition() {
   const steps = Array.from(document.querySelectorAll("[data-timeline-step]"));
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  if (!stage || !source || !image || !canvas || steps.length === 0) return null;
+  if (!stage || !image) return null;
+
+  const asciiRenderer = createAsciiPortraitRenderer({ wrap: stage, image });
+  if (!source || !canvas || steps.length === 0) {
+    return {
+      destroy() {
+        asciiRenderer?.destroy();
+      },
+      setStage() {},
+    };
+  }
 
   const ctx = canvas.getContext("2d", { alpha: true });
-  if (!ctx) return null;
+  if (!ctx) {
+    return {
+      destroy() {
+        asciiRenderer?.destroy();
+      },
+      setStage() {},
+    };
+  }
 
   const portraitCache = new Map();
   const glyphs = "01/\\|<>{}#+*";
@@ -172,6 +489,8 @@ function initializeCareerPortraitTransition() {
   }
 
   function captureCurrentPortrait() {
+    const asciiSnapshot = asciiRenderer?.snapshot();
+    if (asciiSnapshot) return asciiSnapshot;
     if (!image.complete || !image.naturalWidth || !image.naturalHeight) return null;
 
     const snapshot = document.createElement("canvas");
@@ -312,7 +631,7 @@ function initializeCareerPortraitTransition() {
     clearTransition();
 
     preloadPortrait(webpPath, pngPath)
-      .then(({ format }) => {
+      .then(({ portrait, format }) => {
         if (token !== transitionToken) return;
         stage.classList.remove("has-image-error");
         fallback?.setAttribute("aria-hidden", "true");
@@ -320,6 +639,7 @@ function initializeCareerPortraitTransition() {
         else source.removeAttribute("srcset");
         image.setAttribute("src", pngPath);
         image.setAttribute("alt", alt);
+        asciiRenderer?.setImage(portrait);
         currentIndex = boundedIndex;
 
         if (!reduceMotion && !options.immediate && snapshot) {
@@ -336,6 +656,7 @@ function initializeCareerPortraitTransition() {
   image.addEventListener("load", () => {
     stage.classList.remove("has-image-error");
     fallback?.setAttribute("aria-hidden", "true");
+    asciiRenderer?.setImage(image);
   });
   image.addEventListener("error", () => {
     stage.classList.add("has-image-error");
@@ -355,7 +676,13 @@ function initializeCareerPortraitTransition() {
   });
 
   resizeCanvas();
-  return { setStage };
+  return {
+    destroy() {
+      clearTransition();
+      asciiRenderer?.destroy();
+    },
+    setStage,
+  };
 }
 
 document.addEventListener("DOMContentLoaded", () => {
