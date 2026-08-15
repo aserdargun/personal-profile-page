@@ -64,6 +64,40 @@ test("Azure bypasses build discovery for the dependency-free static site", () =>
     "true",
     "Azure must upload the static files without invoking Oryx",
   );
+  assert.match(
+    targetWorkflow,
+    /^\s*output_location:\s*["']{2}\s*(?:#.*)?$/m,
+    "prebuilt static upload must leave output_location empty",
+  );
+});
+
+test("production deployment validates the exact checkout before upload", () => {
+  assert.match(targetWorkflow, /^\s*workflow_dispatch:\s*$/m);
+  assert.match(targetWorkflow, /^permissions:\s*\r?\n\s+contents:\s*read\s*$/m);
+  assert.match(
+    targetWorkflow,
+    /^concurrency:\s*\r?\n\s+group:\s*deploy-swa-aserdargun-com\s*\r?\n\s+cancel-in-progress:\s*false\s*$/m,
+  );
+  assert.match(
+    targetWorkflow,
+    /actions\/checkout@11d5960a326750d5838078e36cf38b85af677262\b/,
+  );
+  assert.match(
+    targetWorkflow,
+    /actions\/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020\b/,
+  );
+  assert.match(targetWorkflow, /run:\s*npm ci\b/);
+  assert.match(targetWorkflow, /run:\s*npm test\b/);
+  assert.match(targetWorkflow, /run:\s*npm run test:server\b/);
+  assert.match(
+    targetWorkflow,
+    /Azure\/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1\b/,
+  );
+  assert.doesNotMatch(
+    targetWorkflow,
+    /uses:\s*(?:actions\/(?:checkout|setup-node)|Azure\/static-web-apps-deploy)@v\d+\b/,
+    "production actions must use immutable commit SHAs",
+  );
 });
 
 test("Azure serves a self-canonical English homepage directly at root", async () => {
@@ -119,7 +153,7 @@ test("main pushes trigger exactly one Azure Static Web Apps deployment", async (
   for (const workflowFile of workflowFiles) {
     const source = await readFile(path.join(workflowsDirectory, workflowFile), "utf8");
     if (
-      source.includes("Azure/static-web-apps-deploy@v1") &&
+      source.includes("Azure/static-web-apps-deploy@") &&
       /push:\s*[\s\S]*?branches:\s*[\s\S]*?- main/.test(source)
     ) {
       deploymentWorkflows.push(workflowFile);

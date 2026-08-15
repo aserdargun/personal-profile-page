@@ -5,7 +5,6 @@ import path from "node:path";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedStageKeys = [
   "ai-engineer",
-  "ai-practitioner",
   "full-stack-ai",
   "data-scientist",
   "production-manager",
@@ -13,6 +12,17 @@ const expectedStageKeys = [
   "materials-manufacturing",
   "industrial-engineering",
   "mechanical-engineering",
+];
+const expectedStageNumbers = ["08", "07", "06", "05", "04", "03", "02", "01"];
+const expectedStageImages = [
+  "08-ai-engineer",
+  "07-full-stack-ai-engineer",
+  "06-data-scientist",
+  "05-production-manager",
+  "04-production-engineer",
+  "03-materials-manufacturing",
+  "02-industrial-engineering",
+  "01-mechanical-engineering",
 ];
 const expectedAnchors = ["top", "apps", "journey", "approach", "about"];
 const expectedAppCodes = ["stk", "aia", "llm", "usl", "gpu", "cld"];
@@ -50,6 +60,12 @@ function readPngDimensions(buffer) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
+function pngHasAlpha(buffer) {
+  const signature = buffer.subarray(0, 8).toString("hex");
+  if (signature !== "89504e470d0a1a0a") return false;
+  return [4, 6].includes(buffer.readUInt8(25));
+}
+
 const pages = {
   en: await readFile(path.join(root, "en/index.html"), "utf8"),
   tr: await readFile(path.join(root, "tr/index.html"), "utf8"),
@@ -71,15 +87,21 @@ for (const [locale, html] of Object.entries(pages)) {
   const wordmarkLink = html.match(/<a class="wordmark"[^>]*>/)?.[0] ?? "";
   check(wordmarkLink.includes('aria-label="SG — Serdar Gündoğdu'), `${locale}: wordmark accessible name must contain all visible text`);
   check(html.includes("/styles.css") && html.includes("/scripts.js"), `${locale}: shared root assets are not linked`);
-  check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
-  check(html.includes("/images/serdar-gundogdu-ascii-480.webp 480w") && html.includes("/images/serdar-gundogdu-ascii-720.webp 720w"), `${locale}: responsive WebP portrait sources are missing`);
-  check(html.includes('width="720" height="952" fetchpriority="high"'), `${locale}: portrait dimensions or loading priority are incorrect`);
+  check(html.includes("data-career-portrait"), `${locale}: career portrait stage is missing`);
+  check(html.includes("data-career-transition"), `${locale}: career transition canvas is missing`);
+  check(html.includes('width="640" height="800"'), `${locale}: normalized career portrait dimensions are missing`);
   check(!html.includes("current-stage-link"), `${locale}: current-stage Explore buttons must be removed`);
 
   const stageKeys = matches(html, /data-stage-key="([^"]+)"/g);
   check(JSON.stringify(stageKeys) === JSON.stringify(expectedStageKeys), `${locale}: timeline stage keys or order differ`);
   const stageNumbers = matches(html, /data-stage-number="([^"]+)"/g);
-  check(JSON.stringify(stageNumbers) === JSON.stringify(["09", "08", "07", "06", "05", "04", "03", "02", "01"]), `${locale}: timeline stage numbers must descend from 09 to 01`);
+  check(JSON.stringify(stageNumbers) === JSON.stringify(expectedStageNumbers), `${locale}: timeline stage numbers must descend from 08 to 01`);
+  for (const assetName of expectedStageImages) {
+    check(html.includes(`/images/career/${assetName}.webp`), `${locale}: WebP career portrait is missing: ${assetName}`);
+    check(html.includes(`/images/career/${assetName}.png`), `${locale}: PNG career portrait is missing: ${assetName}`);
+  }
+  const withoutCredential = html.replaceAll("AWS Certified AI Practitioner", "");
+  check(!/AI Practitioner/i.test(withoutCredential), `${locale}: AI Practitioner remains as a personal title`);
 
   for (const anchor of expectedAnchors) {
     check(new RegExp(`id="${anchor}"`).test(html), `${locale}: #${anchor} anchor is missing`);
@@ -122,15 +144,15 @@ check(pages.en.includes("https://aserdargun.com/images/og-ascii.png"), "English 
 check(pages.tr.includes("https://aserdargun.com/images/og-ascii-tr.png"), "Turkish Open Graph image is incorrect");
 check(pages.en.includes("AI Engineer"), "English AI Engineer status is missing");
 check(pages.tr.includes("AI Engineer"), "Turkish AI Engineer status is missing");
-check(pages.en.includes("Reading direction · 09 → 01"), "English reverse-chronology explanation is missing");
-check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronology explanation is missing");
+check(pages.en.includes("Reading direction · 08 → 01"), "English reverse-chronology explanation is missing");
+check(pages.tr.includes("Okuma yönü · 08 → 01"), "Turkish reverse-chronology explanation is missing");
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
 check(pages.en.includes("https://usl.aserdargun.com/") && pages.tr.includes("https://usl.aserdargun.com/"), "Unsloth Studio Learning link is missing");
 check(pages.en.includes("One portfolio, six focused applications."), "English application map definition is missing");
 check(pages.tr.includes("Tek portföy, altı odaklı uygulama."), "Turkish application map definition is missing");
 check(!pages.en.includes("<h3>GPU Kernel Engineer") && !pages.tr.includes("<h3>GPU Kernel Engineer"), "Legacy GPU Kernel Engineer career title is still present");
-check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
-check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 1, "Only the static portrait image should rely on CSS scaling");
+check(styles.includes(".career-transition"), "Career transition canvas styles are missing");
+check(styles.includes(".career-portrait-fallback"), "Career portrait fallback styles are missing");
 check(/\.has-js \.timeline-step\s*\{[^}]*opacity:\s*1;/.test(styles), "Inactive timeline steps must not reduce descendant contrast with parent opacity");
 check(/\.section-kicker\s*\{[^}]*color:\s*rgba\(18, 19, 16, 0\.65\);/.test(styles), "Section kicker contrast is below the required token");
 check(styles.includes(".app-map tbody tr:first-child"), "Stackfolio-first application map styling is missing");
@@ -147,6 +169,13 @@ check(rootPage.includes('<meta property="og:url" content="https://aserdargun.com
 check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL is incorrect");
 check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
 check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
+check(JSON.stringify(matches(rootPage, /data-stage-key="([^"]+)"/g)) === JSON.stringify(expectedStageKeys), "Root timeline stage keys or order differ");
+check(JSON.stringify(matches(rootPage, /data-stage-number="([^"]+)"/g)) === JSON.stringify(expectedStageNumbers), "Root timeline stage numbers must descend from 08 to 01");
+for (const assetName of expectedStageImages) {
+  check(rootPage.includes(`/images/career/${assetName}.webp`), `Root WebP career portrait is missing: ${assetName}`);
+  check(rootPage.includes(`/images/career/${assetName}.png`), `Root PNG career portrait is missing: ${assetName}`);
+}
+check(!/AI Practitioner/i.test(rootPage.replaceAll("AWS Certified AI Practitioner", "")), "Root AI Practitioner personal title remains");
 for (const url of expectedAppUrls) {
   check(rootPage.includes(`href="${url}"`), `Root application URL is missing: ${url}`);
 }
@@ -158,7 +187,7 @@ check(sitemap.includes("<loc>https://aserdargun.com/</loc>"), "Sitemap is missin
 check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
 check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
 
-for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "images/serdar-gundogdu-ascii.png", "images/serdar-gundogdu-ascii-480.avif", "images/serdar-gundogdu-ascii-720.avif", "images/serdar-gundogdu-ascii-480.webp", "images/serdar-gundogdu-ascii-720.webp", "styles.css", "scripts.js"]) {
+for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "styles.css", "scripts.js"]) {
   try {
     await stat(path.join(root, asset));
   } catch {
@@ -170,21 +199,23 @@ const trOgBuffer = await readFile(path.join(root, "images/og-ascii-tr.png"));
 const trOgDimensions = readPngDimensions(trOgBuffer);
 check(trOgDimensions?.width === 1730 && trOgDimensions?.height === 909, "Turkish Open Graph image must be 1730×909 PNG");
 
-const portraitBuffer = await readFile(path.join(root, "images/serdar-gundogdu-ascii.png"));
-const portraitDimensions = readPngDimensions(portraitBuffer);
-const portraitPngStats = await stat(path.join(root, "images/serdar-gundogdu-ascii.png"));
-const portrait480AvifStats = await stat(path.join(root, "images/serdar-gundogdu-ascii-480.avif"))
-  .catch(() => ({ size: Number.POSITIVE_INFINITY }));
-const portrait720AvifStats = await stat(path.join(root, "images/serdar-gundogdu-ascii-720.avif"))
-  .catch(() => ({ size: Number.POSITIVE_INFINITY }));
-const portrait480Stats = await stat(path.join(root, "images/serdar-gundogdu-ascii-480.webp"));
-const portrait720Stats = await stat(path.join(root, "images/serdar-gundogdu-ascii-720.webp"));
-check(portraitDimensions?.width === 720 && portraitDimensions?.height === 952, "Fallback portrait must be 720×952 PNG");
-check(portraitPngStats.size <= 550_000, "Fallback portrait exceeds its 550 KB performance budget");
-check(portrait480AvifStats.size < portrait480Stats.size, "480px AVIF portrait must be smaller than WebP");
-check(portrait720AvifStats.size < portrait720Stats.size, "720px AVIF portrait must be smaller than WebP");
-check(portrait480Stats.size <= 150_000, "480px WebP portrait exceeds its 150 KB performance budget");
-check(portrait720Stats.size <= 300_000, "720px WebP portrait exceeds its 300 KB performance budget");
+for (const assetName of expectedStageImages) {
+  const pngPath = path.join(root, `images/career/${assetName}.png`);
+  const webpPath = path.join(root, `images/career/${assetName}.webp`);
+  const pngBuffer = await readFile(pngPath).catch(() => null);
+  const pngStats = await stat(pngPath).catch(() => null);
+  const webpStats = await stat(webpPath).catch(() => null);
+
+  check(Boolean(pngBuffer), `Career PNG is missing: ${assetName}`);
+  check(Boolean(webpStats), `Career WebP is missing: ${assetName}`);
+  if (pngBuffer) {
+    const dimensions = readPngDimensions(pngBuffer);
+    check(dimensions?.width === 640 && dimensions?.height === 800, `Career PNG must be 640×800: ${assetName}`);
+    check(pngHasAlpha(pngBuffer), `Career PNG must support transparency: ${assetName}`);
+  }
+  if (pngStats) check(pngStats.size <= 1_500_000, `Career PNG exceeds 1.5 MB: ${assetName}`);
+  if (webpStats) check(webpStats.size <= 300_000, `Career WebP exceeds 300 KB: ${assetName}`);
+}
 
 if (failures.length > 0) {
   console.error("Site validation failed:");

@@ -34,6 +34,8 @@ function initializeTimeline() {
 
   if (!timeline || steps.length === 0) return;
 
+  const portraitTransition = initializeCareerPortraitTransition();
+
   const setActiveStep = (index) => {
     const boundedIndex = Math.max(0, Math.min(steps.length - 1, index));
     const activeStep = steps[boundedIndex];
@@ -50,6 +52,7 @@ function initializeTimeline() {
     if (stageCount) stageCount.textContent = `${stageNumber} / ${String(steps.length).padStart(2, "0")}`;
     if (stageRole) stageRole.textContent = activeStep.dataset.stageRole || "";
     if (stageFocus) stageFocus.textContent = activeStep.dataset.stageFocus || "";
+    portraitTransition?.setStage(boundedIndex);
 
     if (!reduceMotion && typeof stageSummary?.animate === "function") {
       stageSummary.animate(
@@ -104,300 +107,258 @@ function initializeTimeline() {
   timeline.style.setProperty("--timeline-progress", "0");
 }
 
-function initializePortrait() {
-  const wrap = document.querySelector("[data-portrait-effect]");
-  const image = wrap?.querySelector(".portrait-ascii");
-  const canvas = wrap?.querySelector(".portrait-canvas");
+function initializeCareerPortraitTransition() {
+  const stage = document.querySelector("[data-career-portrait]");
+  const source = stage?.querySelector("[data-career-source]");
+  const image = stage?.querySelector("[data-career-image]");
+  const canvas = stage?.querySelector("[data-career-transition]");
+  const fallback = stage?.querySelector("[data-career-fallback]");
+  const steps = Array.from(document.querySelectorAll("[data-timeline-step]"));
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  if (!wrap || !image || !canvas || reduceMotion) return;
+  if (!stage || !source || !image || !canvas || steps.length === 0) return null;
 
   const ctx = canvas.getContext("2d", { alpha: true });
-  if (!ctx) return;
+  if (!ctx) return null;
 
-  const sourceCanvas = document.createElement("canvas");
-  const sourceCtx = sourceCanvas.getContext("2d", { alpha: true });
-  if (!sourceCtx) return;
-
-  const columns = 30;
-  const rows = 28;
-  const offsets = new Float32Array(columns);
-  const velocities = new Float32Array(columns);
-  const pointer = {
-    x: 0,
-    y: 0,
-    previousX: 0,
-    previousY: 0,
-    inside: false,
-  };
-
+  const portraitCache = new Map();
+  const glyphs = "01/\\|<>{}#+*";
+  let transitionFrame = 0;
+  let transitionToken = 0;
+  let currentIndex = 0;
   let width = 0;
   let height = 0;
   let dpr = 1;
-  let sourceX = 0;
-  let sourceY = 0;
-  let sourceWidth = 0;
-  let sourceHeight = 0;
-  let mediaX = 0;
-  let mediaY = 0;
-  let mediaWidth = 0;
-  let mediaHeight = 0;
-  let animationFrame = 0;
-  let animationRunning = false;
-  let portraitVisible = true;
-  let dragging = false;
-  let dragAnchorX = 0;
-  let dragAnchorY = 0;
 
-  function rasterizeSource() {
-    const declaredWidth = Number.parseInt(image.getAttribute("width"), 10);
-    const declaredHeight = Number.parseInt(image.getAttribute("height"), 10);
-
-    sourceCanvas.width = Number.isFinite(declaredWidth) && declaredWidth > 0
-      ? declaredWidth
-      : image.naturalWidth;
-    sourceCanvas.height = Number.isFinite(declaredHeight) && declaredHeight > 0
-      ? declaredHeight
-      : image.naturalHeight;
-    sourceCtx.drawImage(image, 0, 0, sourceCanvas.width, sourceCanvas.height);
-  }
-
-  function resize() {
-    const rect = wrap.getBoundingClientRect();
-    width = Math.max(1, rect.width);
-    height = Math.max(1, rect.height);
+  function resizeCanvas() {
+    const bounds = stage.getBoundingClientRect();
+    width = Math.max(1, bounds.width);
+    height = Math.max(1, bounds.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const mediaScale = Number.parseFloat(
-      getComputedStyle(wrap).getPropertyValue("--portrait-media-scale"),
-    );
-    const fittedScale = Number.isFinite(mediaScale)
-      ? Math.max(0.01, Math.min(1, mediaScale))
-      : 1;
-
-    mediaWidth = width * fittedScale;
-    mediaHeight = height * fittedScale;
-    mediaX = (width - mediaWidth) / 2;
-    mediaY = (height - mediaHeight) / 2;
-
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+  }
 
-    const imageRatio = sourceCanvas.width / sourceCanvas.height;
-    const frameRatio = mediaWidth / mediaHeight;
+  function clearTransition() {
+    if (transitionFrame) cancelAnimationFrame(transitionFrame);
+    transitionFrame = 0;
+    resizeCanvas();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    stage.classList.remove("is-transitioning");
+  }
 
-    if (imageRatio > frameRatio) {
-      sourceHeight = sourceCanvas.height;
-      sourceWidth = sourceHeight * frameRatio;
-      sourceX = (sourceCanvas.width - sourceWidth) / 2;
-      sourceY = 0;
+  function loadImage(path) {
+    return new Promise((resolve, reject) => {
+      const portrait = new Image();
+      portrait.decoding = "async";
+      portrait.onload = () => resolve(portrait);
+      portrait.onerror = reject;
+      portrait.src = path;
+    });
+  }
+
+  function preloadPortrait(webpPath, pngPath) {
+    const cacheKey = `${webpPath}|${pngPath}`;
+    if (portraitCache.has(cacheKey)) return portraitCache.get(cacheKey);
+
+    const promise = loadImage(webpPath)
+      .then((portrait) => ({ portrait, format: "webp" }))
+      .catch(() => loadImage(pngPath).then((portrait) => ({ portrait, format: "png" })));
+    portraitCache.set(cacheKey, promise);
+    return promise;
+  }
+
+  function captureCurrentPortrait() {
+    if (!image.complete || !image.naturalWidth || !image.naturalHeight) return null;
+
+    const snapshot = document.createElement("canvas");
+    snapshot.width = image.naturalWidth;
+    snapshot.height = image.naturalHeight;
+    snapshot.getContext("2d", { alpha: true })?.drawImage(image, 0, 0);
+    return snapshot;
+  }
+
+  function drawContained(media, sx, sy, sw, sh, dx, dy, dw, dh) {
+    const sourceRatio = sw / sh;
+    const destinationRatio = dw / dh;
+    let renderWidth = dw;
+    let renderHeight = dh;
+    let renderX = dx;
+    let renderY = dy;
+
+    if (sourceRatio > destinationRatio) {
+      renderHeight = dw / sourceRatio;
+      renderY += (dh - renderHeight) / 2;
     } else {
-      sourceWidth = sourceCanvas.width;
-      sourceHeight = sourceWidth / frameRatio;
-      sourceX = 0;
-      sourceY = 0;
+      renderWidth = dh * sourceRatio;
+      renderX += (dw - renderWidth) / 2;
     }
 
-    if (sourceHeight > sourceCanvas.height) {
-      sourceHeight = sourceCanvas.height;
-      sourceWidth = sourceHeight * frameRatio;
-      sourceX = (sourceCanvas.width - sourceWidth) / 2;
-    }
-
-    pointer.x = width / 2;
-    pointer.y = height * 0.46;
-    pointer.previousX = pointer.x;
-    pointer.previousY = pointer.y;
+    ctx.drawImage(media, sx, sy, sw, sh, renderX, renderY, renderWidth, renderHeight);
   }
 
-  function updatePointer(event) {
-    const rect = wrap.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const deltaX = x - pointer.previousX;
-    const deltaY = y - pointer.previousY;
-
-    pointer.x = x;
-    pointer.y = y;
-    pointer.inside = true;
-    wrap.style.setProperty("--portrait-x", `${x}px`);
-    wrap.style.setProperty("--portrait-y", `${y}px`);
-    wrap.classList.add("is-pointer-active");
-
-    const speed = Math.max(-22, Math.min(22, deltaX * 0.82 + deltaY * 0.16));
-    const radius = Math.max(110, width * 0.28);
-
-    for (let column = 0; column < columns; column += 1) {
-      const centerX = ((column + 0.5) / columns) * width;
-      const distance = Math.abs(centerX - x);
-      if (distance >= radius) continue;
-
-      const falloff = 1 - distance / radius;
-      const verticalWeight = 0.35 + Math.min(1, y / height) * 0.75;
-      velocities[column] += speed * falloff * falloff * verticalWeight;
-    }
-
-    pointer.previousX = x;
-    pointer.previousY = y;
-  }
-
-  function draw(time) {
-    if (!portraitVisible || document.hidden) {
-      animationRunning = false;
-      animationFrame = 0;
-      return;
-    }
-
-    const stripWidth = mediaWidth / columns;
-    const rowHeight = mediaHeight / rows;
-    const sourceStripWidth = sourceWidth / columns;
-    const sourceRowHeight = sourceHeight / rows;
+  function drawMatrixTransition(snapshot, progress, elapsed) {
+    const columns = width < 250 ? 10 : 18;
+    const rows = Math.max(22, Math.round(height / 15));
+    const cellWidth = width / columns;
+    const cellHeight = height / rows;
+    const sourceCellWidth = snapshot.width / columns;
+    const sourceCellHeight = snapshot.height / rows;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    ctx.filter = "contrast(1.34) brightness(0.86) saturate(0.82)";
 
     for (let column = 0; column < columns; column += 1) {
-      velocities[column] += -offsets[column] * 0.045;
-      velocities[column] *= 0.92;
-      offsets[column] += velocities[column];
-
-      const idle = Math.sin(time * 0.00072 + column * 0.46) * 0.75;
-      const columnCenter = mediaX + (column + 0.5) * stripWidth;
-
+      const columnDelay = ((column * 7) % 11) / 30;
       for (let row = 0; row < rows; row += 1) {
-        const rowProgress = row / Math.max(1, rows - 1);
-        const rowCenter = mediaY + (row + 0.5) * rowHeight;
-        const pointerFalloff = pointer.inside
-          ? Math.max(0, 1 - Math.abs(rowCenter - pointer.y) / Math.max(170, height * 0.28))
-          : 0.28;
-        const pinning = Math.pow(rowProgress, 0.9);
-        const dragRadius = Math.max(230, width * 0.48);
-        const dragDistance = Math.hypot(columnCenter - pointer.x, rowCenter - pointer.y);
-        const dragFalloff = dragging
-          ? Math.pow(Math.max(0, 1 - dragDistance / dragRadius), 1.65)
-          : 0;
-        const dragX = (pointer.x - dragAnchorX) * 0.34 * dragFalloff;
-        const dragY = (pointer.y - dragAnchorY) * 0.13 * dragFalloff * pinning;
-        const displacement = ((offsets[column] * (0.28 + pointerFalloff * 0.72) + idle) * pinning) + dragX;
-        const lift = Math.abs(displacement) * 0.025 * pinning;
-
-        ctx.drawImage(
-          sourceCanvas,
-          sourceX + column * sourceStripWidth,
-          sourceY + row * sourceRowHeight,
-          sourceStripWidth + 1,
-          sourceRowHeight + 1,
-          mediaX + column * stripWidth + displacement,
-          mediaY + row * rowHeight - lift + dragY,
-          stripWidth + 1.3,
-          rowHeight + 1.3,
-        );
+        const rowProgress = row / rows;
+        const localProgress = (progress * 1.38) - rowProgress - columnDelay;
+        if (localProgress <= 0) {
+          ctx.globalAlpha = 1;
+          drawContained(
+            snapshot,
+            column * sourceCellWidth,
+            row * sourceCellHeight,
+            sourceCellWidth + 1,
+            sourceCellHeight + 1,
+            column * cellWidth,
+            row * cellHeight,
+            cellWidth + 1,
+            cellHeight + 1,
+          );
+        } else if (localProgress < 0.34) {
+          ctx.globalAlpha = Math.max(0, 1 - localProgress * 3.1);
+          drawContained(
+            snapshot,
+            column * sourceCellWidth,
+            row * sourceCellHeight,
+            sourceCellWidth + 1,
+            sourceCellHeight + 1,
+            column * cellWidth,
+            row * cellHeight + localProgress * 42,
+            cellWidth + 1,
+            cellHeight + 1,
+          );
+        }
       }
     }
 
-    animationFrame = window.requestAnimationFrame(draw);
-  }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#c8ff36";
+    ctx.shadowColor = "rgba(200, 255, 54, 0.5)";
+    ctx.shadowBlur = 5;
+    ctx.font = `700 ${Math.max(9, Math.min(13, cellWidth * 0.72))}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-  function startAnimation() {
-    if (animationRunning || !portraitVisible || document.hidden) return;
-    animationRunning = true;
-    animationFrame = window.requestAnimationFrame(draw);
-  }
-
-  function stopAnimation() {
-    if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    animationFrame = 0;
-    animationRunning = false;
-  }
-
-  function start() {
-    rasterizeSource();
-    resize();
-    wrap.classList.add("is-interactive");
-    startAnimation();
-  }
-
-  wrap.addEventListener("pointerenter", (event) => {
-    pointer.previousX = event.clientX - wrap.getBoundingClientRect().left;
-    pointer.previousY = event.clientY - wrap.getBoundingClientRect().top;
-    updatePointer(event);
-  });
-  wrap.addEventListener("pointermove", updatePointer, { passive: true });
-  wrap.addEventListener("pointerleave", () => {
-    pointer.inside = false;
-    dragging = false;
-    wrap.classList.remove("is-pointer-active", "is-dragging");
-  });
-  wrap.addEventListener("pointerdown", (event) => {
-    if (event.pointerType !== "touch") event.preventDefault();
-    updatePointer(event);
-    dragging = true;
-    dragAnchorX = pointer.x;
-    dragAnchorY = pointer.y;
-    if (event.pointerType !== "touch") wrap.setPointerCapture?.(event.pointerId);
-    wrap.classList.add("is-dragging");
-  });
-  window.addEventListener("pointerup", (event) => {
-    if (dragging) {
-      const release = Math.max(-30, Math.min(30, (pointer.x - dragAnchorX) * 0.09));
-      const radius = Math.max(130, width * 0.3);
-      for (let column = 0; column < columns; column += 1) {
-        const centerX = ((column + 0.5) / columns) * width;
-        const falloff = Math.max(0, 1 - Math.abs(centerX - pointer.x) / radius);
-        velocities[column] += release * falloff * falloff;
+    for (let column = 0; column < columns; column += 1) {
+      const streamOffset = ((column * 7) % 11) / 30;
+      const streamHead = (progress * 1.38) - streamOffset;
+      for (let trail = 0; trail < 5; trail += 1) {
+        const row = Math.floor((streamHead * rows) - trail);
+        if (row < 0 || row >= rows) continue;
+        const glyphIndex = Math.floor(elapsed / 42 + column * 5 + row * 3) % glyphs.length;
+        ctx.globalAlpha = Math.max(0.16, 1 - trail * 0.2) * (1 - progress * 0.35);
+        ctx.fillText(glyphs[glyphIndex], (column + 0.5) * cellWidth, (row + 0.5) * cellHeight);
       }
     }
-    dragging = false;
-    if (wrap.hasPointerCapture?.(event.pointerId)) wrap.releasePointerCapture(event.pointerId);
-    wrap.classList.remove("is-dragging");
-  }, { passive: true });
-  image.addEventListener("dragstart", (event) => event.preventDefault());
+
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  function animateTransition(snapshot, token) {
+    resizeCanvas();
+    stage.classList.add("is-transitioning");
+    const duration = window.matchMedia?.("(max-width: 900px)").matches ? 420 : 680;
+    const startedAt = performance.now();
+
+    const drawFrame = (now) => {
+      if (token !== transitionToken) return;
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      drawMatrixTransition(snapshot, easedProgress, now - startedAt);
+
+      if (progress < 1) {
+        transitionFrame = requestAnimationFrame(drawFrame);
+      } else {
+        transitionFrame = 0;
+        ctx.clearRect(0, 0, width, height);
+        stage.classList.remove("is-transitioning");
+      }
+    };
+
+    transitionFrame = requestAnimationFrame(drawFrame);
+  }
+
+  function setStage(index, options = {}) {
+    const boundedIndex = Math.max(0, Math.min(steps.length - 1, index));
+    if (boundedIndex === currentIndex && !options.immediate) return;
+
+    const nextStep = steps[boundedIndex];
+    const webpPath = nextStep.getAttribute("data-stage-image-webp");
+    const pngPath = nextStep.getAttribute("data-stage-image-png");
+    const alt = nextStep.getAttribute("data-stage-image-alt") || "";
+    if (!webpPath || !pngPath) return;
+
+    const snapshot = captureCurrentPortrait();
+    transitionToken += 1;
+    const token = transitionToken;
+    clearTransition();
+
+    preloadPortrait(webpPath, pngPath)
+      .then(({ format }) => {
+        if (token !== transitionToken) return;
+        stage.classList.remove("has-image-error");
+        fallback?.setAttribute("aria-hidden", "true");
+        if (format === "webp") source.setAttribute("srcset", webpPath);
+        else source.removeAttribute("srcset");
+        image.setAttribute("src", pngPath);
+        image.setAttribute("alt", alt);
+        currentIndex = boundedIndex;
+
+        if (!reduceMotion && !options.immediate && snapshot) {
+          animateTransition(snapshot, token);
+        }
+      })
+      .catch(() => {
+        if (token !== transitionToken) return;
+        stage.classList.add("has-image-error");
+        fallback?.setAttribute("aria-hidden", "false");
+      });
+  }
+
+  image.addEventListener("load", () => {
+    stage.classList.remove("has-image-error");
+    fallback?.setAttribute("aria-hidden", "true");
+  });
+  image.addEventListener("error", () => {
+    stage.classList.add("has-image-error");
+    fallback?.setAttribute("aria-hidden", "false");
+  });
 
   if ("ResizeObserver" in window) {
-    new ResizeObserver(resize).observe(wrap);
-  } else {
-    window.addEventListener("resize", resize, { passive: true });
+    new ResizeObserver(() => {
+      if (!transitionFrame) resizeCanvas();
+    }).observe(stage);
   }
 
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver(
-      ([entry]) => {
-        portraitVisible = entry.isIntersecting;
-        if (portraitVisible) {
-          resize();
-          startAnimation();
-        } else {
-          stopAnimation();
-        }
-      },
-      { threshold: 0.01 },
-    ).observe(wrap);
-  }
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopAnimation();
-    else startAnimation();
+  steps.slice(1).forEach((step) => {
+    const webpPath = step.getAttribute("data-stage-image-webp");
+    const pngPath = step.getAttribute("data-stage-image-png");
+    if (webpPath && pngPath) preloadPortrait(webpPath, pngPath).catch(() => {});
   });
 
-  if (image.complete && image.naturalWidth) start();
-  else image.addEventListener("load", start, { once: true });
-}
-
-function schedulePortraitInitialization() {
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(initializePortrait, { timeout: 800 });
-    return;
-  }
-
-  window.setTimeout(initializePortrait, 300);
+  resizeCanvas();
+  return { setStage };
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeLanguageSwitch();
   initializeTimeline();
-  schedulePortraitInitialization();
 });
