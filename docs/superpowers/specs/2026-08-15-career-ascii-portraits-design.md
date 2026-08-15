@@ -12,7 +12,7 @@ Render every career photograph as a persistent, recognizable Matrix-green ASCII 
 
 - Continue loading each normalized 640 × 800 WebP/PNG through its existing semantic `<img>`.
 - With JavaScript and Canvas 2D available, visually hide the source pixels and draw the settled portrait entirely from monospace glyphs.
-- Sample source alpha and luminance on a fixed character grid. Transparent cells remain empty; darker facial/clothing cells use denser glyphs and highlighted cells use lighter glyphs.
+- Sample source alpha and luminance on a dense, width-adaptive character grid. Transparent cells remain empty; darker facial/clothing cells use denser glyphs and highlighted cells use lighter glyphs. Keep character cells near 2.75 CSS pixels wide, capped at 112 columns, so eyes, nose, mouth, hair, and facial outline remain legible without sacrificing the ASCII treatment.
 - Use a lime tonal range rather than full photographic color so every visible portrait is unmistakably ASCII.
 - Preserve the real `<img>` alternative text. Generated canvases are decorative and `aria-hidden`.
 - If JavaScript, image decoding, or Canvas 2D fails, reveal the existing normal photo rather than leaving an empty frame.

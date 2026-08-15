@@ -234,7 +234,7 @@ async function createAsciiFixture({ mobile = false, reduceMotion = false, canvas
   };
 }
 
-test("renders settled career portraits as glyphs", async () => {
+test("renders settled career portraits with a detailed glyph grid", async () => {
   const fixture = await createAsciiFixture();
 
   assert.equal(typeof fixture.context.initializeAsciiPortraits, "function");
@@ -243,7 +243,10 @@ test("renders settled career portraits as glyphs", async () => {
 
   const displayCanvas = fixture.desktopWrap.querySelector(".ascii-portrait-canvas");
   assert.ok(displayCanvas, "desktop portrait must receive a decorative ASCII canvas");
-  assert.ok(displayCanvas.fillTextCalls.length > 100, "settled portrait must be drawn from glyphs");
+  assert.ok(
+    displayCanvas.fillTextCalls.length > 6_500,
+    "desktop portrait must preserve facial detail with a dense glyph grid",
+  );
   assert.equal(fixture.desktopWrap.classList.contains("is-ascii-rendered"), true);
 });
 
@@ -256,7 +259,10 @@ test("enhances every mobile inline portrait and responds to pointer movement", a
   for (const wrap of fixture.inlineWraps) {
     const canvas = wrap.querySelector(".ascii-portrait-canvas");
     assert.ok(canvas, "each mobile timeline portrait must receive an ASCII canvas");
-    assert.ok(canvas.fillTextCalls.length > 80, "each mobile portrait must visibly use glyphs");
+    assert.ok(
+      canvas.fillTextCalls.length > 5_000,
+      "each mobile portrait must preserve facial detail with a dense glyph grid",
+    );
     assert.equal(wrap.classList.contains("is-ascii-rendered"), true);
   }
 

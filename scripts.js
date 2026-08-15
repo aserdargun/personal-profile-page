@@ -167,7 +167,7 @@ function createAsciiPortraitRenderer({ wrap, image }) {
     width = Math.max(1, bounds.width);
     height = Math.max(1, bounds.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    columns = Math.max(38, Math.min(58, Math.round(width / 5.5)));
+    columns = Math.max(78, Math.min(112, Math.round(width / 2.75)));
     rows = Math.max(28, Math.round(columns * (height / width) * 0.55));
 
     canvas.width = Math.round(width * dpr);
