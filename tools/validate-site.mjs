@@ -4,7 +4,7 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedStageKeys = [
-  "gpu-kernel-engineer",
+  "ai-engineer",
   "ai-practitioner",
   "full-stack-ai",
   "data-scientist",
@@ -74,6 +74,7 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes("/images/serdar-gundogdu-ascii-480.avif 480w") && html.includes("/images/serdar-gundogdu-ascii-720.avif 720w"), `${locale}: responsive AVIF portrait sources are missing`);
   check(html.includes("/images/serdar-gundogdu-ascii-480.webp 480w") && html.includes("/images/serdar-gundogdu-ascii-720.webp 720w"), `${locale}: responsive WebP portrait sources are missing`);
   check(html.includes('width="720" height="952" fetchpriority="high"'), `${locale}: portrait dimensions or loading priority are incorrect`);
+  check(!html.includes("current-stage-link"), `${locale}: current-stage Explore buttons must be removed`);
 
   const stageKeys = matches(html, /data-stage-key="([^"]+)"/g);
   check(JSON.stringify(stageKeys) === JSON.stringify(expectedStageKeys), `${locale}: timeline stage keys or order differ`);
@@ -119,15 +120,15 @@ check(JSON.stringify(enExternalLinks) === JSON.stringify(trExternalLinks), "TR/E
 
 check(pages.en.includes("https://aserdargun.com/images/og-ascii.png"), "English Open Graph image is incorrect");
 check(pages.tr.includes("https://aserdargun.com/images/og-ascii-tr.png"), "Turkish Open Graph image is incorrect");
-check(pages.en.includes("GPU Kernel Engineer — studying"), "English GPU kernel learning status is missing");
-check(pages.tr.includes("GPU Kernel Engineer — öğrenme aşamasında"), "Turkish GPU kernel learning status is missing");
+check(pages.en.includes("AI Engineer"), "English AI Engineer status is missing");
+check(pages.tr.includes("AI Engineer"), "Turkish AI Engineer status is missing");
 check(pages.en.includes("Reading direction · 09 → 01"), "English reverse-chronology explanation is missing");
 check(pages.tr.includes("Okuma yönü · 09 → 01"), "Turkish reverse-chronology explanation is missing");
 check(pages.en.includes("https://gpu.aserdargun.com/") && pages.tr.includes("https://gpu.aserdargun.com/"), "Kernel Atlas link is missing");
 check(pages.en.includes("https://usl.aserdargun.com/") && pages.tr.includes("https://usl.aserdargun.com/"), "Unsloth Studio Learning link is missing");
-check(pages.en.includes("Explore Unsloth Studio Atlas") && pages.tr.includes("Unsloth Studio Atlas&apos;ı keşfet"), "Localized Unsloth Studio Atlas labels are missing");
 check(pages.en.includes("One portfolio, six focused applications."), "English application map definition is missing");
 check(pages.tr.includes("Tek portföy, altı odaklı uygulama."), "Turkish application map definition is missing");
+check(!pages.en.includes("<h3>GPU Kernel Engineer") && !pages.tr.includes("<h3>GPU Kernel Engineer"), "Legacy GPU Kernel Engineer career title is still present");
 check(styles.includes("--portrait-media-scale: 0.9"), "Portrait media must be inset within its frame");
 check((styles.match(/transform: scale\(var\(--portrait-media-scale\)\)/g) ?? []).length === 1, "Only the static portrait image should rely on CSS scaling");
 check(/\.has-js \.timeline-step\s*\{[^}]*opacity:\s*1;/.test(styles), "Inactive timeline steps must not reduce descendant contrast with parent opacity");
@@ -149,6 +150,8 @@ check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Roo
 for (const url of expectedAppUrls) {
   check(rootPage.includes(`href="${url}"`), `Root application URL is missing: ${url}`);
 }
+check(rootPage.includes("<h3>AI Engineer</h3>") && !rootPage.includes("<h3>GPU Kernel Engineer"), "Root AI Engineer career content is incorrect");
+check(!rootPage.includes("current-stage-link"), "Root current-stage Explore buttons must be removed");
 
 const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
 check(sitemap.includes("<loc>https://aserdargun.com/</loc>"), "Sitemap is missing root URL");
