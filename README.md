@@ -1,8 +1,15 @@
 # Personal Profile Page
 
-Bilingual personal portfolio for Serdar Gündoğdu, available at `/en/` and `/tr/`. The root route selects the saved or browser language and retains accessible language links when JavaScript is unavailable.
+Bilingual personal portfolio for Serdar Gündoğdu. The English homepage is served
+directly at `/`, the Turkish edition lives at `/tr/`, and the retired `/en/`
+duplicate permanently redirects to `/`.
 
-The opening experience combines an interactive ASCII portrait with a nine-stage career timeline spanning mechanical engineering, manufacturing leadership, data science, full-stack AI, and AI engineering.
+The opening experience combines an interactive ASCII/pixel portrait engine with a
+reverse-chronological eight-stage career timeline spanning mechanical engineering,
+manufacturing leadership, data science, full-stack AI, and AI engineering,
+followed by a learning-system loop that connects the application atlas
+(`aia` → `gpu` → `llm` → `usl` → `cld`), the application map itself, working
+principles, verified credentials, and contact.
 
 ## Development
 
@@ -39,6 +46,7 @@ For focused troubleshooting, run an individual check:
 
 ```bash
 npm run check:js
+npm run test:deployment
 npm run test:environment
 npm run test:portrait
 npm run test:server
@@ -46,71 +54,16 @@ npm run test:stop
 npm run validate:site
 ```
 
-## Projects
+`tools/validate-site.mjs` also encodes the list of retired project URLs
+(Stackfolio, PIPolars, PIWebAPI, SWAPP, SCADA Nerve, Industry-Learn,
+Scikit-Play, Aeon-Play, PyTorch-Play, DSML101). Those projects were removed
+from this site deliberately; the validator fails if any of them reappear.
 
-### Industry-Learn
-AI-Powered ML Solutions platform for industrial applications and machine learning workflows.
+## Assets
 
-**Website:** https://industry-learn.com
-
----
-
-### Scikit-Play
-Interactive machine learning playground built with Streamlit for experimenting with ML algorithms.
-
-**Website:** https://scikit-play.org
-
----
-
-### PIPolars
-Python library for extracting OSIsoft PI System data into Polars DataFrames with 10-100x performance over pandas.
-
-**Features:**
-- Bulk tag extraction
-- Lazy evaluation with LazyFrame support
-- SQLite and Arrow IPC caching
-- Fluent API with method chaining
-
-**Requirements:**
-- Python 3.10+
-- Windows OS
-- OSIsoft PI AF SDK 2.x
-
-**Installation:**
-```bash
-pip install pipolars
-```
-
-**PyPI:** https://pypi.org/project/pipolars/
-
----
-
-### DSML101
-Data Science and Machine Learning educational platform and resources.
-
-**Website:** https://dsml101.com
-
----
-
-### SWAPP
-AI-First Industrial Data Workbench replacing licensed tools with governed APIs and AI-powered insights.
-
-**Modules:**
-- Explorer: Asset framework navigation with tree view and search
-- Trend: Multi-tag charting with AI-powered anomaly analysis
-- Stats: Statistical analysis for correlation, regression, and outlier detection
-- PPM: KPI dashboards with loss accounting and AI-generated reports
-
-**Features:**
-- Dual .NET/Python API architecture
-- Natural language-to-query capabilities
-- Edge-to-cloud data ingestion
-
-**Website:** https://swapp.org.tr
-
----
-
-### SCADA Nerve
-SCADA and industrial control systems platform for monitoring and automation.
-
-**Website:** https://scadanerve.com
+- **Fonts:** self-hosted Inter variable subsets in `fonts/` (latin +
+  latin-ext, preloaded) — no third-party font requests.
+- **Portraits:** WebP primaries with palette-quantized PNG fallbacks
+  (640×800, ≤250 KB) in `images/career/`.
+- **Open Graph:** 1200×630 JPEG (≤400 KB) at `images/og-ascii.jpg` and
+  `images/og-ascii-tr.jpg`.

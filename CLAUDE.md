@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal portfolio website for Serdar Gundogdu - AI Practitioner. The site showcases end-to-end artificial intelligence solutions built using cutting-edge AI coding assistants (Claude Code, ChatGPT Codex, Google Gemini) with VS Code and Antigravity IDE.
+Personal portfolio website for Serdar Gündoğdu — Industrial AI Engineer. The site presents a physical-to-digital career journey (mechanical engineering → AI engineering) with an interactive ASCII/pixel portrait engine, an application map of live subdomain products, and verified credentials.
 
-**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero runtime dependencies. Node.js 20+ and npm provide dependency-free local development and validation commands. The public experience is bilingual: `/en/` and `/tr/`, with `/` acting as an accessible language gateway.
+**Tech Stack:** Pure HTML5, CSS3, vanilla JavaScript - zero runtime dependencies. Node.js 20+ and npm provide dependency-free local development and validation commands. The public experience is bilingual: `/` serves the English page directly, `/tr/` serves Turkish, and the retired `/en/` duplicate 301-redirects to `/` (see `staticwebapp.config.json`).
 
 ## Development Commands
 
@@ -21,68 +21,43 @@ There is no production build step. npm provides the shared development command s
 ## Architecture
 
 ### Root Level
-- `index.html` - Saved/browser-language gateway with no-JavaScript language links
-- `en/index.html`, `tr/index.html` - Complete localized portfolio pages with matching anchors and timeline stage keys
-- `styles.css` - Global design system with CSS custom properties for theming
+- `index.html` - English homepage served at `/` (self-canonical)
+- `tr/index.html` - Turkish homepage with matching anchors and timeline stage keys
+- `styles.css` - Global design system with CSS custom properties; self-hosted Inter variable font (`/fonts/`)
 - `scripts.js` - Language preference, active career timeline, and viewport-aware ASCII portrait animation
+- `staticwebapp.config.json` - Route rules: `/en` + `/en/*` 301 to `/`, immutable caching for versioned assets, security headers
+- `sitemap.xml`, `robots.txt` - SEO surfaces listing `/` and `/tr/` only
 - `package.json` - Shared setup, preview, and validation command contract
 - `tools/serve.mjs` - Dependency-free local static preview server
 - `tools/serve.test.mjs` - HTTP behavior and path-confinement regression tests
-- `tools/validate-site.mjs` - Dependency-free parity and metadata validation for both locales
+- `tools/validate-site.mjs` - Dependency-free parity and metadata validation for both locales (also encodes retired project URLs that must not return to the site)
 
-### Projects
+### Pages and sections (both locales, keep in parity)
+- Hero + reverse-chronological eight-stage career timeline (`08 AI Engineer` → `01 Mechanical Engineering`)
+- `#learning` learning system - the application atlas expressed as a study loop (AIA → GPU → LLM → USL → CLD) with an ASCII flow diagram, guiding questions, and an investment-priority strip
+- `#apps` application map - five live subdomain products, each keyed by a three-letter code
+- `#approach` working principles, `#about` + verified credentials, contact
 
-**Industry-Learn** (https://industry-learn.com)
-- AI-Powered ML Solutions platform for industrial applications and machine learning workflows
+### Application map products
+| Code | Product | Address |
+| ---- | ------- | ------- |
+| `aia` | AI Ecosystem Atlas | https://aia.aserdargun.com/ |
+| `llm` | LLM Runtime & Serving Atlas | https://llm.aserdargun.com/ |
+| `usl` | Unsloth Studio Learning | https://usl.aserdargun.com/ |
+| `gpu` | GPU Kernel Engineering — Kernel Atlas | https://gpu.aserdargun.com/ |
+| `cld` | Cloud Provider Cost Comparison | https://cld.aserdargun.com/ |
 
-**Scikit-Play** (https://scikit-play.org)
-- Interactive machine learning playground built with Streamlit for experimenting with ML algorithms
-
-**Aeon-Play** (https://aeon-play.org)
-- Time series playground built with Plotly Dash and the Aeon library
-- Experimenting with time series analysis and forecasting
-
-**PyTorch-Play** (https://pytorch-play.org)
-- Deep learning playground built with PyTorch and Gradio
-- Experimenting with neural networks and deep learning models
-
-**PIPolars** (https://pypi.org/project/pipolars/ | https://github.com/aserdargun/pipolars)
-- Python library for extracting OSIsoft PI System data into Polars DataFrames
-- 10-100x performance improvements over pandas
-- Features: bulk tag extraction, lazy evaluation, SQLite/Arrow caching, fluent API
-- Requires Python 3.10+, Windows, PI AF SDK 2.x
-
-**PIWebAPI** (https://www.nuget.org/packages/PIWebAPI | https://github.com/aserdargun/piwebapi)
-- .NET Framework 4.8 REST API for accessing OSIsoft PI System data via the AF SDK
-- Features: PI Points data retrieval, AF hierarchy navigation, StreamSets bulk operations, Event Frames management
-- Health monitoring endpoints for PI Data Archive and AF Server connectivity
-- Windows Integrated Authentication (NTLM/Kerberos)
-
-**DSML101** (https://dsml101.com)
-- Data Science and Machine Learning educational platform and resources
-
-**SWAPP** (https://swapp.org.tr)
-- AI-First Industrial Data Workbench for operational analytics
-- Modules: Explorer, Trend, Stats, PPM dashboards
-- Dual .NET/Python API, natural language queries, edge-to-cloud ingestion
-
-**SCADA Nerve** (https://scadanerve.com)
-- SCADA and industrial control systems platform for monitoring and automation
-
-**AI Practitioner Dev OS** (https://github.com/aserdargun/ai-practitioner-dev-os | https://github.com/aserdargun/my-ai-practitioner-dev-os)
-- AI-driven, project-based learning operating system for AI practitioners
-- 12-month adaptive curriculum across three tiers (Beginner, Intermediate, Advanced)
-- Claude Code integration with AI agents for planning, building, reviewing, evaluation
-- Features: Command system (/plan-week, /evaluate, /retro), memory tracking, Python evaluation engine
-- Personal fork customized for Advanced tier with NLP pipeline and sequence models specialization
+Earlier portfolio projects (Stackfolio, PIPolars, PIWebAPI, SWAPP, SCADA Nerve, Industry-Learn, Scikit-Play, Aeon-Play, PyTorch-Play, DSML101) were retired from this site on purpose; `tools/validate-site.mjs` fails the build if any of their URLs reappear.
 
 ### Key Patterns
 
-**Theme System:** CSS custom properties (`--bg`, `--text`, `--primary`, etc.) with `data-theme` attribute. Respects `prefers-color-scheme` and persists choice to localStorage.
+**Typography:** Self-hosted Inter variable font (latin + latin-ext subsets in `/fonts/`, preloaded), enabling intermediate weights (520/560/650) with a Helvetica/Arial fallback stack. Monospace UI accents use the system mono stack.
 
-**JavaScript:** Vanilla JS using IIFE pattern for module encapsulation. No framework dependencies.
+**Images:** Career portraits ship as WebP with palette-quantized PNG fallbacks (≤250 KB each, transparency via tRNS). Open Graph images are 1200×630 JPEG (≤400 KB). Asset changes require bumping the shared `?v=` cache-busting query, mirrored in `tools/validate-site.mjs` (`expectedAssetVersion`).
 
-**Accessibility:** ARIA labels, live regions, keyboard navigation, skip links, focus indicators throughout.
+**JavaScript:** Vanilla JS using IIFE pattern for module encapsulation. No framework dependencies. Portrait renderers are gated by IntersectionObserver visibility and a requestAnimationFrame energy threshold; `prefers-reduced-motion` disables all animation.
+
+**Accessibility:** ARIA labels, skip link, keyboard navigation, focus indicators, sticky mobile navigation, print stylesheet, no-JS fallbacks throughout.
 
 ## Deployment
 

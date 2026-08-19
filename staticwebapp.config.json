@@ -1,15 +1,31 @@
 {
   "routes": [
     {
+      "route": "/en",
+      "statusCode": 301,
+      "redirect": "/"
+    },
+    {
+      "route": "/en/*",
+      "statusCode": 301,
+      "redirect": "/"
+    },
+    {
       "route": "/styles.css",
       "headers": {
-        "Cache-Control": "public, max-age=86400"
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {
       "route": "/scripts.js",
       "headers": {
-        "Cache-Control": "public, max-age=86400"
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/fonts/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {

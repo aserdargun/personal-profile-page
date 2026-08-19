@@ -57,7 +57,7 @@ const expectedTurkishBridges = [
   "Madde ve mekanik",
 ];
 const expectedAnchors = ["top", "apps", "learning", "journey", "approach", "about"];
-const expectedAssetVersion = "20260819-full-bleed";
+const expectedAssetVersion = "20260819-full-bleed-review";
 const expectedStylesheetHref = `/styles.css?v=${expectedAssetVersion}`;
 const expectedScriptSrc = `/scripts.js?v=${expectedAssetVersion}`;
 const expectedApplicationRows = [
@@ -492,18 +492,48 @@ function readPngDimensions(buffer) {
 function pngHasAlpha(buffer) {
   const signature = buffer.subarray(0, 8).toString("hex");
   if (signature !== "89504e470d0a1a0a") return false;
-  return [4, 6].includes(buffer.readUInt8(25));
+  const colorType = buffer.readUInt8(25);
+  if ([4, 6].includes(colorType)) return true;
+  if (colorType !== 3) return false;
+  let offset = 8;
+  while (offset + 8 <= buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString("latin1", offset + 4, offset + 8);
+    if (type === "tRNS") return true;
+    if (type === "IDAT") break;
+    offset += 12 + length;
+  }
+  return false;
+}
+
+function readJpegDimensions(buffer) {
+  if (buffer[0] !== 0xff || buffer[1] !== 0xd8) return null;
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = buffer[offset + 1];
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return { height: buffer.readUInt16BE(offset + 5), width: buffer.readUInt16BE(offset + 7) };
+    }
+    offset += 2 + buffer.readUInt16BE(offset + 2);
+  }
+  return null;
 }
 
 const pages = {
-  en: await readFile(path.join(root, "en/index.html"), "utf8"),
+  en: await readFile(path.join(root, "index.html"), "utf8"),
   tr: await readFile(path.join(root, "tr/index.html"), "utf8"),
 };
 const styles = await readFile(path.join(root, "styles.css"), "utf8");
 
 for (const [locale, html] of Object.entries(pages)) {
+  const expectedCanonical = locale === "tr" ? "https://aserdargun.com/tr/" : "https://aserdargun.com/";
   check(html.includes(`<html lang="${locale}" data-locale="${locale}">`), `${locale}: html language marker is missing`);
-  check(html.includes(`<link rel="canonical" href="https://aserdargun.com/${locale}/">`), `${locale}: canonical URL is incorrect`);
+  check(html.includes(`<link rel="canonical" href="${expectedCanonical}">`), `${locale}: canonical URL is incorrect`);
+  check(!html.includes("https://aserdargun.com/en/"), `${locale}: retired /en/ URL remains`);
   check(html.includes("hreflang=\"en\""), `${locale}: English hreflang is missing`);
   check(html.includes("hreflang=\"tr\""), `${locale}: Turkish hreflang is missing`);
   check(html.includes("hreflang=\"x-default\""), `${locale}: x-default hreflang is missing`);
@@ -556,6 +586,7 @@ for (const [locale, html] of Object.entries(pages)) {
   }
 
   check(html.includes('class="app-map"'), `${locale}: application map is missing`);
+  check(html.includes('class="app-map-band"'), `${locale}: standalone application map band is missing`);
   check(html.includes('aria-labelledby="app-map-title"'), `${locale}: application map heading relationship is missing`);
   check(html.includes('aria-describedby="app-map-description"'), `${locale}: application map description relationship is missing`);
   validateApplicationMapRows(locale, html);
@@ -589,11 +620,15 @@ for (const [locale, html] of Object.entries(pages)) {
     try {
       const jsonLd = JSON.parse(jsonLdMatch[1]);
       check(jsonLd["@type"] === "Person", `${locale}: JSON-LD type must be Person`);
-      check(jsonLd.url === `https://aserdargun.com/${locale}/`, `${locale}: JSON-LD URL is incorrect`);
+      check(jsonLd.url === (locale === "tr" ? "https://aserdargun.com/tr/" : "https://aserdargun.com/"), `${locale}: JSON-LD URL is incorrect`);
+      check(!String(jsonLd.image || "").includes("?"), `${locale}: JSON-LD image URL must not carry a cache-busting query`);
     } catch (error) {
       failures.push(`${locale}: JSON-LD is invalid JSON (${error.message})`);
     }
   }
+
+  check(html.includes('rel="preload" href="/fonts/inter-var-latin.woff2"'), `${locale}: self-hosted Inter preload is missing`);
+  check(html.includes('class="contact-kicker"'), `${locale}: contact section heading is missing`);
 }
 
 const externalAnchorPattern = /<a[^>]+href="(https:\/\/[^"#]+)"/g;
@@ -601,8 +636,10 @@ const enExternalLinks = matches(pages.en, externalAnchorPattern).sort();
 const trExternalLinks = matches(pages.tr, externalAnchorPattern).sort();
 check(JSON.stringify(enExternalLinks) === JSON.stringify(trExternalLinks), "TR/EN external links differ");
 
-check(pages.en.includes("https://aserdargun.com/images/og-ascii.png"), "English Open Graph image is incorrect");
-check(pages.tr.includes("https://aserdargun.com/images/og-ascii-tr.png"), "Turkish Open Graph image is incorrect");
+check(pages.en.includes("https://aserdargun.com/images/og-ascii.jpg"), "English Open Graph image is incorrect");
+check(pages.tr.includes("https://aserdargun.com/images/og-ascii-tr.jpg"), "Turkish Open Graph image is incorrect");
+check(pages.en.includes('<meta property="og:image:type" content="image/jpeg">'), "English Open Graph image MIME type is missing");
+check(pages.tr.includes('<meta property="og:image:type" content="image/jpeg">'), "Turkish Open Graph image MIME type is missing");
 check(pages.en.includes("AI Engineer"), "English AI Engineer status is missing");
 check(pages.tr.includes("AI Engineer"), "Turkish AI Engineer status is missing");
 check(pages.en.includes("Reading direction · 08 → 01"), "English reverse-chronology explanation is missing");
@@ -651,7 +688,7 @@ check(rootPage.includes(`<link rel="stylesheet" href="${expectedStylesheetHref}"
 check(rootPage.includes(`<script src="${expectedScriptSrc}" defer></script>`), "Root script cache version is stale");
 check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL is incorrect");
 check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
-check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
+check(rootPage.includes('href="/tr/"') && rootPage.includes('data-language-link="en"'), "Root language links are missing");
 check(JSON.stringify(matches(rootPage, /data-stage-key="([^"]+)"/g)) === JSON.stringify(expectedStageKeys), "Root timeline stage keys or order differ");
 check(JSON.stringify(matches(rootPage, /class="timeline-index">(\d+)<\/span>/g)) === JSON.stringify(expectedStageNumbers), "Root timeline stage numbers must descend from 08 to 01");
 check(JSON.stringify(matches(rootPage, /data-stage-portrait-mode="([^"]+)"/g)) === JSON.stringify(expectedPortraitModes), "Root portrait modes or order differ");
@@ -683,10 +720,17 @@ check(!rootPage.includes("current-stage-link"), "Root current-stage Explore butt
 
 const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
 check(sitemap.includes("<loc>https://aserdargun.com/</loc>"), "Sitemap is missing root URL");
-check(sitemap.includes("https://aserdargun.com/en/"), "Sitemap is missing /en/");
-check(sitemap.includes("https://aserdargun.com/tr/"), "Sitemap is missing /tr/");
+check(!sitemap.includes("https://aserdargun.com/en/"), "Sitemap must not list the redirected /en/ URL");
+check(sitemap.includes("<loc>https://aserdargun.com/tr/</loc>"), "Sitemap is missing /tr/");
 
-for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "styles.css", "scripts.js"]) {
+for (const asset of [
+  "images/og-ascii.jpg",
+  "images/og-ascii-tr.jpg",
+  "fonts/inter-var-latin.woff2",
+  "fonts/inter-var-latin-ext.woff2",
+  "styles.css",
+  "scripts.js",
+]) {
   try {
     await stat(path.join(root, asset));
   } catch {
@@ -694,9 +738,14 @@ for (const asset of ["images/og-ascii.png", "images/og-ascii-tr.png", "styles.cs
   }
 }
 
-const trOgBuffer = await readFile(path.join(root, "images/og-ascii-tr.png"));
-const trOgDimensions = readPngDimensions(trOgBuffer);
-check(trOgDimensions?.width === 1730 && trOgDimensions?.height === 909, "Turkish Open Graph image must be 1730×909 PNG");
+const trOgBuffer = await readFile(path.join(root, "images/og-ascii-tr.jpg"));
+const trOgDimensions = readJpegDimensions(trOgBuffer);
+check(trOgDimensions?.width === 1200 && trOgDimensions?.height === 630, "Turkish Open Graph image must be 1200×630 JPEG");
+check(trOgBuffer.length <= 400_000, "Turkish Open Graph image exceeds 400 KB");
+
+const enOgBuffer = await readFile(path.join(root, "images/og-ascii.jpg"));
+check(readJpegDimensions(enOgBuffer)?.width === 1200 && readJpegDimensions(enOgBuffer)?.height === 630, "English Open Graph image must be 1200×630 JPEG");
+check(enOgBuffer.length <= 400_000, "English Open Graph image exceeds 400 KB");
 
 for (const assetName of expectedStageImages) {
   const pngPath = path.join(root, `images/career/${assetName}.png`);
@@ -712,7 +761,7 @@ for (const assetName of expectedStageImages) {
     check(dimensions?.width === 640 && dimensions?.height === 800, `Career PNG must be 640×800: ${assetName}`);
     check(pngHasAlpha(pngBuffer), `Career PNG must support transparency: ${assetName}`);
   }
-  if (pngStats) check(pngStats.size <= 1_500_000, `Career PNG exceeds 1.5 MB: ${assetName}`);
+  if (pngStats) check(pngStats.size <= 250_000, `Career PNG exceeds 250 KB after palette optimization: ${assetName}`);
   if (webpStats) check(webpStats.size <= 300_000, `Career WebP exceeds 300 KB: ${assetName}`);
 }
 

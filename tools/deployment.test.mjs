@@ -31,11 +31,14 @@ test("Azure deployment root contains every public route and shared asset", async
   const deploymentRoot = path.resolve(root, relativeAppLocation);
   const requiredPaths = [
     "index.html",
-    "en/index.html",
     "tr/index.html",
     "styles.css",
     "scripts.js",
     "staticwebapp.config.json",
+    "fonts/inter-var-latin.woff2",
+    "fonts/inter-var-latin-ext.woff2",
+    "images/og-ascii.jpg",
+    "images/og-ascii-tr.jpg",
     "images/serdar-gundogdu-ascii.png",
     "images/serdar-gundogdu-ascii-480.avif",
     "images/serdar-gundogdu-ascii-720.avif",
@@ -116,6 +119,17 @@ test("Azure serves a self-canonical English homepage directly at root", async ()
   assert.doesNotMatch(rootHomepage, /window\.location\.replace/);
 });
 
+test("Azure permanently redirects the retired /en/ duplicate to root", () => {
+  const redirectRules = new Map(
+    (staticConfig.routes ?? [])
+      .filter((rule) => rule.statusCode === 301)
+      .map((rule) => [rule.route, rule.redirect]),
+  );
+
+  assert.equal(redirectRules.get("/en"), "/", "/en must 301 to /");
+  assert.equal(redirectRules.get("/en/*"), "/", "/en/* must 301 to /");
+});
+
 test("Azure caches static assets without long-caching HTML", () => {
   const routeMap = new Map(
     (staticConfig.routes ?? []).map((rule) => [rule.route, rule]),
@@ -123,11 +137,15 @@ test("Azure caches static assets without long-caching HTML", () => {
 
   assert.equal(
     routeMap.get("/styles.css")?.headers?.["Cache-Control"],
-    "public, max-age=86400",
+    "public, max-age=31536000, immutable",
   );
   assert.equal(
     routeMap.get("/scripts.js")?.headers?.["Cache-Control"],
-    "public, max-age=86400",
+    "public, max-age=31536000, immutable",
+  );
+  assert.equal(
+    routeMap.get("/fonts/*")?.headers?.["Cache-Control"],
+    "public, max-age=31536000, immutable",
   );
   assert.equal(
     routeMap.get("/images/*")?.headers?.["Cache-Control"],
