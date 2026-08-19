@@ -57,7 +57,7 @@ const expectedTurkishBridges = [
   "Madde ve mekanik",
 ];
 const expectedAnchors = ["top", "apps", "learning", "journey", "approach", "about"];
-const expectedAssetVersion = "20260819-learning-atlas";
+const expectedAssetVersion = "20260819-timeline-dry";
 const expectedStylesheetHref = `/styles.css?v=${expectedAssetVersion}`;
 const expectedScriptSrc = `/scripts.js?v=${expectedAssetVersion}`;
 const expectedApplicationRows = [
@@ -525,7 +525,7 @@ for (const [locale, html] of Object.entries(pages)) {
 
   const stageKeys = matches(html, /data-stage-key="([^"]+)"/g);
   check(JSON.stringify(stageKeys) === JSON.stringify(expectedStageKeys), `${locale}: timeline stage keys or order differ`);
-  const stageNumbers = matches(html, /data-stage-number="([^"]+)"/g);
+  const stageNumbers = matches(html, /class="timeline-index">(\d+)<\/span>/g);
   check(JSON.stringify(stageNumbers) === JSON.stringify(expectedStageNumbers), `${locale}: timeline stage numbers must descend from 08 to 01`);
   const portraitModes = matches(html, /data-stage-portrait-mode="([^"]+)"/g);
   check(JSON.stringify(portraitModes) === JSON.stringify(expectedPortraitModes), `${locale}: portrait modes or order differ`);
@@ -534,10 +534,10 @@ for (const [locale, html] of Object.entries(pages)) {
   const paletteLevels = matches(html, /data-stage-palette-levels="([^"]+)"/g);
   check(JSON.stringify(paletteLevels) === JSON.stringify(expectedPaletteLevels), `${locale}: analog palette levels must be 5, 4, 4, 3, 2 in reverse timeline order`);
   const expectedBridges = locale === "tr" ? expectedTurkishBridges : expectedEnglishBridges;
-  const bridges = matches(html, /data-stage-bridge="([^"]+)"/g);
+  const bridges = matches(html, /class="portrait-story-bridge">([^<]+)<\/span>/g);
   check(JSON.stringify(bridges) === JSON.stringify(expectedBridges), `${locale}: physical-to-digital bridge copy differs`);
   check((html.match(/class="portrait-story"/g) || []).length === 8, `${locale}: every portrait needs one visible story`);
-  const worldLabels = matches(html, /data-stage-world-label="([^"]+)"/g);
+  const worldLabels = matches(html, /class="portrait-story-world"><span aria-hidden="true">[^<]*<\/span>\s*([^<]+)<\/span>/g);
   const expectedWorldLabels = expectedPortraitModes.map((mode) => (
     locale === "tr"
       ? mode === "pixel-analog" ? "FİZİKSEL DÜNYA" : "DİJİTAL DÜNYA"
@@ -653,13 +653,13 @@ check(rootPage.includes('"url": "https://aserdargun.com/"'), "Root JSON-LD URL i
 check(!rootPage.includes("window.location.replace"), "Root must not redirect with client JavaScript");
 check(rootPage.includes('href="/tr/"') && rootPage.includes('href="/en/"'), "Root language links are missing");
 check(JSON.stringify(matches(rootPage, /data-stage-key="([^"]+)"/g)) === JSON.stringify(expectedStageKeys), "Root timeline stage keys or order differ");
-check(JSON.stringify(matches(rootPage, /data-stage-number="([^"]+)"/g)) === JSON.stringify(expectedStageNumbers), "Root timeline stage numbers must descend from 08 to 01");
+check(JSON.stringify(matches(rootPage, /class="timeline-index">(\d+)<\/span>/g)) === JSON.stringify(expectedStageNumbers), "Root timeline stage numbers must descend from 08 to 01");
 check(JSON.stringify(matches(rootPage, /data-stage-portrait-mode="([^"]+)"/g)) === JSON.stringify(expectedPortraitModes), "Root portrait modes or order differ");
 check(JSON.stringify(matches(rootPage, /data-stage-pixel-size="([^"]+)"/g)) === JSON.stringify(expectedPixelSizes), "Root analog pixel sizes must be 4, 6, 8, 11, 14 in reverse timeline order");
 check(JSON.stringify(matches(rootPage, /data-stage-palette-levels="([^"]+)"/g)) === JSON.stringify(expectedPaletteLevels), "Root analog palette levels must be 5, 4, 4, 3, 2 in reverse timeline order");
-check(JSON.stringify(matches(rootPage, /data-stage-bridge="([^"]+)"/g)) === JSON.stringify(expectedEnglishBridges), "Root physical-to-digital bridge copy differs");
+check(JSON.stringify(matches(rootPage, /class="portrait-story-bridge">([^<]+)<\/span>/g)) === JSON.stringify(expectedEnglishBridges), "Root physical-to-digital bridge copy differs");
 check((rootPage.match(/class="portrait-story"/g) || []).length === 8, "Root every portrait needs one visible story");
-const rootWorldLabels = matches(rootPage, /data-stage-world-label="([^"]+)"/g);
+const rootWorldLabels = matches(rootPage, /class="portrait-story-world"><span aria-hidden="true">[^<]*<\/span>\s*([^<]+)<\/span>/g);
 check(JSON.stringify(rootWorldLabels) === JSON.stringify(expectedPortraitModes.map((mode) => mode === "pixel-analog" ? "PHYSICAL WORLD" : "DIGITAL WORLD")), "Root physical/digital world labels differ");
 for (const assetName of expectedStageImages) {
   check(rootPage.includes(`/images/career/${assetName}.webp`), `Root WebP career portrait is missing: ${assetName}`);

@@ -50,22 +50,31 @@ function createStage({
   nominalCellSize,
   paletteLevels,
   scale = 1,
-  role = "AI Engineer",
-  png = "/images/career/08-ai-engineer.png",
-  webp = "/images/career/08-ai-engineer.webp",
 } = {}) {
   const attributes = new Map([
-    ["data-stage-image-alt", `Portrait associated with the ${role} career stage`],
-    ["data-stage-image-png", png],
-    ["data-stage-image-webp", webp],
     ["data-stage-portrait-mode", mode],
-    ["data-stage-role", role],
   ]);
   if (nominalCellSize != null) attributes.set("data-stage-pixel-size", String(nominalCellSize));
   if (paletteLevels != null) attributes.set("data-stage-palette-levels", String(paletteLevels));
   if (scale !== 1) attributes.set("data-stage-portrait-scale", String(scale));
   return createEventTarget({
     getAttribute: (name) => attributes.get(name) || null,
+  });
+}
+
+function createFakeStep({ png, webp, alt, attributes = {} } = {}) {
+  const image = {
+    getAttribute: (name) => (name === "src" ? png : name === "alt" ? alt : null),
+  };
+  const source = {
+    getAttribute: (name) => (name === "srcset" ? webp : null),
+  };
+  const picture = {
+    querySelector: (selector) => (selector === "source" ? source : selector === "img" ? image : null),
+  };
+  return createEventTarget({
+    getAttribute: (name) => attributes[name] || null,
+    querySelector: (selector) => (selector === ".timeline-step-portrait" ? picture : null),
   });
 }
 
@@ -235,36 +244,21 @@ async function createAsciiFixture({
 
   const desktopWrap = createWrap();
   const desktopSteps = [
-    createEventTarget({
-      getAttribute(name) {
-        return {
-          "data-stage-image-alt": "Portrait associated with the AI Engineer career stage",
-          "data-stage-image-png": "/images/career/08-ai-engineer.png",
-          "data-stage-image-webp": "/images/career/08-ai-engineer.webp",
-          "data-stage-role": "AI Engineer",
-        }[name] || null;
-      },
+    createFakeStep({
+      png: "/images/career/08-ai-engineer.png",
+      webp: "/images/career/08-ai-engineer.webp",
+      alt: "Portrait associated with the AI Engineer career stage",
     }),
-    createEventTarget({
-      getAttribute(name) {
-        return {
-          "data-stage-image-alt": "Portrait associated with the Production Engineer career stage",
-          "data-stage-image-png": "/images/career/04-production-engineer.png",
-          "data-stage-image-webp": "/images/career/04-production-engineer.webp",
-          "data-stage-portrait-scale": "0.84",
-          "data-stage-role": "Production Engineer",
-        }[name] || null;
-      },
+    createFakeStep({
+      png: "/images/career/04-production-engineer.png",
+      webp: "/images/career/04-production-engineer.webp",
+      alt: "Portrait associated with the Production Engineer career stage",
+      attributes: { "data-stage-portrait-scale": "0.84" },
     }),
-    createEventTarget({
-      getAttribute(name) {
-        return {
-          "data-stage-image-alt": "Portrait associated with the Data Scientist career stage",
-          "data-stage-image-png": "/images/career/06-data-scientist.png",
-          "data-stage-image-webp": "/images/career/06-data-scientist.webp",
-          "data-stage-role": "Data Scientist",
-        }[name] || null;
-      },
+    createFakeStep({
+      png: "/images/career/06-data-scientist.png",
+      webp: "/images/career/06-data-scientist.webp",
+      alt: "Portrait associated with the Data Scientist career stage",
     }),
   ];
   const resolvedMobileStages = mobileStages || [null, null];
@@ -415,7 +409,6 @@ test("routes explicit analog presentation and defaults ordinary stages to ASCII 
     mode: "pixel-analog",
     nominalCellSize: 14,
     paletteLevels: 2,
-    role: "Mechanical Engineering",
   });
   const fixture = await createAsciiFixture({ mobile: true, mobileStages: [analogStage, createStage()] });
 
@@ -430,11 +423,11 @@ test("routes explicit analog presentation and defaults ordinary stages to ASCII 
 
 test("renders stages 01 through 05 as progressively finer square phosphor pixels", async () => {
   const physicalStages = [
-    createStage({ mode: "pixel-analog", nominalCellSize: 14, paletteLevels: 2, role: "Mechanical Engineering" }),
-    createStage({ mode: "pixel-analog", nominalCellSize: 11, paletteLevels: 3, role: "Industrial Engineering" }),
-    createStage({ mode: "pixel-analog", nominalCellSize: 8, paletteLevels: 4, role: "M.Sc. Materials and Manufacturing" }),
-    createStage({ mode: "pixel-analog", nominalCellSize: 6, paletteLevels: 4, scale: 0.84, role: "Production Engineer" }),
-    createStage({ mode: "pixel-analog", nominalCellSize: 4, paletteLevels: 5, role: "Production Manager" }),
+    createStage({ mode: "pixel-analog", nominalCellSize: 14, paletteLevels: 2 }),
+    createStage({ mode: "pixel-analog", nominalCellSize: 11, paletteLevels: 3 }),
+    createStage({ mode: "pixel-analog", nominalCellSize: 8, paletteLevels: 4 }),
+    createStage({ mode: "pixel-analog", nominalCellSize: 6, paletteLevels: 4, scale: 0.84 }),
+    createStage({ mode: "pixel-analog", nominalCellSize: 4, paletteLevels: 5 }),
   ];
   const fixture = await createAsciiFixture({ mobile: true, mobileStages: physicalStages });
 
@@ -538,7 +531,6 @@ test("applies desktop stage scale metadata and resets it for an unannotated stag
   const fixture = await createAsciiFixture();
 
   const transition = fixture.context.initializeAsciiPortraits();
-  assert.equal(fixture.desktopSteps[1].getAttribute("data-stage-role"), "Production Engineer");
 
   transition.setStage(1);
   await flushPortraitLoad();

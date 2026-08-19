@@ -50,17 +50,17 @@ function initializeTimeline() {
     const progress = steps.length > 1 ? boundedIndex / (steps.length - 1) : 1;
     timeline.style.setProperty("--timeline-progress", String(progress));
 
-    const stageNumber = activeStep.dataset.stageNumber || String(boundedIndex + 1).padStart(2, "0");
+    const stageData = readStageData(activeStep);
+    const stageNumber = stageData.number || String(boundedIndex + 1).padStart(2, "0");
     if (stageCount) stageCount.textContent = `${stageNumber} / ${String(steps.length).padStart(2, "0")}`;
-    const worldLabel = activeStep.dataset.stageWorldLabel || "";
     const portraitWorld = activeStep.dataset.stagePortraitMode === "pixel-analog" ? "physical" : "digital";
     if (stageSummary) stageSummary.dataset.portraitWorld = portraitWorld;
     if (stageWorldLabel) {
       const marker = portraitWorld === "physical" ? "■" : ">_";
-      stageWorldLabel.textContent = `${marker} ${worldLabel}`;
+      stageWorldLabel.textContent = `${marker} ${stageData.worldLabel}`;
     }
-    if (stageRole) stageRole.textContent = activeStep.dataset.stageRole || "";
-    if (stageBridge) stageBridge.textContent = activeStep.dataset.stageBridge || "";
+    if (stageRole) stageRole.textContent = stageData.role;
+    if (stageBridge) stageBridge.textContent = stageData.bridge;
     if (stageFocus) stageFocus.textContent = activeStep.dataset.stageFocus || "";
     portraitTransition?.setStage(boundedIndex);
 
@@ -150,6 +150,28 @@ const STAGE_PRESENTATION_ATTRIBUTES = {
   paletteLevels: "data-stage-palette-levels",
   scale: "data-stage-portrait-scale",
 };
+
+function readStageData(step) {
+  const picture = step?.querySelector(".timeline-step-portrait");
+  const source = picture?.querySelector("source");
+  const image = picture?.querySelector("img");
+  const world = step?.querySelector(".portrait-story-world");
+  let worldLabel = "";
+  if (world) {
+    const label = world.cloneNode(true);
+    label.querySelector('[aria-hidden="true"]')?.remove();
+    worldLabel = label.textContent.trim();
+  }
+  return {
+    number: step?.querySelector(".timeline-index")?.textContent.trim() || "",
+    role: step?.querySelector("h3")?.textContent.trim() || "",
+    worldLabel,
+    bridge: step?.querySelector(".portrait-story-bridge")?.textContent.trim() || "",
+    webp: source?.getAttribute("srcset") || "",
+    png: image?.getAttribute("src") || "",
+    alt: image?.getAttribute("alt") || "",
+  };
+}
 
 function createCareerPortraitRenderer({ wrap, image, presentation }) {
   if (!wrap || !image) return null;
@@ -853,9 +875,10 @@ function initializeCareerPortraitTransition() {
     if (boundedIndex === currentIndex && !options.immediate) return;
 
     const nextStep = steps[boundedIndex];
-    const webpPath = nextStep.getAttribute("data-stage-image-webp");
-    const pngPath = nextStep.getAttribute("data-stage-image-png");
-    const alt = nextStep.getAttribute("data-stage-image-alt") || "";
+    const stageData = readStageData(nextStep);
+    const webpPath = stageData.webp;
+    const pngPath = stageData.png;
+    const alt = stageData.alt;
     const presentation = readPortraitPresentation(nextStep, STAGE_PRESENTATION_ATTRIBUTES);
     if (!webpPath || !pngPath) return;
 
@@ -906,8 +929,7 @@ function initializeCareerPortraitTransition() {
   }
 
   steps.slice(1).forEach((step) => {
-    const webpPath = step.getAttribute("data-stage-image-webp");
-    const pngPath = step.getAttribute("data-stage-image-png");
+    const { webp: webpPath, png: pngPath } = readStageData(step);
     if (webpPath && pngPath) preloadPortrait(webpPath, pngPath).catch(() => {});
   });
 
