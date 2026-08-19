@@ -1562,7 +1562,8 @@ footer a {
 
   .story-content,
   .app-map,
-  .section {
+  .section,
+  .learning-system {
     scroll-margin-top: 118px;
   }
 
@@ -2206,10 +2207,25 @@ footer a {
 
   .learning-study-list li {
     width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .learning-study-list li[aria-hidden="true"] {
+    width: auto;
+    justify-content: center;
+    border: 0;
+    padding: 0;
+  }
+
+  .learning-invest-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   .learning-invest-seg {
-    min-width: 118px;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .learning-node-link {
@@ -2257,10 +2273,33 @@ footer a {
   .section,
   .section-dark,
   .app-map-band,
+  .learning-system,
+  .learning-invest,
   .contact {
     min-height: auto !important;
     padding: 18px 0 !important;
     background: #fff !important;
+    color: #000 !important;
+  }
+
+  .learning-diagram {
+    color: #000 !important;
+    border-color: #999 !important;
+  }
+
+  .learning-node,
+  .learning-study-list li,
+  .learning-invest-seg {
+    border-color: #bbb !important;
+    background: #fff !important;
+  }
+
+  .learning-node h3,
+  .learning-question,
+  .learning-kicker,
+  .learning-invest-label,
+  .learning-study-label,
+  .learning-stage-label {
     color: #000 !important;
   }
 
