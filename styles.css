@@ -673,18 +673,22 @@ ul {
 
 /* Bilingual career journey */
 .journey-shell {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  max-width: var(--content);
-  margin: 0 auto;
   overflow: clip;
   background: var(--ink);
   color: var(--white);
   isolation: isolate;
 }
 
-.journey-shell::before {
+.journey-shell-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  max-width: var(--content);
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.journey-shell-inner::before {
   position: absolute;
   z-index: -1;
   top: 140px;
@@ -1072,14 +1076,17 @@ ul {
 }
 
 .signal-strip {
+  border-top: 1px solid var(--line-dark);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.signal-strip-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr auto 1fr;
   align-items: center;
   max-width: var(--content);
   margin: 0 auto;
-  border-top: 1px solid var(--line-dark);
-  background: var(--ink);
-  color: var(--white);
 }
 
 .signal-strip p {
@@ -1093,6 +1100,10 @@ ul {
 }
 
 .section {
+  /* full-width container; content is centered by .section-inner */
+}
+
+.section-inner {
   max-width: var(--content);
   margin: 0 auto;
   padding: 120px clamp(24px, 7vw, 104px);
@@ -1195,10 +1206,13 @@ ul {
 }
 
 .section-about {
+  background: var(--paper);
+}
+
+.section-about .section-inner {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.7fr);
   gap: clamp(60px, 8vw, 130px);
-  background: var(--paper);
 }
 
 .about-main h2 {
@@ -1284,6 +1298,11 @@ ul {
 }
 
 .contact {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.contact-inner {
   display: grid;
   grid-template-columns: minmax(180px, 0.35fr) 1fr;
   gap: 50px;
@@ -1291,8 +1310,6 @@ ul {
   max-width: var(--content);
   margin: 0 auto;
   padding: 100px clamp(24px, 7vw, 104px);
-  background: var(--lime);
-  color: var(--ink);
 }
 
 .contact p {
@@ -1324,15 +1341,18 @@ ul {
 }
 
 footer {
+  background: var(--ink);
+  color: rgba(255, 253, 247, 0.55);
+  font-size: 0.62rem;
+}
+
+.footer-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   max-width: var(--content);
   margin: 0 auto;
   padding: 28px 40px;
-  background: var(--ink);
-  color: rgba(255, 253, 247, 0.55);
-  font-size: 0.62rem;
 }
 
 footer p:nth-child(2) {
@@ -1366,7 +1386,7 @@ footer a {
     max-width: 550px;
   }
 
-  .section-about {
+  .section-about .section-inner {
     grid-template-columns: 1fr;
   }
 
@@ -1419,7 +1439,7 @@ footer a {
     min-height: 620px;
   }
 
-  .signal-strip {
+  .signal-strip-inner {
     grid-template-columns: 1fr;
     padding: 18px 20px;
   }
@@ -1433,11 +1453,11 @@ footer a {
     text-align: center;
   }
 
-  .section {
+  .section-inner {
     padding: 82px 20px;
   }
 
-  .section-about {
+  .section-about .section-inner {
     padding-bottom: 0;
   }
 
@@ -1479,7 +1499,7 @@ footer a {
     grid-template-columns: 1fr;
   }
 
-  .contact {
+  .contact-inner {
     grid-template-columns: 1fr;
     gap: 28px;
     padding: 74px 20px;
@@ -1489,7 +1509,7 @@ footer a {
     font-size: clamp(3rem, 14vw, 4.5rem);
   }
 
-  footer {
+  .footer-inner {
     grid-template-columns: 1fr;
     gap: 12px;
     padding: 26px 20px;
@@ -1550,7 +1570,7 @@ footer a {
     gap: 16px;
   }
 
-  .journey-shell {
+  .journey-shell-inner {
     grid-template-columns: minmax(0, 1fr) 320px;
   }
 
@@ -1573,7 +1593,7 @@ footer a {
     display: none;
   }
 
-  .journey-shell {
+  .journey-shell-inner {
     grid-template-columns: 1fr;
   }
 
