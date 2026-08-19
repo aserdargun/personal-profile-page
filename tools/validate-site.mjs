@@ -56,8 +56,8 @@ const expectedTurkishBridges = [
   "Sistemler ve akış",
   "Madde ve mekanik",
 ];
-const expectedAnchors = ["top", "apps", "journey", "approach", "about"];
-const expectedAssetVersion = "20260815-physical-digital";
+const expectedAnchors = ["top", "apps", "learning", "journey", "approach", "about"];
+const expectedAssetVersion = "20260819-learning-atlas";
 const expectedStylesheetHref = `/styles.css?v=${expectedAssetVersion}`;
 const expectedScriptSrc = `/scripts.js?v=${expectedAssetVersion}`;
 const expectedApplicationRows = [
@@ -193,6 +193,40 @@ function validateApplicationMapRows(locale, html) {
     JSON.stringify(rows) === JSON.stringify(expectedApplicationRows),
     `${locale}: application map row tuples or order differ`,
   );
+}
+
+const expectedLearningCodes = ["aia", "gpu", "llm", "usl", "cld"];
+const expectedLearningUrls = expectedLearningCodes.map((code) => `https://${code}.aserdargun.com/`);
+
+function validateLearningSystem(locale, html) {
+  const isTurkish = locale === "tr";
+  const section = html.match(/<section class="learning-system"[\s\S]*?<\/section>/)?.[0] ?? "";
+  check(section.length > 0, `${locale}: learning system section is missing`);
+  if (section.length === 0) return;
+  check(section.includes('id="learning"'), `${locale}: learning system anchor is missing`);
+  check(section.includes('aria-labelledby="learning-title"'), `${locale}: learning system heading relationship is missing`);
+  check(section.includes('aria-describedby="learning-description"'), `${locale}: learning system description relationship is missing`);
+  const intro = section.match(/<div class="learning-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
+  const expectedKicker = isTurkish
+    ? "Öğrenme sistemi · AI Ekosistem Atlası"
+    : "Learning system · AI Ecosystem Atlas";
+  const expectedHeading = isTurkish
+    ? "Atlas bir öğrenme sistemidir."
+    : "The atlas is a learning system.";
+  check(intro.includes(expectedKicker), `${locale}: learning system kicker is missing`);
+  check(intro.includes(expectedHeading), `${locale}: learning system heading is missing`);
+  check(section.includes('<pre class="learning-diagram" aria-hidden="true">'), `${locale}: learning system diagram is missing`);
+  check(section.includes("AIA") && section.includes("CLD"), `${locale}: learning system diagram endpoints are missing`);
+  const codes = matches(section, /<code class="learning-code">([a-z]{3})<\/code>/g);
+  check(JSON.stringify(codes) === JSON.stringify(expectedLearningCodes), `${locale}: learning system node codes or order differ`);
+  const urls = matches(section, /<a class="learning-node-link" href="(https:\/\/[a-z]{3}\.aserdargun\.com\/)" target="_blank" rel="noreferrer">/g);
+  check(JSON.stringify(urls) === JSON.stringify(expectedLearningUrls), `${locale}: learning system node links or order differ`);
+  for (const [index, code] of expectedLearningCodes.entries()) {
+    const link = `<a class="learning-node-link" href="${expectedLearningUrls[index]}" target="_blank" rel="noreferrer">${code}.aserdargun.com <span aria-hidden="true">↗</span></a>`;
+    check(section.includes(link), `${locale}: learning system node link is missing or malformed: ${code}`);
+  }
+  check(section.includes("gpu → llm") && section.includes("usl → llm"), `${locale}: learning system feed markers are missing`);
+  check((section.match(/class="learning-stage-label"/g) || []).length === 3, `${locale}: learning system must keep three stages`);
 }
 
 function stripCssComments(source) {
@@ -437,6 +471,8 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes('aria-labelledby="app-map-title"'), `${locale}: application map heading relationship is missing`);
   check(html.includes('aria-describedby="app-map-description"'), `${locale}: application map description relationship is missing`);
   validateApplicationMapRows(locale, html);
+  validateLearningSystem(locale, html);
+  check(html.includes('<a href="#learning">'), `${locale}: learning navigation link is missing`);
 
   const appMapIntro = html.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
   const expectedKicker = locale === "tr"
@@ -542,6 +578,8 @@ for (const assetName of expectedStageImages) {
 }
 check(!/AI Practitioner/i.test(rootPage.replaceAll("AWS Certified AI Practitioner", "")), "Root AI Practitioner personal title remains");
 validateApplicationMapRows("Root", rootPage);
+validateLearningSystem("Root", rootPage);
+check(rootPage.includes('<a href="#learning">'), "Root learning navigation link is missing");
 const rootAppMapIntro = rootPage.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
 check(rootAppMapIntro.includes("Application map · live destinations"), "Root number-neutral application map kicker is missing");
 check(rootAppMapIntro.includes("One portfolio. Focused applications."), "Root number-neutral application map heading is missing");

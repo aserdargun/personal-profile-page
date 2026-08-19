@@ -30,8 +30,8 @@
   <meta name="twitter:title" content="Serdar Gündoğdu — Industrial AI Engineer">
   <meta name="twitter:description" content="From mechanics and manufacturing to data, software, and AI engineering.">
   <meta name="twitter:image" content="https://aserdargun.com/images/og-ascii.png">
-  <link rel="stylesheet" href="/styles.css?v=20260815-physical-digital">
-  <script src="/scripts.js?v=20260815-physical-digital" defer></script>
+  <link rel="stylesheet" href="/styles.css?v=20260819-learning-atlas">
+  <script src="/scripts.js?v=20260819-learning-atlas" defer></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -67,6 +67,7 @@
     <nav class="nav-links" aria-label="Primary navigation">
       <a href="#journey">Journey</a>
       <a href="#apps">Apps</a>
+      <a href="#learning">Learning</a>
       <a href="#approach">Approach</a>
       <a href="#about">About</a>
     </nav>
@@ -178,6 +179,75 @@
             <article><p class="timeline-type">Education</p><picture class="timeline-step-portrait"><source type="image/webp" srcset="/images/career/01-mechanical-engineering.webp?v=20260815-head-detail"><img src="/images/career/01-mechanical-engineering.png?v=20260815-head-detail" alt="Portrait associated with the Mechanical Engineering career stage" width="640" height="800" loading="lazy"></picture><div class="portrait-story" data-portrait-world="physical"><span class="portrait-story-world"><span aria-hidden="true">■</span> PHYSICAL WORLD</span><span class="portrait-story-bridge">Matter and mechanics</span></div><h3>Mechanical Engineering</h3><p>Built a foundation in mechanics, physical systems, and engineering problem solving.</p><ul class="stage-tags" aria-label="Core skills"><li>Mechanics</li><li>Engineering fundamentals</li></ul></article>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <section class="learning-system" id="learning" aria-labelledby="learning-title" aria-describedby="learning-description">
+      <div class="learning-system-inner">
+      <div class="learning-intro">
+        <p class="learning-kicker">Learning system · AI Ecosystem Atlas</p>
+        <h2 id="learning-title">The atlas is a learning system.</h2>
+        <p id="learning-description">The five applications form one learning loop: orient in the atlas, build through three parallel tracks — hardware, serving, training — and converge on AI infrastructure. Evidence from every track flows back into the atlas.</p>
+      </div>
+      <pre class="learning-diagram" aria-hidden="true">
+                    AIA
+             AI Ecosystem Atlas
+                     │
+       ┌─────────────┼─────────────┐
+       │             │             │
+       ▼             ▼             ▼
+      GPU ────────► LLM ◄──────── USL
+   Hardware        Runtime      Training
+       │          Serving          │
+       │             │             │
+       └─────────────┼─────────────┘
+                     ▼
+                    CLD
+             AI Infrastructure</pre>
+      <ol class="learning-flow">
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">01</span>Orient</p>
+          <article class="learning-node learning-node-entry">
+            <div class="learning-node-head"><code class="learning-code">aia</code><h3>AI Ecosystem Atlas</h3></div>
+            <p>Start with the map of the territory. Compare AI products and developer ecosystems with evidence before investing time in any track.</p>
+            <a class="learning-node-link" href="https://aia.aserdargun.com/" target="_blank" rel="noreferrer">aia.aserdargun.com <span aria-hidden="true">↗</span></a>
+          </article>
+        </li>
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">02</span>Build · three parallel tracks</p>
+          <ul class="learning-tracks">
+            <li class="learning-node learning-node-track">
+              <div class="learning-node-head"><code class="learning-code">gpu</code><h3>Hardware track</h3></div>
+              <p class="learning-track-app">GPU Kernel Engineering — Kernel Atlas</p>
+              <p>Learn the machine the models run on: CUDA, Triton, GPU memory, profiling, and kernel optimization across a bilingual 12-week atlas.</p>
+              <a class="learning-node-link" href="https://gpu.aserdargun.com/" target="_blank" rel="noreferrer">gpu.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+            <li class="learning-node learning-node-track learning-node-hub">
+              <div class="learning-node-head"><code class="learning-code">llm</code><h3>Serving track · hub</h3></div>
+              <p class="learning-track-app">LLM Runtime &amp; Serving Atlas</p>
+              <p>Learn to ship models: runtime and serving solutions classified across seven architectural layers. Hardware and training both feed this track.</p>
+              <a class="learning-node-link" href="https://llm.aserdargun.com/" target="_blank" rel="noreferrer">llm.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+            <li class="learning-node learning-node-track">
+              <div class="learning-node-head"><code class="learning-code">usl</code><h3>Training track</h3></div>
+              <p class="learning-track-app">Unsloth Studio Learning</p>
+              <p>Learn to adapt models: Unsloth, LoRA, QLoRA, dataset engineering, and evaluation in a bilingual learning atlas.</p>
+              <a class="learning-node-link" href="https://usl.aserdargun.com/" target="_blank" rel="noreferrer">usl.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+          </ul>
+          <p class="learning-feed"><code>gpu → llm</code> hardware decides what you can serve <span aria-hidden="true">·</span> <code>usl → llm</code> the models you train become what you serve</p>
+        </li>
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">03</span>Converge</p>
+          <article class="learning-node learning-node-exit">
+            <div class="learning-node-head"><code class="learning-code">cld</code><h3>AI Infrastructure</h3></div>
+            <p class="learning-track-app">Cloud Provider Cost Comparison</p>
+            <p>Turn the stack into decisions: compare pre-tax USD costs of cloud services available from Türkiye and choose where the whole system runs.</p>
+            <a class="learning-node-link" href="https://cld.aserdargun.com/" target="_blank" rel="noreferrer">cld.aserdargun.com <span aria-hidden="true">↗</span></a>
+          </article>
+          <p class="learning-loop">The loop closes when what you learned returns to the atlas — the map you started with becomes the record of what you can now build.</p>
+        </li>
+      </ol>
       </div>
     </section>
 

@@ -30,8 +30,8 @@
   <meta name="twitter:title" content="Serdar Gündoğdu — Endüstriyel AI Mühendisi">
   <meta name="twitter:description" content="Mekanik ve üretimden veri, yazılım ve yapay zekâ mühendisliğine uzanan bir yolculuk.">
   <meta name="twitter:image" content="https://aserdargun.com/images/og-ascii-tr.png">
-  <link rel="stylesheet" href="/styles.css?v=20260815-physical-digital">
-  <script src="/scripts.js?v=20260815-physical-digital" defer></script>
+  <link rel="stylesheet" href="/styles.css?v=20260819-learning-atlas">
+  <script src="/scripts.js?v=20260819-learning-atlas" defer></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -67,6 +67,7 @@
     <nav class="nav-links" aria-label="Ana navigasyon">
       <a href="#journey">Yolculuk</a>
       <a href="#apps">Uygulamalar</a>
+      <a href="#learning">Öğrenme</a>
       <a href="#approach">Yaklaşım</a>
       <a href="#about">Hakkımda</a>
     </nav>
@@ -178,6 +179,75 @@
             <article><p class="timeline-type">Eğitim</p><picture class="timeline-step-portrait"><source type="image/webp" srcset="/images/career/01-mechanical-engineering.webp?v=20260815-head-detail"><img src="/images/career/01-mechanical-engineering.png?v=20260815-head-detail" alt="Kariyerin Makine Mühendisliği aşamasına ait portre" width="640" height="800" loading="lazy"></picture><div class="portrait-story" data-portrait-world="physical"><span class="portrait-story-world"><span aria-hidden="true">■</span> FİZİKSEL DÜNYA</span><span class="portrait-story-bridge">Madde ve mekanik</span></div><h3>Makine Mühendisliği</h3><p>Mekanik, fiziksel sistemler ve mühendislik problem çözme yaklaşımında güçlü bir temel oluşturdum.</p><ul class="stage-tags" aria-label="Temel yetkinlikler"><li>Mekanik</li><li>Mühendislik temelleri</li></ul></article>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <section class="learning-system" id="learning" aria-labelledby="learning-title" aria-describedby="learning-description">
+      <div class="learning-system-inner">
+      <div class="learning-intro">
+        <p class="learning-kicker">Öğrenme sistemi · AI Ekosistem Atlası</p>
+        <h2 id="learning-title">Atlas bir öğrenme sistemidir.</h2>
+        <p id="learning-description">Beş uygulama tek bir öğrenme döngüsü kurar: atlasta yönünü bul, üç paralel rotada — donanım, servis, eğitim — inşa et ve AI altyapısında birleştir. Her rotadan gelen kanıt atlasa geri akar.</p>
+      </div>
+      <pre class="learning-diagram" aria-hidden="true">
+                    AIA
+             AI Ekosistem Atlası
+                     │
+       ┌─────────────┼─────────────┐
+       │             │             │
+       ▼             ▼             ▼
+      GPU ────────► LLM ◄──────── USL
+    Donanım        Runtime       Eğitim
+       │          Servis           │
+       │             │             │
+       └─────────────┼─────────────┘
+                     ▼
+                    CLD
+               AI Altyapısı</pre>
+      <ol class="learning-flow">
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">01</span>Yönünü bul</p>
+          <article class="learning-node learning-node-entry">
+            <div class="learning-node-head"><code class="learning-code">aia</code><h3>AI Ecosystem Atlas</h3></div>
+            <p>Bölgenin haritasıyla başla. Herhangi bir rotaya zaman ayırmadan önce AI ürünlerini ve geliştirici ekosistemlerini kanıtlarıyla karşılaştır.</p>
+            <a class="learning-node-link" href="https://aia.aserdargun.com/" target="_blank" rel="noreferrer">aia.aserdargun.com <span aria-hidden="true">↗</span></a>
+          </article>
+        </li>
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">02</span>İnşa et · üç paralel rota</p>
+          <ul class="learning-tracks">
+            <li class="learning-node learning-node-track">
+              <div class="learning-node-head"><code class="learning-code">gpu</code><h3>Donanım rotası</h3></div>
+              <p class="learning-track-app">GPU Kernel Engineering — Kernel Atlas</p>
+              <p>Modelin koştuğu makineyi öğren: iki dilli 12 haftalık atlasta CUDA, Triton, GPU belleği, profil çıkarma ve kernel optimizasyonu.</p>
+              <a class="learning-node-link" href="https://gpu.aserdargun.com/" target="_blank" rel="noreferrer">gpu.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+            <li class="learning-node learning-node-track learning-node-hub">
+              <div class="learning-node-head"><code class="learning-code">llm</code><h3>Servis rotası · merkez</h3></div>
+              <p class="learning-track-app">LLM Runtime &amp; Serving Atlas</p>
+              <p>Modeli canlıya almayı öğren: yedi mimari katmanda sınıflandırılan çalıştırma ve sunma çözümleri. Donanım da eğitim de bu rotaya akar.</p>
+              <a class="learning-node-link" href="https://llm.aserdargun.com/" target="_blank" rel="noreferrer">llm.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+            <li class="learning-node learning-node-track">
+              <div class="learning-node-head"><code class="learning-code">usl</code><h3>Eğitim rotası</h3></div>
+              <p class="learning-track-app">Unsloth Studio Learning</p>
+              <p>Modeli uyarlamayı öğren: iki dilli öğrenme atlasında Unsloth, LoRA, QLoRA, veri seti mühendisliği ve değerlendirme.</p>
+              <a class="learning-node-link" href="https://usl.aserdargun.com/" target="_blank" rel="noreferrer">usl.aserdargun.com <span aria-hidden="true">↗</span></a>
+            </li>
+          </ul>
+          <p class="learning-feed"><code>gpu → llm</code> neyi servis edebileceğini donanım belirler <span aria-hidden="true">·</span> <code>usl → llm</code> eğittiğin modeller, servis ettiklerin olur</p>
+        </li>
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">03</span>Birleştir</p>
+          <article class="learning-node learning-node-exit">
+            <div class="learning-node-head"><code class="learning-code">cld</code><h3>AI Altyapısı</h3></div>
+            <p class="learning-track-app">Bulut Sağlayıcı Maliyet Karşılaştırması</p>
+            <p>Yığını karara dönüştür: Türkiye'den erişilebilen bulut servislerinin vergi öncesi USD maliyetlerini karşılaştır ve tüm sistemin nerede çalışacağını seç.</p>
+            <a class="learning-node-link" href="https://cld.aserdargun.com/" target="_blank" rel="noreferrer">cld.aserdargun.com <span aria-hidden="true">↗</span></a>
+          </article>
+          <p class="learning-loop">Döngü, öğrendiklerin atlasa geri döndüğünde kapanır — başladığın harita, artık inşa edebildiklerinin kaydına dönüşür.</p>
+        </li>
+      </ol>
       </div>
     </section>
 
