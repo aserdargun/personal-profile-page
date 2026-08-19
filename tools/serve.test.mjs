@@ -142,12 +142,15 @@ test("serves the English homepage at root without client navigation", async () =
   assert.doesNotMatch(response.body, /window\.location\.replace/);
 });
 
-test("serves both localized directory indexes", async () => {
-  for (const locale of ["en", "tr"]) {
-    const response = await request(`/${locale}/`);
-    assert.equal(response.statusCode, 200);
-    assert.match(response.body, new RegExp(`<html lang="${locale}"`));
-  }
+test("serves the Turkish directory index and retires the /en/ duplicate", async () => {
+  const trResponse = await request("/tr/");
+  assert.equal(trResponse.statusCode, 200);
+  assert.match(trResponse.body, /<html lang="tr"/);
+
+  // /en/ is retired by a 301 on Azure; the local static server has no
+  // redirect layer, so the retired directory must simply be absent.
+  const enResponse = await request("/en/");
+  assert.equal(enResponse.statusCode, 404);
 });
 
 test("supports HEAD requests with asset metadata and no body", async () => {
@@ -161,8 +164,9 @@ test("supports HEAD requests with asset metadata and no body", async () => {
 
 test("emulates Azure cache headers for shared assets", async () => {
   const expectations = new Map([
-    ["/styles.css", "public, max-age=86400"],
-    ["/scripts.js", "public, max-age=86400"],
+    ["/styles.css", "public, max-age=31536000, immutable"],
+    ["/scripts.js", "public, max-age=31536000, immutable"],
+    ["/fonts/inter-var-latin.woff2", "public, max-age=31536000, immutable"],
     ["/images/serdar-gundogdu-ascii-480.webp", "public, max-age=604800"],
     ["/icons/stackfolio.svg", "public, max-age=604800"],
   ]);
