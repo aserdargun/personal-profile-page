@@ -187,7 +187,7 @@
       <div class="learning-intro">
         <p class="learning-kicker">Öğrenme sistemi · AI Ekosistem Atlası</p>
         <h2 id="learning-title">Atlas bir öğrenme sistemidir.</h2>
-        <p id="learning-description">Beş uygulama tek bir öğrenme döngüsü kurar: atlasta yönünü bul, üç paralel rotada — donanım, servis, eğitim — inşa et ve AI altyapısında birleştir. Her rotadan gelen kanıt atlasa geri akar.</p>
+        <p id="learning-description">Beş uygulama tek bir öğrenme döngüsü kurar ve her durak bir soruyla başlar: atlasta yönünü bul, üç paralel rotada — donanım, servis, eğitim — inşa et ve AI altyapısında birleştir. Her rotadan gelen kanıt atlasa geri akar.</p>
       </div>
       <pre class="learning-diagram" aria-hidden="true">
                     AIA
@@ -203,13 +203,32 @@
        └─────────────┼─────────────┘
                      ▼
                     CLD
-               AI Altyapısı</pre>
+               AI Altyapısı
+                     │
+                     ▼
+                    AIA</pre>
+      <div class="learning-study">
+        <p class="learning-study-label">Çalışma sırası · rotalar birbirinin üstüne kurulur</p>
+        <ol class="learning-study-list">
+          <li><span class="learning-order" aria-hidden="true">1</span><code>aia</code><span class="learning-study-role">Yaşayan harita · hiç “bitmez”</span></li>
+          <li aria-hidden="true">→</li>
+          <li><span class="learning-order" aria-hidden="true">2</span><code>gpu</code><span class="learning-study-role">Temel katman</span></li>
+          <li aria-hidden="true">→</li>
+          <li><span class="learning-order" aria-hidden="true">3</span><code>llm</code><span class="learning-study-role">Ana proje</span></li>
+          <li aria-hidden="true">→</li>
+          <li><span class="learning-order" aria-hidden="true">4</span><code>usl</code><span class="learning-study-role">Çalıştırmadan değiştirmeye</span></li>
+          <li aria-hidden="true">→</li>
+          <li><span class="learning-order" aria-hidden="true">5</span><code>cld</code><span class="learning-study-role">Üretim · en son</span></li>
+        </ol>
+      </div>
       <ol class="learning-flow">
         <li class="learning-stage">
           <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">01</span>Yönünü bul</p>
           <article class="learning-node learning-node-entry">
-            <div class="learning-node-head"><code class="learning-code">aia</code><h3>AI Ecosystem Atlas</h3></div>
-            <p>Bölgenin haritasıyla başla. Herhangi bir rotaya zaman ayırmadan önce AI ürünlerini ve geliştirici ekosistemlerini kanıtlarıyla karşılaştır.</p>
+            <div class="learning-node-head"><code class="learning-code">aia</code><span class="learning-order" aria-hidden="true">1</span><h3>AI Ecosystem Atlas</h3></div>
+            <p class="learning-question">“Neler var?”</p>
+            <p>Bölgenin haritasıyla başla. Herhangi bir rotaya zaman ayırmadan önce AI ürünlerini ve geliştirici ekosistemlerini kanıtlarıyla karşılaştır. Atlas bitirilecek bir proje değil, yaşayan bir indekstir — döngünün her turunda güncellenir.</p>
+            <p class="learning-topics">ekosistem <span aria-hidden="true">→</span> modeller <span aria-hidden="true">→</span> eğitim <span aria-hidden="true">→</span> inference <span aria-hidden="true">→</span> runtime <span aria-hidden="true">→</span> donanım <span aria-hidden="true">→</span> bulut</p>
             <a class="learning-node-link" href="https://aia.aserdargun.com/" target="_blank" rel="noreferrer">aia.aserdargun.com <span aria-hidden="true">↗</span></a>
           </article>
         </li>
@@ -217,35 +236,52 @@
           <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">02</span>İnşa et · üç paralel rota</p>
           <ul class="learning-tracks">
             <li class="learning-node learning-node-track">
-              <div class="learning-node-head"><code class="learning-code">gpu</code><h3>Donanım rotası</h3></div>
+              <div class="learning-node-head"><code class="learning-code">gpu</code><span class="learning-order" aria-hidden="true">2</span><h3>Donanım rotası</h3></div>
+              <p class="learning-question">“Hesaplama nasıl çalışır?”</p>
               <p class="learning-track-app">GPU Kernel Engineering — Kernel Atlas</p>
               <p>Modelin koştuğu makineyi öğren: iki dilli 12 haftalık atlasta CUDA, Triton, GPU belleği, profil çıkarma ve kernel optimizasyonu.</p>
+              <p class="learning-topics">CPU vs GPU <span aria-hidden="true">→</span> GPU mimarisi <span aria-hidden="true">→</span> VRAM <span aria-hidden="true">→</span> bellek bant genişliği <span aria-hidden="true">→</span> CUDA / Tensor çekirdekleri <span aria-hidden="true">→</span> FP32 / FP16 / BF16 / FP8 / INT8 / INT4 <span aria-hidden="true">→</span> matris çarpımı <span aria-hidden="true">→</span> CUDA kernelleri <span aria-hidden="true">→</span> FlashAttention <span aria-hidden="true">→</span> KV cache <span aria-hidden="true">→</span> quantization <span aria-hidden="true">→</span> çoklu GPU <span aria-hidden="true">→</span> tensor paralellik</p>
               <a class="learning-node-link" href="https://gpu.aserdargun.com/" target="_blank" rel="noreferrer">gpu.aserdargun.com <span aria-hidden="true">↗</span></a>
             </li>
             <li class="learning-node learning-node-track learning-node-hub">
-              <div class="learning-node-head"><code class="learning-code">llm</code><h3>Servis rotası · merkez</h3></div>
+              <div class="learning-node-head"><code class="learning-code">llm</code><span class="learning-order" aria-hidden="true">3</span><h3>Servis rotası · merkez</h3></div>
+              <p class="learning-question">“Modeller nasıl çalıştırılır?”</p>
               <p class="learning-track-app">LLM Runtime &amp; Serving Atlas</p>
               <p>Modeli canlıya almayı öğren: yedi mimari katmanda sınıflandırılan çalıştırma ve sunma çözümleri. Donanım da eğitim de bu rotaya akar.</p>
+              <p class="learning-topics">model <span aria-hidden="true">→</span> mimari <span aria-hidden="true">→</span> hassasiyet <span aria-hidden="true">→</span> bellek hesabı <span aria-hidden="true">→</span> runtime <span aria-hidden="true">→</span> inference motoru <span aria-hidden="true">→</span> sunum <span aria-hidden="true">→</span> API <span aria-hidden="true">→</span> benchmark</p>
+              <p class="learning-topics">Ollama <span aria-hidden="true">·</span> llama.cpp <span aria-hidden="true">·</span> vLLM <span aria-hidden="true">·</span> SGLang <span aria-hidden="true">·</span> TensorRT-LLM <span aria-hidden="true">·</span> Transformers <span aria-hidden="true">·</span> MLX</p>
               <a class="learning-node-link" href="https://llm.aserdargun.com/" target="_blank" rel="noreferrer">llm.aserdargun.com <span aria-hidden="true">↗</span></a>
             </li>
             <li class="learning-node learning-node-track">
-              <div class="learning-node-head"><code class="learning-code">usl</code><h3>Eğitim rotası</h3></div>
+              <div class="learning-node-head"><code class="learning-code">usl</code><span class="learning-order" aria-hidden="true">4</span><h3>Eğitim rotası</h3></div>
+              <p class="learning-question">“Modeller nasıl öğrenir/değişir?”</p>
               <p class="learning-track-app">Unsloth Studio Learning</p>
-              <p>Modeli uyarlamayı öğren: iki dilli öğrenme atlasında Unsloth, LoRA, QLoRA, veri seti mühendisliği ve değerlendirme.</p>
+              <p>Modelleri yalnız çalıştırmayı değil, değiştirmeyi öğren: iki dilli öğrenme atlasında Unsloth, LoRA, QLoRA, veri seti mühendisliği ve değerlendirme.</p>
+              <p class="learning-topics">eğitilmiş model <span aria-hidden="true">→</span> veri seti <span aria-hidden="true">→</span> tokenization <span aria-hidden="true">→</span> LoRA <span aria-hidden="true">→</span> QLoRA <span aria-hidden="true">→</span> SFT <span aria-hidden="true">→</span> DPO <span aria-hidden="true">→</span> GRPO <span aria-hidden="true">→</span> değerlendirme <span aria-hidden="true">→</span> birleştirilmiş model <span aria-hidden="true">→</span> LLM runtime</p>
               <a class="learning-node-link" href="https://usl.aserdargun.com/" target="_blank" rel="noreferrer">usl.aserdargun.com <span aria-hidden="true">↗</span></a>
             </li>
           </ul>
-          <p class="learning-feed"><code>gpu → llm</code> neyi servis edebileceğini donanım belirler <span aria-hidden="true">·</span> <code>usl → llm</code> eğittiğin modeller, servis ettiklerin olur</p>
+          <p class="learning-feed"><code>gpu → llm</code> neyi servis edebileceğini donanım belirler <span aria-hidden="true">·</span> <code>usl → llm</code> eğittiğin modeller, servis ettiklerin olur <span aria-hidden="true">·</span> <code>llm → gpu</code> inference baskısı donanım sınırlarını görünür kılar</p>
         </li>
         <li class="learning-stage">
           <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">03</span>Birleştir</p>
           <article class="learning-node learning-node-exit">
-            <div class="learning-node-head"><code class="learning-code">cld</code><h3>AI Altyapısı</h3></div>
+            <div class="learning-node-head"><code class="learning-code">cld</code><span class="learning-order" aria-hidden="true">5</span><h3>AI Altyapısı</h3></div>
+            <p class="learning-question">“Bunu ölçekte nasıl işletirim?”</p>
             <p class="learning-track-app">Bulut Sağlayıcı Maliyet Karşılaştırması</p>
-            <p>Yığını karara dönüştür: Türkiye'den erişilebilen bulut servislerinin vergi öncesi USD maliyetlerini karşılaştır ve tüm sistemin nerede çalışacağını seç.</p>
+            <p>Yığını karara dönüştür: Türkiye'den erişilebilen bulut servislerinin vergi öncesi USD maliyetlerini karşılaştır ve tüm sistemin nerede çalışacağını seç. Bulut bilerek en sonda — neyi deploy ettiğini bilince altyapı soyut olmaktan çıkar.</p>
+            <p class="learning-topics">model <span aria-hidden="true">→</span> vLLM <span aria-hidden="true">→</span> Docker <span aria-hidden="true">→</span> GPU instance <span aria-hidden="true">→</span> bulut GPU <span aria-hidden="true">→</span> load balancer <span aria-hidden="true">→</span> autoscaling <span aria-hidden="true">→</span> API</p>
             <a class="learning-node-link" href="https://cld.aserdargun.com/" target="_blank" rel="noreferrer">cld.aserdargun.com <span aria-hidden="true">↗</span></a>
           </article>
-          <p class="learning-loop">Döngü, öğrendiklerin atlasa geri döndüğünde kapanır — başladığın harita, artık inşa edebildiklerinin kaydına dönüşür.</p>
+        </li>
+        <li class="learning-stage">
+          <p class="learning-stage-label"><span class="learning-step" aria-hidden="true">04</span>Dönüş</p>
+          <div class="learning-node learning-node-return">
+            <div class="learning-node-head"><code class="learning-code">aia</code><h3>Atlasa dönüş</h3></div>
+            <p class="learning-question">“Bu teknoloji nereye oturur?”</p>
+            <a class="learning-node-link" href="https://aia.aserdargun.com/" target="_blank" rel="noreferrer">aia.aserdargun.com <span aria-hidden="true">↗</span></a>
+          </div>
+          <p class="learning-loop">Döngü, öğrendiklerin atlasa geri döndüğünde kapanır — başladığın harita, artık inşa edebildiklerinin kaydına dönüşür ve bir sonraki tur daha derinden başlar.</p>
         </li>
       </ol>
       </div>
@@ -278,6 +314,17 @@
     </section>
 
     <section class="contact"><p>Çözmeye değer bir endüstriyel AI probleminiz mi var?</p><a href="mailto:aserdargun@gmail.com">Birlikte faydalı bir şey geliştirelim. <span aria-hidden="true">↗</span></a></section>
+    <section class="learning-invest" aria-label="Öğrenme yatırımı öncelikleri">
+      <p class="learning-invest-label">Yatırım · derinlik sırayı yener</p>
+      <div class="learning-invest-bar">
+        <span class="learning-invest-seg" style="flex-basis: 30%;"><code>llm</code> %30</span>
+        <span class="learning-invest-seg" style="flex-basis: 25%;"><code>gpu</code> %25</span>
+        <span class="learning-invest-seg" style="flex-basis: 20%;"><code>usl</code> %20</span>
+        <span class="learning-invest-seg" style="flex-basis: 15%;"><code>cld</code> %15</span>
+        <span class="learning-invest-seg" style="flex-basis: 10%;"><code>aia</code> %10</span>
+      </div>
+      <p class="learning-invest-note">Çalışma sırası AIA → GPU → LLM → USL → CLD; derinleşme önceliği LLM ile başlar. Şu anda ağırlık merkezi GPU + LLM ikilisi — donanımın runtime ile buluştuğu yer.</p>
+    </section>
   </main>
 
   <footer><p>© 2026 Serdar Gündoğdu</p><p>AI mühendisi · Endüstriyel zekâ</p><a href="#top">Başa dön ↑</a></footer>

@@ -1925,8 +1925,162 @@ footer a {
 }
 
 .learning-node-entry,
-.learning-node-exit {
+.learning-node-exit,
+.learning-node-return {
   max-width: 760px;
+}
+
+.learning-node-return {
+  border-style: dashed;
+  border-color: rgba(200, 255, 54, 0.45);
+}
+
+.learning-question {
+  margin-top: 12px;
+  color: var(--lime);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.learning-order {
+  display: inline-grid;
+  min-width: 24px;
+  min-height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--ink);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.learning-topics {
+  max-width: 64ch;
+  margin-top: 12px;
+  color: rgba(255, 253, 247, 0.58);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.learning-topics span {
+  color: var(--lime);
+  padding: 0 1px;
+}
+
+.learning-study {
+  margin-top: 30px;
+}
+
+.learning-study-label {
+  color: rgba(255, 253, 247, 0.6);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.learning-study-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.learning-study-list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(255, 253, 247, 0.14);
+  background: rgba(255, 253, 247, 0.03);
+  padding: 9px 12px;
+}
+
+.learning-study-list li:not(:last-child)::after {
+  content: "→";
+  margin-left: 8px;
+  color: var(--lime);
+}
+
+.learning-study-list code {
+  color: var(--lime);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.learning-study-role {
+  color: rgba(255, 253, 247, 0.6);
+  font-size: 0.68rem;
+}
+
+.learning-invest {
+  border-top: 1px solid var(--line-dark);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.learning-invest-label {
+  color: var(--lime);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.learning-invest-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.learning-invest-seg {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 150px;
+  padding: 10px 8px;
+  border: 1px solid rgba(200, 255, 54, 0.34);
+  background: rgba(200, 255, 54, 0.08);
+  color: var(--white);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 160ms ease;
+}
+
+.learning-invest-seg:hover {
+  background: rgba(200, 255, 54, 0.16);
+}
+
+.learning-invest-seg code {
+  color: var(--lime);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.learning-invest-note {
+  max-width: 780px;
+  margin-top: 12px;
+  color: rgba(255, 253, 247, 0.62);
+  font-size: 0.74rem;
+  line-height: 1.6;
 }
 
 .learning-node-head {
@@ -1966,7 +2120,7 @@ footer a {
   text-transform: uppercase;
 }
 
-.learning-node > p:not(.learning-track-app) {
+.learning-node > p:not(.learning-track-app):not(.learning-question) {
   max-width: 58ch;
   margin-top: 10px;
   color: rgba(255, 253, 247, 0.7);
@@ -2052,8 +2206,21 @@ footer a {
   }
 
   .learning-node-entry,
-  .learning-node-exit {
+  .learning-node-exit,
+  .learning-node-return {
     max-width: none;
+  }
+
+  .learning-study-list li:not(:last-child)::after {
+    content: none;
+  }
+
+  .learning-study-list li {
+    width: 100%;
+  }
+
+  .learning-invest-seg {
+    min-width: 118px;
   }
 
   .learning-node-link {

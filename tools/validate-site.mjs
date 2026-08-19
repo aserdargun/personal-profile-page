@@ -195,8 +195,60 @@ function validateApplicationMapRows(locale, html) {
   );
 }
 
-const expectedLearningCodes = ["aia", "gpu", "llm", "usl", "cld"];
+const expectedLearningCodes = ["aia", "gpu", "llm", "usl", "cld", "aia"];
 const expectedLearningUrls = expectedLearningCodes.map((code) => `https://${code}.aserdargun.com/`);
+const expectedLearningQuestions = {
+  en: [
+    "“What exists?”",
+    "“How does compute work?”",
+    "“How do models run?”",
+    "“How do models learn/change?”",
+    "“How do I operate this at scale?”",
+    "“Where does this technology fit?”",
+  ],
+  tr: [
+    "“Neler var?”",
+    "“Hesaplama nasıl çalışır?”",
+    "“Modeller nasıl çalıştırılır?”",
+    "“Modeller nasıl öğrenir/değişir?”",
+    "“Bunu ölçekte nasıl işletirim?”",
+    "“Bu teknoloji nereye oturur?”",
+  ],
+};
+const expectedLearningStudyRoles = {
+  en: [
+    "Living map · never “done”",
+    "Foundation",
+    "Main project",
+    "From running to changing models",
+    "Production, last",
+  ],
+  tr: [
+    "Yaşayan harita · hiç “bitmez”",
+    "Temel katman",
+    "Ana proje",
+    "Çalıştırmadan değiştirmeye",
+    "Üretim · en son",
+  ],
+};
+const expectedLearningTopics = {
+  en: [
+    "ecosystem → models → training → inference → runtime → hardware → cloud",
+    "CPU vs GPU → GPU architecture → VRAM → memory bandwidth → CUDA / Tensor cores → FP32 / FP16 / BF16 / FP8 / INT8 / INT4 → matrix multiplication → CUDA kernels → FlashAttention → KV cache → quantization → multi-GPU → tensor parallelism",
+    "model → architecture → precision → memory calculator → runtime → inference engine → serving → API → benchmark",
+    "Ollama · llama.cpp · vLLM · SGLang · TensorRT-LLM · Transformers · MLX",
+    "pretrained model → dataset → tokenization → LoRA → QLoRA → SFT → DPO → GRPO → evaluation → merged model → LLM runtime",
+    "model → vLLM → Docker → GPU instance → cloud GPU → load balancer → autoscaling → API",
+  ],
+  tr: [
+    "ekosistem → modeller → eğitim → inference → runtime → donanım → bulut",
+    "CPU vs GPU → GPU mimarisi → VRAM → bellek bant genişliği → CUDA / Tensor çekirdekleri → FP32 / FP16 / BF16 / FP8 / INT8 / INT4 → matris çarpımı → CUDA kernelleri → FlashAttention → KV cache → quantization → çoklu GPU → tensor paralellik",
+    "model → mimari → hassasiyet → bellek hesabı → runtime → inference motoru → sunum → API → benchmark",
+    "Ollama · llama.cpp · vLLM · SGLang · TensorRT-LLM · Transformers · MLX",
+    "eğitilmiş model → veri seti → tokenization → LoRA → QLoRA → SFT → DPO → GRPO → değerlendirme → birleştirilmiş model → LLM runtime",
+    "model → vLLM → Docker → GPU instance → bulut GPU → load balancer → autoscaling → API",
+  ],
+};
 
 function validateLearningSystem(locale, html) {
   const isTurkish = locale === "tr";
@@ -225,8 +277,44 @@ function validateLearningSystem(locale, html) {
     const link = `<a class="learning-node-link" href="${expectedLearningUrls[index]}" target="_blank" rel="noreferrer">${code}.aserdargun.com <span aria-hidden="true">↗</span></a>`;
     check(section.includes(link), `${locale}: learning system node link is missing or malformed: ${code}`);
   }
-  check(section.includes("gpu → llm") && section.includes("usl → llm"), `${locale}: learning system feed markers are missing`);
-  check((section.match(/class="learning-stage-label"/g) || []).length === 3, `${locale}: learning system must keep three stages`);
+  check(section.includes("gpu → llm") && section.includes("usl → llm") && section.includes("llm → gpu"), `${locale}: learning system feed markers are missing`);
+  const questions = matches(section, /<p class="learning-question">([^<]+)<\/p>/g);
+  check(
+    JSON.stringify(questions) === JSON.stringify(isTurkish ? expectedLearningQuestions.tr : expectedLearningQuestions.en),
+    `${locale}: learning system guiding questions or order differ`,
+  );
+  const studyCodes = matches(section, /<li><span class="learning-order" aria-hidden="true">\d<\/span><code>([a-z]{3})<\/code>/g);
+  check(JSON.stringify(studyCodes) === JSON.stringify(["aia", "gpu", "llm", "usl", "cld"]), `${locale}: learning study order codes differ`);
+  const studyRoles = matches(section, /<span class="learning-study-role">([^<]+)<\/span>/g);
+  check(
+    JSON.stringify(studyRoles) === JSON.stringify(isTurkish ? expectedLearningStudyRoles.tr : expectedLearningStudyRoles.en),
+    `${locale}: learning study order roles differ`,
+  );
+  const topics = matches(section, /<p class="learning-topics">([\s\S]*?)<\/p>/g).map((topic) => topic.replace(/<span aria-hidden="true">([^<]*)<\/span>/g, "$1").replace(/\s+/g, " ").trim());
+  check(
+    JSON.stringify(topics) === JSON.stringify(isTurkish ? expectedLearningTopics.tr : expectedLearningTopics.en),
+    `${locale}: learning system topic chains differ`,
+  );
+  check((section.match(/class="learning-stage-label"/g) || []).length === 4, `${locale}: learning system must keep four stages`);
+}
+
+function validateLearningInvest(locale, html) {
+  const isTurkish = locale === "tr";
+  const section = html.match(/<section class="learning-invest"[\s\S]*?<\/section>/)?.[0] ?? "";
+  check(section.length > 0, `${locale}: learning investment section is missing`);
+  if (section.length === 0) return;
+  const segments = matches(section, /<span class="learning-invest-seg" style="flex-basis: \d+%;"><code>([a-z]{3})<\/code> ([^<]+)<\/span>/g);
+  const expectedCodes = ["llm", "gpu", "usl", "cld", "aia"];
+  check(JSON.stringify(segments) === JSON.stringify(expectedCodes), `${locale}: learning investment segment codes or order differ`);
+  const labels = Array.from(
+    section.matchAll(/<span class="learning-invest-seg" style="flex-basis: \d+%;"><code>[a-z]{3}<\/code> ([^<]+)<\/span>/g),
+    (match) => match[1].trim(),
+  );
+  const expectedLabels = isTurkish ? ["%30", "%25", "%20", "%15", "%10"] : ["30%", "25%", "20%", "15%", "10%"];
+  check(JSON.stringify(labels) === JSON.stringify(expectedLabels), `${locale}: learning investment percentages differ`);
+  const expectedBasis = ["30", "25", "20", "15", "10"];
+  const basis = matches(section, /flex-basis: (\d+)%;/g);
+  check(JSON.stringify(basis) === JSON.stringify(expectedBasis), `${locale}: learning investment weights differ`);
 }
 
 function stripCssComments(source) {
@@ -472,6 +560,7 @@ for (const [locale, html] of Object.entries(pages)) {
   check(html.includes('aria-describedby="app-map-description"'), `${locale}: application map description relationship is missing`);
   validateApplicationMapRows(locale, html);
   validateLearningSystem(locale, html);
+  validateLearningInvest(locale, html);
   check(html.includes('<a href="#learning">'), `${locale}: learning navigation link is missing`);
 
   const appMapIntro = html.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
@@ -579,6 +668,7 @@ for (const assetName of expectedStageImages) {
 check(!/AI Practitioner/i.test(rootPage.replaceAll("AWS Certified AI Practitioner", "")), "Root AI Practitioner personal title remains");
 validateApplicationMapRows("Root", rootPage);
 validateLearningSystem("Root", rootPage);
+validateLearningInvest("Root", rootPage);
 check(rootPage.includes('<a href="#learning">'), "Root learning navigation link is missing");
 const rootAppMapIntro = rootPage.match(/<div class="app-map-intro">([\s\S]*?)<\/div>/)?.[1] ?? "";
 check(rootAppMapIntro.includes("Application map · live destinations"), "Root number-neutral application map kicker is missing");
