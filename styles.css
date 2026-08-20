@@ -227,6 +227,20 @@ ul {
   border-radius: 50%;
   background: var(--lime);
   box-shadow: 0 0 18px rgba(200, 255, 54, 0.6);
+  animation: status-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 14px rgba(200, 255, 54, 0.55);
+  }
+
+  50% {
+    transform: scale(1.35);
+    box-shadow: 0 0 22px rgba(200, 255, 54, 0.85);
+  }
 }
 
 .hero-intro {
@@ -1495,6 +1509,10 @@ footer a {
 
   .timeline::after {
     transition: none;
+  }
+
+  .status-dot {
+    animation: none;
   }
 }
 
