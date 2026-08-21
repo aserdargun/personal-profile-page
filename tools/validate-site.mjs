@@ -57,7 +57,7 @@ const expectedTurkishBridges = [
   "Madde ve mekanik",
 ];
 const expectedAnchors = ["top", "apps", "learning", "journey", "approach", "about"];
-const expectedAssetVersion = "20260820-now-svg-v2";
+const expectedAssetVersion = "20260820-inline-svg-v2";
 const expectedStylesheetHref = `/styles.css?v=${expectedAssetVersion}`;
 const expectedScriptSrc = `/scripts.js?v=${expectedAssetVersion}`;
 const expectedApplicationRows = [
@@ -267,9 +267,9 @@ function validateLearningSystem(locale, html) {
     : "The atlas is a learning system.";
   check(intro.includes(expectedKicker), `${locale}: learning system kicker is missing`);
   check(intro.includes(expectedHeading), `${locale}: learning system heading is missing`);
-  const expectedDiagramSrc = isTurkish ? "/images/learning/diagram-tr.svg" : "/images/learning/diagram.svg";
   check(
-    section.includes(`<object type="image/svg+xml" data="${expectedDiagramSrc}" class="ld-svg"`),
+    section.includes('<figure class="learning-diagram-wrap">')
+      && section.includes('class="ld-svg"'),
     `${locale}: learning system diagram is missing`,
   );
   check(section.includes("AIA") && section.includes("CLD"), `${locale}: learning system diagram endpoints are missing`);
