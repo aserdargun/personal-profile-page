@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="tr" data-locale="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121310">
+  <title>Şimdi · Serdar Gündoğdu</title>
+  <meta name="description" content="Serdar Gündoğdu'nun bu hafta, bu ay ve uzun vadede üzerinde çalıştığı konular.">
+  <meta name="author" content="Serdar Gündoğdu">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aserdargun.com/tr/now/">
+  <link rel="alternate" hreflang="en" href="https://aserdargun.com/now/">
+  <link rel="alternate" hreflang="tr" href="https://aserdargun.com/tr/now/">
+  <link rel="alternate" hreflang="x-default" href="https://aserdargun.com/now/">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:url" content="https://aserdargun.com/tr/now/">
+  <meta property="og:title" content="Şimdi · Serdar Gündoğdu">
+  <meta property="og:description" content="Bu hafta, bu ay ve uzun vadede üzerinde çalıştığım konular — küratörlük değil, not.">
+  <meta property="og:image" content="https://aserdargun.com/images/og-ascii-tr.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Şimdi · Serdar Gündoğdu">
+  <meta name="twitter:description" content="Bu hafta, bu ay ve uzun vadede üzerinde çalıştığım konular — küratörlük değil, not.">
+  <link rel="preload" href="/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css?v=20260820-now-svg-v2">
+  <script src="/scripts.js?v=20260820-now-svg-v2" defer></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Şimdi · Serdar Gündoğdu",
+      "url": "https://aserdargun.com/tr/now/",
+      "isPartOf": { "@id": "https://aserdargun.com/tr/" },
+      "inLanguage": "tr",
+      "dateModified": "2026-08-21"
+    }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">İçeriğe geç</a>
+  <header class="site-header site-header-page">
+    <a class="wordmark" href="/tr/" aria-label="SG — Serdar Gündoğdu, ana sayfa">
+      <span class="wordmark-mark" aria-hidden="true">SG</span>
+      <span>Serdar Gündoğdu</span>
+    </a>
+    <nav class="nav-links" aria-label="Ana navigasyon">
+      <a href="/tr/#journey">Yolculuk</a>
+      <a href="/tr/#apps">Uygulamalar</a>
+      <a href="/tr/#learning">Öğrenme</a>
+      <a href="/tr/#approach">Yaklaşım</a>
+      <a href="/tr/#about">Hakkımda</a>
+    </nav>
+    <div class="header-actions">
+      <nav class="language-switch" aria-label="Dil seçimi">
+        <a href="/tr/now/" lang="tr" data-language-link="tr" aria-label="TR — Geçerli dil" aria-current="page">TR</a>
+        <span aria-hidden="true">/</span>
+        <a href="/now/" lang="en" data-language-link="en" aria-label="EN — İngilizce sürüme geç">EN</a>
+      </nav>
+      <a class="nav-cta" href="mailto:aserdargun@gmail.com">Konuşalım <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main" class="now-page">
+    <section class="now-hero">
+      <p class="now-kicker"><span class="app-live-dot" aria-hidden="true"></span>Güncellendi <time datetime="2026-08-21">2026-08-21</time> · 34. hafta</p>
+      <h1>Şu an ne üzerinde çalışıyorum, <em>gerçekten.</em></h1>
+      <p class="now-intro">Kısa, tarihli, küratörlük olmayan bir not. Buradaki amaç dikkatimin bu hafta nereye aktığı ve bu ay ne inşa ettiğimi göstermek. Listelenen bir şey sende yankı uyandırırsa ya da not alışverişi yapmak istersen, bana yaz.</p>
+    </section>
+
+    <section class="now-grid" aria-label="Şu anki odak">
+      <article class="now-card now-card-this">
+        <p class="now-card-label"><span aria-hidden="true">01</span>Bu hafta</p>
+        <h2>GPU + LLM çiftini kapatmak</h2>
+        <p>Kernel atlasının runtime atlasıyla buluştuğu yer. CUDA bellek trafik örüntülerini okuyor ve bir sonraki GPU atlas bölümünü doğru model bağlamıyla, yalnız değil, vLLM PagedAttention ile eşleştirerek hazırlıyorum.</p>
+        <ul class="now-tags">
+          <li>GPU bellek bant genişliği</li>
+          <li>PagedAttention</li>
+          <li>KV cache</li>
+          <li>Atlas çapraz referansları</li>
+        </ul>
+      </article>
+
+      <article class="now-card now-card-this">
+        <p class="now-card-label"><span aria-hidden="true">02</span>Bu ay</p>
+        <h2>Atlası bir öğrenme döngüsüne çevirmek</h2>
+        <p>Genel atlas haritasını düz bir dizinden, ana sayfada gördüğün öğrenme sistemine dönüştürüyorum: çalışma sırası, üç paralel rota (donanım, servis, eğitim) ve birleşim adımı. Bu /now sayfası o döngünün bir sonraki parçası.</p>
+        <ul class="now-tags">
+          <li>Öğrenme sistemi</li>
+          <li>Yönlendirici sorular</li>
+          <li>Yatırım çubuğu</li>
+          <li>Kanıt akışı</li>
+        </ul>
+      </article>
+
+      <article class="now-card now-card-this">
+        <p class="now-card-label"><span aria-hidden="true">03</span>Uzun vadeli odak</p>
+        <h2>Operatörün güvendiği endüstriyel yapay zekâ</h2>
+        <p>Makine mühendisliğinden yapay zekâ mühendisliğine uzanan ortak şu: &quot;kararı gerçek bir kişinin uygulayacağı&quot;. Her atlas ve her defter, endüstriyel zekâı okunabilir, denetlenebilir ve işletilebilir kılma denemesi — sadece doğru değil.</p>
+        <ul class="now-tags">
+          <li>İzlenebilirlik</li>
+          <li>İnsan incelemesi</li>
+          <li>Dağıtım kısıtları</li>
+          <li>Operatör-odaklı</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="now-archive" aria-label="Son güncellemeler">
+      <h2>Son güncellemeler</h2>
+      <ol class="now-archive-list">
+        <li>
+          <time datetime="2026-08-21">2026-08-21</time>
+          <span><code>/now</code> yayınlandı ve ana sayfa footer&apos;ından bağlandı.</span>
+        </li>
+        <li>
+          <time datetime="2026-08-20">2026-08-20</time>
+          <span>Hero&apos;daki AI mühendisi status dot&apos;u nabız attırıldı; uygulama haritasına uygulama başına güncellendi rozetleri eklendi.</span>
+        </li>
+        <li>
+          <time datetime="2026-08-19">2026-08-19</time>
+          <span>Ana sayfada öğrenme sistemi yayınlandı — çalışma sırası, üç paralel rota, birleşim adımı, atlasa dönüş.</span>
+        </li>
+        <li>
+          <time datetime="2026-08-15">2026-08-15</time>
+          <span>Eski /en/ kopya kaldırıldı; kök EN sayfası, /tr/ TR kaldı.</span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="now-contact">
+      <p>Yukarıdakilerden biri üzerine not alışverişi yapmak ister misin?</p>
+      <a href="mailto:aserdargun@gmail.com">Bana yaz <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><p>© 2026 Serdar Gündoğdu</p><p>AI mühendisi · Endüstriyel zekâ</p><a href="/tr/">Ana sayfaya dön ↑</a></div></footer>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 460" role="img" aria-labelledby="ld-title-tr ld-desc-tr" class="ld-svg">
+  <title id="ld-title-tr">AI Ekosistem Atlası öğrenme döngüsü</title>
+  <desc id="ld-desc-tr">AIA tepede üç paralel rotaya — GPU (donanım), LLM (runtime / servis), USL (eğitim) — ayrılır, CLD&apos;de (AI altyapısı) birleşir ve AIA&apos;ya geri döner.</desc>
+  <style>
+    .ld-svg { font-family: ui-sans-serif, system-ui, sans-serif; }
+    .ld-svg .ld-links path { fill: none; stroke: #c8ff36; stroke-opacity: 0.42; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+    .ld-svg .ld-node rect { fill: rgba(255,253,247,0.04); stroke: rgba(255,253,247,0.22); stroke-width: 1; }
+    .ld-svg .ld-node text { fill: rgba(255,253,247,0.78); font-size: 11px; text-anchor: middle; pointer-events: none; }
+    .ld-svg .ld-node .ld-code { fill: #c8ff36; font-family: ui-monospace, monospace; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+    .ld-svg .ld-node-aia rect { fill: rgba(200,255,54,0.1); stroke: rgba(200,255,54,0.5); }
+    .ld-svg .ld-node-hub rect { fill: rgba(200,255,54,0.06); stroke: rgba(200,255,54,0.36); }
+    .ld-svg .ld-pulse-dot circle { fill: #c8ff36; }
+  </style>
+  <defs>
+    <marker id="ld-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="rgba(200,255,54,0.55)"/>
+    </marker>
+  </defs>
+
+  <g class="ld-links">
+    <path d="M 320 90 L 130 190"/>
+    <path d="M 320 90 L 320 190"/>
+    <path d="M 320 90 L 510 190"/>
+    <path d="M 165 210 L 290 210" marker-end="url(#ld-arrow)"/>
+    <path d="M 510 210 L 350 210" marker-end="url(#ld-arrow)"/>
+    <path d="M 130 240 L 130 320 L 285 360"/>
+    <path d="M 320 240 L 320 320"/>
+    <path d="M 510 240 L 510 320 L 355 360"/>
+    <path d="M 320 400 L 320 60" marker-end="url(#ld-arrow)"/>
+  </g>
+
+  <g class="ld-pulse-dot">
+    <circle cx="320" cy="90" r="4"/>
+    <circle cx="130" cy="190" r="3"/>
+    <circle cx="320" cy="190" r="3"/>
+    <circle cx="510" cy="190" r="3"/>
+    <circle cx="320" cy="400" r="3"/>
+  </g>
+
+  <g class="ld-nodes">
+    <a href="https://aia.aserdargun.com/" target="_blank" rel="noreferrer" class="ld-node ld-node-aia">
+      <rect x="252" y="40" width="136" height="56" rx="10"/>
+      <text x="320" y="68" class="ld-code" text-anchor="middle">AIA</text>
+      <text x="320" y="86" class="ld-label" text-anchor="middle">AI Ekosistem Atlası</text>
+    </a>
+
+    <a href="https://gpu.aserdargun.com/" target="_blank" rel="noreferrer" class="ld-node">
+      <rect x="80" y="190" width="100" height="56" rx="10"/>
+      <text x="130" y="216" class="ld-code" text-anchor="middle">GPU</text>
+      <text x="130" y="232" class="ld-label" text-anchor="middle">Donanım</text>
+    </a>
+
+    <a href="https://llm.aserdargun.com/" target="_blank" rel="noreferrer" class="ld-node ld-node-hub">
+      <rect x="270" y="190" width="100" height="56" rx="10"/>
+      <text x="320" y="216" class="ld-code" text-anchor="middle">LLM</text>
+      <text x="320" y="232" class="ld-label" text-anchor="middle">Runtime · Servis</text>
+    </a>
+
+    <a href="https://usl.aserdargun.com/" target="_blank" rel="noreferrer" class="ld-node">
+      <rect x="460" y="190" width="100" height="56" rx="10"/>
+      <text x="510" y="216" class="ld-code" text-anchor="middle">USL</text>
+      <text x="510" y="232" class="ld-label" text-anchor="middle">Eğitim</text>
+    </a>
+
+    <a href="https://cld.aserdargun.com/" target="_blank" rel="noreferrer" class="ld-node">
+      <rect x="260" y="358" width="120" height="56" rx="10"/>
+      <text x="320" y="386" class="ld-code" text-anchor="middle">CLD</text>
+      <text x="320" y="402" class="ld-label" text-anchor="middle">AI Altyapısı</text>
+    </a>
+  </g>
+</svg>
